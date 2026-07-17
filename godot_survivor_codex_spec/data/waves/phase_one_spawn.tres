@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemySpawnSettings" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/waves/enemy_spawn_settings.gd" id="1_settings"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_basic.tres" id="2_enemy_definition"]
+
+[resource]
+script = ExtResource("1_settings")
+enemy_definition = ExtResource("2_enemy_definition")
+spawn_interval_seconds = 1.0
+max_alive_enemies = 30
+min_spawn_distance = 760.0
+max_spawn_distance = 1500.0
+offscreen_margin = 64.0

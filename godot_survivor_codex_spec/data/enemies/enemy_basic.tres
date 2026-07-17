@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/enemies/enemy_definition.gd" id="1_definition"]
+[ext_resource type="PackedScene" path="res://scenes/actors/enemies/enemy_basic.tscn" id="2_enemy_scene"]
+
+[resource]
+script = ExtResource("1_definition")
+id = &"enemy_basic"
+display_name = "Basic Enemy"
+scene = ExtResource("2_enemy_scene")
+max_health = 10.0
+move_speed = 80.0
+contact_damage = 5.0
+experience_value = 1
+spawn_cost = 1.0
+is_boss = false

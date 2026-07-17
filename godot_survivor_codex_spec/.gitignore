@@ -1,0 +1,16 @@
+# Godot generated files
+.godot/
+.import/
+
+# Build and export output
+export/
+build/
+dist/
+logs/
+
+# Editor and operating-system files
+.DS_Store
+*.tmp
+*.log
+.vscode/
+.idea/
