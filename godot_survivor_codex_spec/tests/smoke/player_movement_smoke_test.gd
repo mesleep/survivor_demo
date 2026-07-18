@@ -41,7 +41,8 @@ func _run() -> void:
 	_expect(player.definition == game_session.player_definition, "PlayerActor 未使用 GameSession 注入的配置。")
 	_expect(player.collision_layer == 2, "PlayerActor 未使用 PlayerBody 碰撞层。")
 	_expect(player.collision_mask & 1 != 0, "PlayerActor 未检测 World 碰撞层。")
-	_expect(player.collision_mask & 4 != 0, "PlayerActor 未检测 EnemyBody 碰撞层。")
+	_expect(player.collision_mask & 4 == 0, "PlayerActor 不应与 EnemyBody 产生实体阻挡。")
+	_expect(player.motion_mode == CharacterBody2D.MOTION_MODE_FLOATING, "PlayerActor 未使用俯视角 FLOATING 运动模式。")
 	_expect(player.camera.enabled, "PlayerActor 的 Camera2D 未启用。")
 	_expect(player.get_viewport().get_camera_2d() == player.camera, "PlayerActor 的 Camera2D 未成为当前摄像机。")
 

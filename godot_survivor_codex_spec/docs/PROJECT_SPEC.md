@@ -653,8 +653,8 @@ func reset() -> void
 
 建议关系：
 
-- 玩家身体检测 World、EnemyBody；
-- 敌人身体检测 World、PlayerBody；
+- 玩家和敌人的实体身体只检测 World，彼此不产生物理阻挡；
+- 玩家与敌人的战斗接触统一由 Hitbox/Hurtbox Area 检测，避免追踪敌人贴住或锁住玩家；
 - 玩家攻击只检测 EnemyBody 或敌人的 Hurtbox；
 - 敌人攻击只检测 PlayerBody 或玩家 Hurtbox；
 - Pickup 只与玩家 PickupArea 交互；

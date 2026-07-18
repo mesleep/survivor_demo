@@ -43,7 +43,8 @@ func _run() -> void:
 	_expect(enemy.target_player == player, "EnemyActor 未获得玩家引用。")
 	_expect(enemy.collision_layer == 4, "EnemyActor 未使用 EnemyBody 碰撞层。")
 	_expect(enemy.collision_mask & 1 != 0, "EnemyActor 未检测 World 碰撞层。")
-	_expect(enemy.collision_mask & 2 != 0, "EnemyActor 未检测 PlayerBody 碰撞层。")
+	_expect(enemy.collision_mask & 2 == 0, "EnemyActor 不应与 PlayerBody 产生实体阻挡。")
+	_expect(enemy.motion_mode == CharacterBody2D.MOTION_MODE_FLOATING, "EnemyActor 未使用俯视角 FLOATING 运动模式。")
 
 	player.global_position = Vector2.ZERO
 	enemy.global_position = Vector2(400.0, 0.0)

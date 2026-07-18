@@ -66,7 +66,16 @@ func _run() -> void:
 		is_equal_approx(player.health_component.current_health, player_resource_health - enemy.definition.contact_damage),
 		"ContactHitbox 物理重叠未造成一次接触伤害。"
 	)
+	var contact_position: Vector2 = player.global_position
+	Input.action_press(&"move_right")
+	for _frame: int in range(36):
+		await physics_frame
+	Input.action_release(&"move_right")
+	_expect(player.global_position.distance_to(contact_position) > 100.0, "玩家接触敌人后移动仍受到实体阻挡。")
+	_expect(player.global_position.distance_to(enemy.global_position) > 56.0, "玩家接触敌人后未能拉开距离。")
+
 	player.health_component.reset()
+	player.global_position = Vector2.ZERO
 	enemy.global_position = Vector2(400.0, 0.0)
 	enemy.force_update_transform()
 	await physics_frame

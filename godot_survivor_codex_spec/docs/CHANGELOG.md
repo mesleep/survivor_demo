@@ -19,7 +19,7 @@
 - 新增数据驱动的 `EnemyDefinition` 和基础敌人 Resource。
 - 新增通用 `EnemyActor`，通过注入的玩家引用进行直线追踪。
 - 玩家离开场景树时，敌人会立即停止并关闭物理处理。
-- 启用 PlayerBody 与 EnemyBody 之间的规范化碰撞检测。
+- 配置 PlayerBody 与 EnemyBody 识别层；实体运动只阻挡 World，战斗接触由 Hitbox/Hurtbox 检测。
 - 新增 P1-03 烟雾检查，验证配置、目标注入、追踪和目标失效处理。
 - 新增数据驱动的 `EnemySpawnSettings`，配置生成间隔、数量上限和生成环带。
 - 新增 `EnemySpawner`，在玩家周围、当前摄像机视野外且场地内生成敌人。
@@ -36,6 +36,7 @@
 - 敌人改为设置生成位置后再加入场景树，避免原点短暂碰撞配对导致玩家被物理恢复到远处。
 - 接触 Hitbox 使用略大于实体碰撞体的范围，避免贴边抖动在一次持续接触中重复触发伤害。
 - P1-04 稳定性测试使用独立运行时生命值隔离 P2 接触伤害，保持共享 `.tres` 不变。
+- 玩家与敌人改用 Survivor-like 常见的非实体阻挡方案，并切换为俯视角 `MOTION_MODE_FLOATING`，避免接触后持续贴边锁定玩家。
 
 ### Verified
 
