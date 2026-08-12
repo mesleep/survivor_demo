@@ -383,6 +383,7 @@ extends Resource
 @export var scene: PackedScene
 @export var max_health: float = 100.0
 @export var move_speed: float = 220.0
+@export var base_attack_range: float = 1000.0
 @export var pickup_radius: float = 96.0
 @export var starting_weapons: Array[WeaponDefinition] = []
 ```
@@ -440,6 +441,14 @@ extends Resource
 - 召唤物攻击
 
 不要直接在 `WeaponController` 中写大量 `match weapon_id`。不同复杂策略应抽成独立策略对象或武器行为脚本。
+
+攻击范围采用两层数据约束：
+
+- `CharacterDefinition.base_attack_range` 表示角色自身可索敌的基础范围上限，不同角色可独立配置；
+- `WeaponDefinition.target_range` 表示该武器自身的最大索敌射程，不同武器可独立配置；
+- 单把武器的有效索敌范围为 `min(角色当前攻击范围, 武器射程)`；
+- 范围只参与索敌，不替代子弹速度、生命周期、碰撞或近战区域等实际命中规则；
+- 后续单局升级应在 Actor 或 `WeaponController` 的运行时计算中叠加，不得回写共享 `.tres`。
 
 ## 5.4 ProjectileDefinition
 
@@ -614,7 +623,28 @@ func reset_runtime_state() -> void
 - 可选目标
 - 武器 ID
 
-## 6.6 UpgradeSystem
+## 6.6 经验掉落与拾取
+
+```gdscript
+signal PlayerActor.experience_changed(current_experience: int, gained_amount: int)
+
+func PlayerActor.add_experience(amount: int) -> void
+func PlayerActor.get_current_experience() -> int
+func ExperienceGem.initialize(experience_value: int) -> void
+func ExperienceGem.collect(collector: PlayerActor) -> bool
+func GameSession.spawn_experience_gem(experience_value: int, world_position: Vector2) -> ExperienceGem
+```
+
+要求：
+
+- 经验值来自 `EnemyDefinition.experience_value`，宝石实例只保存本局数值；
+- 敌人死亡通过 `ActorBase.actor_died` 通知 `GameSession` 生成宝石；
+- 玩家拾取半径来自 `CharacterDefinition.pickup_radius`；
+- 宝石必须先标记已结算再通知玩家，同一实例不能重复增加经验；
+- UI 只监听玩家经验信号，不直接扫描宝石或敌人；
+- 等级、经验阈值和升级触发属于阶段三，不在宝石脚本中实现。
+
+## 6.7 UpgradeSystem
 
 ```gdscript
 signal choices_ready(choices: Array[UpgradeDefinition])
@@ -758,6 +788,7 @@ func reset() -> void
 - 创建 `WeaponDefinition`；
 - 创建 `WeaponController`；
 - 默认武器每约 1 秒攻击最近敌人；
+- 角色基础攻击范围与武器自身射程分别配置，有效索敌范围取两者较小值；
 - 武器运行时数据与共享 Resource 分离；
 - 支持未来角色拥有多个武器控制器。
 

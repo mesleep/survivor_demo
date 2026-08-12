@@ -2,7 +2,7 @@
 ##
 ## 输入：只读的角色 Resource 和 DamageEvent。
 ## 输出：组件化生命变化与只转发一次的 actor_died 信号。
-## 扩展点：子类提供基础生命和阵营，移动与决策仍各自实现。
+## 扩展点：子类提供基础生命、阵营和攻击范围，移动与决策仍各自实现。
 class_name ActorBase
 extends CharacterBody2D
 
@@ -60,6 +60,13 @@ func get_aim_position() -> Vector2:
 
 func get_team_id() -> StringName:
 	return &"neutral"
+
+
+## 返回当前 Actor 可用于武器索敌的攻击范围上限。
+##
+## 默认中立 Actor 不具备攻击范围；可攻击子类必须从自身数据或单局状态提供该值。
+func get_attack_range() -> float:
+	return 0.0
 
 
 func _get_base_max_health() -> float:

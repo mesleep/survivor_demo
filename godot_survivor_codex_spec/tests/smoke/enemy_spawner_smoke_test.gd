@@ -40,6 +40,8 @@ func _run() -> void:
 	if spawner == null or settings == null:
 		quit(1)
 		return
+	for controller: WeaponController in game_session.player.weapon_controllers:
+		controller.set_process(false)
 	_expect(is_equal_approx(settings.spawn_interval_seconds, EXPECTED_INTERVAL_SECONDS), "生成间隔不是 1 秒。")
 	_expect(settings.max_alive_enemies == EXPECTED_MAX_ENEMIES, "最大敌人数配置不正确。")
 

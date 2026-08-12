@@ -1,15 +1,18 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/arena.tscn" id="3_arena"]
 [ext_resource type="Resource" path="res://data/waves/phase_one_spawn.tres" id="4_spawn_settings"]
 [ext_resource type="Script" path="res://scripts/systems/enemy_spawner.gd" id="5_enemy_spawner"]
+[ext_resource type="Script" path="res://scripts/systems/targeting_service.gd" id="6_targeting_service"]
+[ext_resource type="PackedScene" path="res://scenes/pickups/experience_gem.tscn" id="7_experience_gem"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
 player_definition = ExtResource("2_player_definition")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
+experience_gem_scene = ExtResource("7_experience_gem")
 
 [node name="Arena" parent="." instance=ExtResource("3_arena")]
 
@@ -27,5 +30,11 @@ enemy_spawn_settings = ExtResource("4_spawn_settings")
 script = ExtResource("5_enemy_spawner")
 
 [node name="SpawnTimer" type="Timer" parent="Systems/EnemySpawner"]
+
+[node name="TargetingService" type="Node" parent="Systems"]
+script = ExtResource("6_targeting_service")
+
+[node name="RefreshTimer" type="Timer" parent="Systems/TargetingService"]
+wait_time = 0.1
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

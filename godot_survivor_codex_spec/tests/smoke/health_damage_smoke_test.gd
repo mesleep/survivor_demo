@@ -35,6 +35,8 @@ func _run() -> void:
 		quit(1)
 		return
 	game_session.enemy_spawner.stop()
+	for controller: WeaponController in game_session.player.weapon_controllers:
+		controller.set_process(false)
 
 	var player: PlayerActor = game_session.player
 	var enemy: EnemyActor = game_session.enemies.get_child(0) as EnemyActor

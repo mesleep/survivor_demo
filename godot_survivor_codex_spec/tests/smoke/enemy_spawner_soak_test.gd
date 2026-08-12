@@ -31,6 +31,8 @@ func _run() -> void:
 		quit(1)
 		return
 	game_session.player.health_component.initialize(SOAK_PLAYER_HEALTH)
+	for controller: WeaponController in game_session.player.weapon_controllers:
+		controller.set_process(false)
 
 	var maximum: int = game_session.enemy_spawn_settings.max_alive_enemies
 	for sample: int in range(1, SAMPLE_COUNT + 1):
