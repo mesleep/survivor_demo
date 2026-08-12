@@ -11,6 +11,7 @@ const BASE_BAR_SIZE := Vector2(300.0, 18.0)
 @onready var health_label: Label = %HealthLabel
 @onready var level_label: Label = %LevelLabel
 @onready var experience_bar: ProgressBar = %ExperienceBar
+@onready var time_label: Label = %TimeLabel
 
 var _player: PlayerActor
 
@@ -21,6 +22,7 @@ func set_ui_scale(ui_scale: float) -> void:
 	var font_size: int = maxi(roundi(BASE_LABEL_FONT_SIZE * safe_scale), 1)
 	health_label.add_theme_font_size_override("font_size", font_size)
 	level_label.add_theme_font_size_override("font_size", font_size)
+	time_label.add_theme_font_size_override("font_size", font_size)
 	health_bar.custom_minimum_size = BASE_BAR_SIZE * safe_scale
 	experience_bar.custom_minimum_size = BASE_BAR_SIZE * safe_scale
 
@@ -50,6 +52,11 @@ func _on_level_progress_changed(level: int, current: int, required: int) -> void
 	level_label.text = "Level %d" % level
 	experience_bar.max_value = maxi(required, 1)
 	experience_bar.value = current
+
+
+func update_remaining_time(remaining_seconds: float) -> void:
+	var total_seconds: int = maxi(ceili(remaining_seconds), 0)
+	time_label.text = "%02d:%02d" % [total_seconds / 60, total_seconds % 60]
 
 
 func _disconnect_player() -> void:

@@ -31,6 +31,8 @@ func _run() -> void:
 		quit(1)
 		return
 	game_session.player.health_component.initialize(SOAK_PLAYER_HEALTH)
+	# P1-04 专项固定验证基础生成器配置，阶段四动态难度由独立测试覆盖。
+	game_session.is_run_active = false
 	for controller: WeaponController in game_session.player.weapon_controllers:
 		controller.set_process(false)
 

@@ -9,6 +9,9 @@ extends ActorBase
 var definition: EnemyDefinition
 var target_player: PlayerActor
 var _move_speed: float = 0.0
+var _health_multiplier: float = 1.0
+var _move_speed_multiplier: float = 1.0
+var _damage_multiplier: float = 1.0
 
 @onready var contact_hitbox: HitboxComponent = %ContactHitbox
 
@@ -30,8 +33,23 @@ func initialize(new_definition: Resource) -> void:
 
 	definition = new_definition as EnemyDefinition
 	super.initialize(new_definition)
-	_move_speed = maxf(definition.move_speed, 0.0)
-	contact_hitbox.initialize(self, definition.contact_damage, [&"contact"])
+	apply_difficulty_multipliers(1.0, 1.0, 1.0)
+
+
+## 将难度倍率应用到当前敌人实例，不修改共享 EnemyDefinition。
+func apply_difficulty_multipliers(
+		health_multiplier: float,
+		move_speed_multiplier: float,
+		damage_multiplier: float
+) -> void:
+	if definition == null:
+		return
+	_health_multiplier = maxf(health_multiplier, 0.05)
+	_move_speed_multiplier = maxf(move_speed_multiplier, 0.05)
+	_damage_multiplier = maxf(damage_multiplier, 0.0)
+	health_component.initialize(definition.max_health * _health_multiplier)
+	_move_speed = maxf(definition.move_speed * _move_speed_multiplier, 0.0)
+	contact_hitbox.initialize(self, definition.contact_damage * _damage_multiplier, [&"contact"])
 
 
 ## 更换追踪目标，可用于后续重启或玩家重生。
@@ -80,3 +98,7 @@ func get_team_id() -> StringName:
 
 func _get_base_max_health() -> float:
 	return definition.max_health if definition != null else 1.0
+
+
+func get_effective_move_speed() -> float:
+	return _move_speed

@@ -28,6 +28,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "HP 100 / 100"
 
+[node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "05:00"
+
 [node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 18)

@@ -395,49 +395,68 @@
 
 ### P4-01 游戏计时
 
-- [ ] GameSession 唯一维护时间
-- [ ] 5 分钟倒计时
-- [ ] 暂停时停止计时
-- [ ] HUD 显示时间
+- [x] GameSession 唯一维护时间
+- [x] 5 分钟倒计时
+- [x] 暂停时停止计时
+- [x] HUD 显示时间
 
 ### P4-02 难度导演
 
-- [ ] DifficultyDirector
-- [ ] 分段生成配置
-- [ ] 生成速度增长
-- [ ] 敌人倍率增长
-- [ ] 最大敌人数控制
+- [x] DifficultyDirector
+- [x] 分段生成配置
+- [x] 生成速度增长
+- [x] 敌人倍率增长
+- [x] 最大敌人数控制
 
 ### P4-03 敌人类型
 
-- [ ] 基础敌人
-- [ ] 快速敌人
-- [ ] 通过 Resource 区分
-- [ ] 不复制基础行为代码
+- [x] 基础敌人
+- [x] 快速敌人
+- [x] 通过 Resource 区分
+- [x] 不复制基础行为代码
 
 ### P4-04 Boss
 
-- [ ] Boss 场景
-- [ ] Boss Resource
-- [ ] 5 分钟只生成一次
-- [ ] Boss 死亡通知 GameSession
+- [x] Boss 场景
+- [x] Boss Resource
+- [x] 5 分钟只生成一次
+- [x] Boss 死亡通知 GameSession
 
 ### P4-05 结算与重开
 
-- [ ] 玩家死亡失败
-- [ ] Boss 死亡胜利
-- [ ] EndPanel
-- [ ] 显示时间、等级、击杀
-- [ ] 重新开始
-- [ ] 清空全部单局状态
-- [ ] 连续重开三次测试
+- [x] 玩家死亡失败
+- [x] Boss 死亡胜利
+- [x] EndPanel
+- [x] 显示时间、等级、击杀
+- [x] 重新开始
+- [x] 清空全部单局状态
+- [x] 连续重开三次测试
 
 最终验收：
 
-- [ ] 可完整游玩一局
-- [ ] 胜利流程完整
-- [ ] 失败流程完整
-- [ ] 重开无残留
+- [x] 可完整游玩一局
+- [x] 胜利流程完整
+- [x] 失败流程完整
+- [x] 重开无残留
 - [ ] macOS 上稳定运行
-- [ ] 文档与变更记录完整
-- [ ] `main` 分支可运行
+- [x] 文档与变更记录完整
+- [x] `main` 分支可运行
+
+验证记录：
+
+```text
+日期：2026-08-12
+实现：GameSession 唯一维护 300 秒经过时间、剩余时间、击杀数、Boss 状态和结算状态；HUD 显示倒计时。新增 RunDefinition、DifficultyStage 与 DifficultyDirector，默认按 0:00、1:00、2:30、4:00 四段提高生成频率、批量、敌人倍率和数量上限。新增快速敌人和 Boss 的独立场景/Resource，二者复用 EnemyActor、HealthComponent、HurtboxComponent 和 HitboxComponent。5:00 停止普通生成并只生成一次 Boss；玩家死亡失败、Boss 死亡胜利。EndPanel 显示存活时间、等级、击杀并通过重新加载当前场景重开。
+执行命令：D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --editor --quit
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --quit-after 300
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/difficulty_director_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/difficulty_density_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/boss_victory_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/ending_restart_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/enemy_spawner_soak_test.gd
+          以及 tests/smoke 下全部 22 项快速烟雾测试
+分步验收：验证 5:00 权威倒计时与暂停停止；验证四段难度、2:30 混合敌人池、4:00 三只一批和 140 动态上限；验证实例生命/移速/伤害倍率且共享 Resource 不变；验证 Boss 独立场景、单次生成、死亡胜利；验证玩家死亡失败、统计显示和连续重开三次无旧节点 ID、等级、经验、计时、击杀、Boss 或 UI 状态残留。
+结果：Godot 4.7.1 解析与 300 帧启动通过；阶段一至阶段四 22 项快速测试全部通过；基础生成器 120 秒测试在四个采样点均稳定为 30；第四阶段快速压力测试稳定在 140 个敌人上限。
+修复：EnemySpawner 初始化顺序调整为先建立基础敌人运行时池再校验依赖；旧 P1-04 soak 固定关闭阶段四时间推进，避免把动态上限增长误判为基础生成器泄漏，并新增独立高密度压力测试覆盖阶段四动态上限。
+已知问题：未执行 GUI 窗口完整 5 分钟人工游玩；当前 Windows headless 会报告系统根证书库读取警告，但不影响项目解析、运行或测试退出码；macOS 稳定性仍需在目标机器验收。
+```

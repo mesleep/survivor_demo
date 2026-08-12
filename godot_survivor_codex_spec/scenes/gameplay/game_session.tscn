@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
@@ -17,11 +17,15 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="15_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_up_panel.tscn" id="16_level_up_panel"]
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="17_upgrade_definition"]
+[ext_resource type="Resource" path="res://data/waves/default_run.tres" id="18_run"]
+[ext_resource type="Script" path="res://scripts/systems/difficulty_director.gd" id="19_director"]
+[ext_resource type="PackedScene" path="res://scenes/ui/end_panel.tscn" id="20_end_panel"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
 player_definition = ExtResource("2_player_definition")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
+run_definition = ExtResource("18_run")
 experience_gem_scene = ExtResource("7_experience_gem")
 ui_scale = 1.3
 
@@ -52,8 +56,13 @@ wait_time = 0.1
 script = ExtResource("8_upgrade_system")
 upgrade_pool = Array[ExtResource("17_upgrade_definition")]([ExtResource("9_damage"), ExtResource("10_fire_rate"), ExtResource("11_projectile_count"), ExtResource("12_move_speed"), ExtResource("13_max_health"), ExtResource("14_heal")])
 
+[node name="DifficultyDirector" type="Node" parent="Systems"]
+script = ExtResource("19_director")
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="HUD" parent="CanvasLayer" instance=ExtResource("15_hud")]
 
 [node name="LevelUpPanel" parent="CanvasLayer" instance=ExtResource("16_level_up_panel")]
+
+[node name="EndPanel" parent="CanvasLayer" instance=ExtResource("20_end_panel")]
