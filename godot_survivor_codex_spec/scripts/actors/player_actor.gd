@@ -180,6 +180,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		UpgradeDefinition.UpgradeType.PICKUP_RANGE_MULTIPLIER:
 			_pickup_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 			pickup_component.initialize(get_effective_pickup_radius())
+		UpgradeDefinition.UpgradeType.REPEAT_SHOT_CHANCE:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value))
 		_:
 			return false
 

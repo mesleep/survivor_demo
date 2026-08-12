@@ -48,6 +48,7 @@ shape = SubResource("3")
 
 [node name="DamageFeedbackComponent" parent="." instance=ExtResource("6")]
 unique_name_in_owner = true
+play_sound = false
 
 [editable path="HurtboxComponent"]
 [editable path="ContactHitbox"]

@@ -36,3 +36,4 @@ collision_mask = 2
 
 [node name="DamageFeedbackComponent" parent="." instance=ExtResource("6_feedback")]
 unique_name_in_owner = true
+play_sound = false

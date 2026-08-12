@@ -19,6 +19,7 @@ signal projectile_spawned(projectile: ProjectileBase)
 
 const MINIMUM_COOLDOWN_SECONDS := 0.02
 const MINIMUM_RUNTIME_MULTIPLIER := 0.05
+const REPEAT_SHOT_DELAY_RATIO := 0.35
 
 var definition: WeaponDefinition
 var owner_actor: ActorBase
@@ -31,6 +32,8 @@ var _runtime_projectile_count_bonus: int = 0
 var _runtime_damage_multiplier: float = 1.0
 var _runtime_bonus_projectile_chance: float = 0.0
 var _runtime_projectile_lifesteal_ratio: float = 0.0
+var _runtime_repeat_shot_chance: float = 0.0
+var _repeat_shot_generation: int = 0
 var _random := RandomNumberGenerator.new()
 
 
@@ -127,7 +130,8 @@ func request_fire(target: Node2D) -> bool:
 	if spawned_count == 0:
 		return false
 
-	_cooldown_remaining = get_effective_cooldown_seconds()
+	var cooldown_seconds := get_effective_cooldown_seconds()
+	_cooldown_remaining = cooldown_seconds
 	fire_requested.emit(
 		definition,
 		owner_actor,
@@ -137,6 +141,12 @@ func request_fire(target: Node2D) -> bool:
 		_runtime_damage_multiplier
 	)
 	weapon_fired.emit(definition.id)
+	if _random.randf() < _runtime_repeat_shot_chance:
+		_fire_repeat_shot_after_delay(
+			target_position,
+			cooldown_seconds * REPEAT_SHOT_DELAY_RATIO,
+			_repeat_shot_generation
+		)
 	return true
 
 
@@ -183,15 +193,22 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 		0.0,
 		1.0
 	)
+	_runtime_repeat_shot_chance = clampf(
+		_runtime_repeat_shot_chance + modifier.repeat_shot_chance,
+		0.0,
+		1.0
+	)
 
 
 func reset_runtime_state() -> void:
+	_repeat_shot_generation += 1
 	_cooldown_remaining = 0.0
 	_runtime_cooldown_multiplier = 1.0
 	_runtime_projectile_count_bonus = 0
 	_runtime_damage_multiplier = 1.0
 	_runtime_bonus_projectile_chance = 0.0
 	_runtime_projectile_lifesteal_ratio = 0.0
+	_runtime_repeat_shot_chance = 0.0
 
 
 func get_effective_cooldown_seconds() -> float:
@@ -218,6 +235,10 @@ func get_runtime_projectile_lifesteal_ratio() -> float:
 	return _runtime_projectile_lifesteal_ratio
 
 
+func get_runtime_repeat_shot_chance() -> float:
+	return _runtime_repeat_shot_chance
+
+
 ## 测试可注入固定种子；正式运行仍使用独立随机源。
 func set_random_seed(seed: int) -> void:
 	_random.seed = seed
@@ -237,6 +258,42 @@ func _get_spread_offset_radians(index: int, projectile_count: int) -> float:
 		return 0.0
 	var ratio: float = float(index) / float(projectile_count - 1)
 	return deg_to_rad(lerpf(-definition.spread_degrees * 0.5, definition.spread_degrees * 0.5, ratio))
+
+
+## 在同一冷却周期中追加一颗弹药；只复用当前伤害效果，不递归判定额外射击。
+func _fire_repeat_shot_after_delay(
+		target_position: Vector2,
+		delay_seconds: float,
+		generation: int
+) -> void:
+	await get_tree().create_timer(maxf(delay_seconds, 0.001), false).timeout
+	if generation != _repeat_shot_generation or not is_instance_valid(owner_actor):
+		return
+	if not is_instance_valid(projectile_parent) or owner_actor.health_component.is_dead():
+		return
+	var direction := owner_actor.get_aim_position().direction_to(target_position)
+	if direction.is_zero_approx():
+		direction = Vector2.RIGHT
+	var context := ProjectileSpawnContext.new(
+		owner_actor,
+		owner_actor.get_team_id(),
+		owner_actor.get_aim_position(),
+		direction
+	)
+	context.damage_multiplier = _runtime_damage_multiplier
+	context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
+	context.weapon_id = definition.id
+	if spawn_projectile(definition.projectile_definition, context) == null:
+		return
+	fire_requested.emit(
+		definition,
+		owner_actor,
+		null,
+		projectile_parent,
+		1,
+		_runtime_damage_multiplier
+	)
+	weapon_fired.emit(definition.id)
 
 
 func _disconnect_dependency_signals() -> void:

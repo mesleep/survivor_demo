@@ -34,10 +34,15 @@ func _run() -> void:
 	var enemy: EnemyActor = session.enemy_spawner.spawn_enemy(session.enemy_spawn_settings.enemy_definition, Vector2(300.0, 0.0), true)
 	_expect(enemy != null and enemy.damage_feedback_component != null, "敌人未复用受伤反馈组件。")
 	if enemy != null:
-		_expect(enemy.damage_feedback_component.audio_player.stream == feedback.audio_player.stream, "不同 Actor 没有复用缓存的合成音效流。")
+		var enemy_base_modulate: Color = enemy.visual.modulate
+		enemy.apply_damage(DamageEvent.new(5.0, player, enemy.global_position))
+		_expect(enemy.visual.modulate != enemy_base_modulate, "敌人受伤时没有保留视觉反馈。")
+		_expect(not enemy.damage_feedback_component.play_sound, "敌人的受伤声音开关没有关闭。")
+		_expect(enemy.damage_feedback_component.audio_player.stream == null, "敌人仍持有受伤音效流。")
+		_expect(not enemy.damage_feedback_component.audio_player.playing, "攻击敌人时错误播放了受伤音效。")
 
 	if not _failed:
-		print("Damage feedback smoke test passed: shared visual flash, scale motion, and synthesized audio are valid.")
+		print("Damage feedback smoke test passed: player audio and silent enemy visual feedback are valid.")
 	quit(1 if _failed else 0)
 
 

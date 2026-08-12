@@ -1,11 +1,13 @@
 ## 为 Actor 提供可复用的受伤视觉和声音反馈。
 ##
 ## 输入：HealthComponent.damaged 与独立 Visual 节点。
-## 输出：短促闪色、缩放抖动和运行时合成音效；不修改碰撞体或共享资源。
+## 输出：短促闪色、缩放抖动和可配置的运行时合成音效；不修改碰撞体或共享资源。
 class_name DamageFeedbackComponent
 extends Node
 
 signal feedback_started(event: DamageEvent)
+
+@export var play_sound: bool = true
 
 const FEEDBACK_DURATION_SECONDS := 0.14
 const HIT_SOUND_DURATION_SECONDS := 0.09
@@ -52,9 +54,13 @@ func initialize(health_component: HealthComponent, visual: Node2D) -> void:
 	_base_scale = _visual.scale
 	_base_modulate = _visual.modulate
 	_health_component.damaged.connect(_on_damaged)
-	if _cached_hit_stream == null:
-		_cached_hit_stream = _create_hit_stream()
-	audio_player.stream = _cached_hit_stream
+	if play_sound:
+		if _cached_hit_stream == null:
+			_cached_hit_stream = _create_hit_stream()
+		audio_player.stream = _cached_hit_stream
+	else:
+		audio_player.stop()
+		audio_player.stream = null
 
 
 ## 立即播放一次反馈；重复受伤会重启效果并先恢复基础变换。
@@ -70,7 +76,7 @@ func play_feedback(event: DamageEvent) -> void:
 	_feedback_tween.tween_property(_visual, "modulate", _base_modulate, FEEDBACK_DURATION_SECONDS)
 	_feedback_tween.tween_property(_visual, "scale", _base_scale, FEEDBACK_DURATION_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_feedback_tween.tween_property(_visual, "position", _base_position, FEEDBACK_DURATION_SECONDS).set_trans(Tween.TRANS_SINE)
-	if audio_player.stream != null:
+	if play_sound and audio_player.stream != null:
 		audio_player.play()
 	feedback_started.emit(event)
 

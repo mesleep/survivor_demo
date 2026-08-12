@@ -1,4 +1,4 @@
-## 概率额外弹、子弹吸血和拾取范围升级烟雾检查。
+## 概率额外弹、延迟追加射击、子弹吸血和拾取范围升级烟雾检查。
 extends SceneTree
 
 const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
@@ -21,7 +21,7 @@ func _run() -> void:
 	var controller: WeaponController = player.weapon_controllers[0]
 	controller.set_process(false)
 	var upgrades := _index_upgrades(session.upgrade_system.upgrade_pool)
-	_expect(upgrades.has(&"bonus_projectile_chance_up") and upgrades.has(&"projectile_lifesteal_up") and upgrades.has(&"pickup_range_up"), "升级池缺少新增的三类升级。")
+	_expect(upgrades.has(&"bonus_projectile_chance_up") and upgrades.has(&"projectile_lifesteal_up") and upgrades.has(&"pickup_range_up") and upgrades.has(&"repeat_shot_chance_up"), "升级池缺少新增的四类升级。")
 
 	var base_radius: float = player.definition.pickup_radius
 	_expect(player.apply_upgrade(upgrades[&"pickup_range_up"]), "拾取范围升级应用失败。")
@@ -38,6 +38,15 @@ func _run() -> void:
 	_expect(_spawned_count == controller.definition.projectile_count + 1, "100% 概率未多生成一颗子弹。")
 	controller.reset_runtime_state()
 	_expect(is_zero_approx(controller.get_runtime_bonus_projectile_chance()), "重置后额外弹概率未清空。")
+	var repeat_count_before: int = _spawned_count
+	controller.apply_runtime_modifier(WeaponRuntimeModifier.new(0.1, 0, 1.0, 0.0, 0.0, 1.0))
+	_expect(is_equal_approx(controller.get_runtime_repeat_shot_chance(), 1.0), "追加射击概率未写入武器运行时状态。")
+	_expect(controller.request_fire(enemy), "100% 追加射击概率下首次发射失败。")
+	_expect(_spawned_count == repeat_count_before + controller.definition.projectile_count, "追加射击不应与首次弹药同时生成。")
+	await create_timer(0.08).timeout
+	_expect(_spawned_count == repeat_count_before + controller.definition.projectile_count + 1, "一个冷却周期内没有追加发射一颗弹药。")
+	controller.reset_runtime_state()
+	_expect(is_zero_approx(controller.get_runtime_repeat_shot_chance()), "重置后追加射击概率未清空。")
 
 	player.apply_damage(DamageEvent.new(50.0, null, Vector2.ZERO))
 	var health_before: float = player.health_component.current_health
@@ -62,11 +71,13 @@ func _run() -> void:
 	controller.reset_runtime_state()
 	_expect(player.apply_upgrade(upgrades[&"bonus_projectile_chance_up"]), "概率升级 Resource 无法应用。")
 	_expect(player.apply_upgrade(upgrades[&"projectile_lifesteal_up"]), "吸血升级 Resource 无法应用。")
+	_expect(player.apply_upgrade(upgrades[&"repeat_shot_chance_up"]), "追加射击升级 Resource 无法应用。")
 	_expect(is_equal_approx(controller.get_runtime_bonus_projectile_chance(), 0.15), "概率升级数值不正确。")
 	_expect(is_equal_approx(controller.get_runtime_projectile_lifesteal_ratio(), 0.03), "吸血升级数值不正确。")
+	_expect(is_equal_approx(controller.get_runtime_repeat_shot_chance(), 0.15), "追加射击升级数值不正确。")
 
 	if not _failed:
-		print("Advanced upgrade smoke test passed: bonus projectile chance, lifesteal, and pickup range are valid.")
+		print("Advanced upgrade smoke test passed: bonus projectile, repeat shot, lifesteal, and pickup range are valid.")
 	quit(1 if _failed else 0)
 
 
