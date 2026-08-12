@@ -15,12 +15,15 @@ var _death_forwarded: bool = false
 
 @onready var health_component: HealthComponent = %HealthComponent
 @onready var hurtbox_component: HurtboxComponent = %HurtboxComponent
+@onready var damage_feedback_component: DamageFeedbackComponent = %DamageFeedbackComponent
+@onready var visual: Node2D = $Visual
 
 
 func _ready() -> void:
 	if not health_component.died.is_connected(_on_health_component_died):
 		health_component.died.connect(_on_health_component_died)
 	hurtbox_component.initialize(self)
+	damage_feedback_component.initialize(health_component, visual)
 
 
 ## 从共享 Resource 初始化 Actor 的独立运行时生命状态。

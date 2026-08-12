@@ -105,7 +105,18 @@ func on_hit(target: Node) -> bool:
 	if context.weapon_id != StringName():
 		event.tags.append(context.weapon_id)
 	event.knockback_strength = definition.knockback_strength
+	var health_before: float = target_actor.health_component.current_health
 	hurtbox.receive_damage(event)
+	if context.lifesteal_ratio > 0.0 and context.shooter is ActorBase:
+		var shooter: ActorBase = context.shooter as ActorBase
+		if not shooter.health_component.is_dead():
+			var damage_dealt := maxf(
+				health_before - target_actor.health_component.current_health,
+				0.0
+			)
+			shooter.health_component.heal(
+				damage_dealt * clampf(context.lifesteal_ratio, 0.0, 1.0)
+			)
 	projectile_hit.emit(target_actor, event)
 
 	if _remaining_pierces <= 0:

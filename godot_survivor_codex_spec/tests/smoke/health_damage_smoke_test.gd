@@ -120,6 +120,8 @@ func _run() -> void:
 
 	_expect(is_equal_approx(player.definition.max_health, player_resource_health), "玩家运行时生命回写了共享 Resource。")
 	_expect(is_equal_approx(enemy.definition.max_health, enemy_resource_health), "敌人运行时生命回写了共享 Resource。")
+	# 等待短促受伤音效自然结束，避免无头进程退出时遗留音频播放句柄。
+	await create_timer(DamageFeedbackComponent.HIT_SOUND_DURATION_SECONDS + 0.02).timeout
 
 	if not _failed:
 		print("Health and damage smoke test passed: components, bounds, events, and single death are valid.")

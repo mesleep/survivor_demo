@@ -460,3 +460,31 @@
 修复：EnemySpawner 初始化顺序调整为先建立基础敌人运行时池再校验依赖；旧 P1-04 soak 固定关闭阶段四时间推进，避免把动态上限增长误判为基础生成器泄漏，并新增独立高密度压力测试覆盖阶段四动态上限。
 已知问题：未执行 GUI 窗口完整 5 分钟人工游玩；当前 Windows headless 会报告系统根证书库读取警告，但不影响项目解析、运行或测试退出码；macOS 稳定性仍需在目标机器验收。
 ```
+
+---
+
+## 阶段四后体验扩展：受伤反馈与进阶升级
+
+- [x] 玩家与全部敌人复用视觉受伤反馈
+- [x] 受伤时播放运行时合成音效
+- [x] 每层 15% 概率额外发射一颗子弹
+- [x] 子弹按实际伤害提供每层 3% 吸血
+- [x] 每层扩大 25% 经验拾取半径
+- [x] 升级通过 `UpgradeDefinition` Resource 加入随机池
+- [x] 运行时效果不回写共享 Resource
+- [x] 新增专项测试并完成全部快速回归
+
+验证记录：
+
+```text
+日期：2026-08-12
+实现：新增 DamageFeedbackComponent，并组合到玩家、基础敌人、快速敌人和 Boss 场景；HealthComponent.damaged 统一触发红色闪烁、缩放位移和 0.09 秒运行时合成音效。UpgradeDefinition 新增额外子弹概率、子弹吸血、拾取范围倍率三类效果及对应 Resource。WeaponController 独立维护每局概率与吸血状态；额外子弹每次发射只进行一次概率判定，命中吸血按目标实际损失生命结算。PlayerActor 独立维护拾取倍率并刷新 PickupComponent 的运行时 Shape。
+执行命令：D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --editor --quit
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --quit-after 300
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/damage_feedback_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/advanced_upgrade_smoke_test.gd
+          以及 tests/smoke 下除 120 秒 soak 外的全部 24 项快速烟雾测试
+分步验收：验证受伤信号只触发一次、视觉立即变化并在 0.14 秒恢复、玩家和敌人共享合成音频流；以 100% 测试概率确认每轮多生成一颗子弹；验证吸血只按实际伤害治疗；验证拾取半径和独立运行时碰撞 Shape 同步扩大；核对角色、武器和升级共享 Resource 未被回写。
+结果：Godot 4.7.1 解析、主场景 300 帧启动和全部 24 项快速烟雾测试通过，未发现新增解析错误、重复警告或对象泄漏。
+已知问题：未执行 GUI 窗口人工听感和手感验收；Windows headless 每次启动会报告系统根证书库读取错误，但不影响项目解析、运行或测试退出码；运行时合成音效当前为统一占位命中音，后续有正式音频素材时可直接替换组件的音频流生成方式。
+```

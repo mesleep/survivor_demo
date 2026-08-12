@@ -29,6 +29,13 @@ var _cooldown_remaining: float = 0.0
 var _runtime_cooldown_multiplier: float = 1.0
 var _runtime_projectile_count_bonus: int = 0
 var _runtime_damage_multiplier: float = 1.0
+var _runtime_bonus_projectile_chance: float = 0.0
+var _runtime_projectile_lifesteal_ratio: float = 0.0
+var _random := RandomNumberGenerator.new()
+
+
+func _ready() -> void:
+	_random.randomize()
 
 
 func _process(delta: float) -> void:
@@ -100,6 +107,8 @@ func request_fire(target: Node2D) -> bool:
 	if base_direction.is_zero_approx():
 		base_direction = Vector2.RIGHT
 	var requested_count: int = get_effective_projectile_count()
+	if _random.randf() < _runtime_bonus_projectile_chance:
+		requested_count += 1
 	var spawned_count: int = 0
 	for index: int in range(requested_count):
 		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
@@ -110,6 +119,7 @@ func request_fire(target: Node2D) -> bool:
 			direction
 		)
 		context.damage_multiplier = _runtime_damage_multiplier
+		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
 		context.target = target
 		context.weapon_id = definition.id
 		if spawn_projectile(definition.projectile_definition, context) != null:
@@ -163,6 +173,16 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 	_runtime_cooldown_multiplier *= maxf(modifier.cooldown_multiplier, MINIMUM_RUNTIME_MULTIPLIER)
 	_runtime_projectile_count_bonus += modifier.projectile_count_bonus
 	_runtime_damage_multiplier *= maxf(modifier.damage_multiplier, 0.0)
+	_runtime_bonus_projectile_chance = clampf(
+		_runtime_bonus_projectile_chance + modifier.bonus_projectile_chance,
+		0.0,
+		1.0
+	)
+	_runtime_projectile_lifesteal_ratio = clampf(
+		_runtime_projectile_lifesteal_ratio + modifier.projectile_lifesteal_ratio,
+		0.0,
+		1.0
+	)
 
 
 func reset_runtime_state() -> void:
@@ -170,6 +190,8 @@ func reset_runtime_state() -> void:
 	_runtime_cooldown_multiplier = 1.0
 	_runtime_projectile_count_bonus = 0
 	_runtime_damage_multiplier = 1.0
+	_runtime_bonus_projectile_chance = 0.0
+	_runtime_projectile_lifesteal_ratio = 0.0
 
 
 func get_effective_cooldown_seconds() -> float:
@@ -186,6 +208,19 @@ func get_effective_projectile_count() -> int:
 
 func get_runtime_damage_multiplier() -> float:
 	return _runtime_damage_multiplier
+
+
+func get_runtime_bonus_projectile_chance() -> float:
+	return _runtime_bonus_projectile_chance
+
+
+func get_runtime_projectile_lifesteal_ratio() -> float:
+	return _runtime_projectile_lifesteal_ratio
+
+
+## 测试可注入固定种子；正式运行仍使用独立随机源。
+func set_random_seed(seed: int) -> void:
+	_random.seed = seed
 
 
 ## 合并角色攻击范围上限与武器自身射程。

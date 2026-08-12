@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
@@ -20,6 +20,9 @@
 [ext_resource type="Resource" path="res://data/waves/default_run.tres" id="18_run"]
 [ext_resource type="Script" path="res://scripts/systems/difficulty_director.gd" id="19_director"]
 [ext_resource type="PackedScene" path="res://scenes/ui/end_panel.tscn" id="20_end_panel"]
+[ext_resource type="Resource" path="res://data/upgrades/bonus_projectile_chance_up.tres" id="21_bonus_projectile"]
+[ext_resource type="Resource" path="res://data/upgrades/projectile_lifesteal_up.tres" id="22_lifesteal"]
+[ext_resource type="Resource" path="res://data/upgrades/pickup_range_up.tres" id="23_pickup_range"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
@@ -54,7 +57,7 @@ wait_time = 0.1
 
 [node name="UpgradeSystem" type="Node" parent="Systems"]
 script = ExtResource("8_upgrade_system")
-upgrade_pool = Array[ExtResource("17_upgrade_definition")]([ExtResource("9_damage"), ExtResource("10_fire_rate"), ExtResource("11_projectile_count"), ExtResource("12_move_speed"), ExtResource("13_max_health"), ExtResource("14_heal")])
+upgrade_pool = Array[ExtResource("17_upgrade_definition")]([ExtResource("9_damage"), ExtResource("10_fire_rate"), ExtResource("11_projectile_count"), ExtResource("12_move_speed"), ExtResource("13_max_health"), ExtResource("14_heal"), ExtResource("21_bonus_projectile"), ExtResource("22_lifesteal"), ExtResource("23_pickup_range")])
 
 [node name="DifficultyDirector" type="Node" parent="Systems"]
 script = ExtResource("19_director")

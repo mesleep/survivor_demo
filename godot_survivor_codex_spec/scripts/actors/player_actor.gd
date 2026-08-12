@@ -22,6 +22,7 @@ var _pending_upgrade_count: int = 0
 var _upgrade_stacks: Dictionary[StringName, int] = {}
 var _move_speed_multiplier: float = 1.0
 var _maximum_health_bonus: float = 0.0
+var _pickup_range_multiplier: float = 1.0
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -56,6 +57,7 @@ func initialize(new_definition: Resource) -> void:
 	_upgrade_stacks.clear()
 	_move_speed_multiplier = 1.0
 	_maximum_health_bonus = 0.0
+	_pickup_range_multiplier = 1.0
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
 	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
@@ -171,6 +173,13 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			health_component.set_maximum_health(get_effective_maximum_health(), true)
 		UpgradeDefinition.UpgradeType.HEAL:
 			health_component.heal(upgrade.value)
+		UpgradeDefinition.UpgradeType.BONUS_PROJECTILE_CHANCE:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, upgrade.value, 0.0))
+		UpgradeDefinition.UpgradeType.PROJECTILE_LIFESTEAL:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, upgrade.value))
+		UpgradeDefinition.UpgradeType.PICKUP_RANGE_MULTIPLIER:
+			_pickup_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
+			pickup_component.initialize(get_effective_pickup_radius())
 		_:
 			return false
 
@@ -187,6 +196,11 @@ func get_effective_move_speed() -> float:
 func get_effective_maximum_health() -> float:
 	var base_health: float = definition.max_health if definition != null else 0.0
 	return maxf(base_health + _maximum_health_bonus, 0.0)
+
+
+func get_effective_pickup_radius() -> float:
+	var base_radius: float = definition.pickup_radius if definition != null else 0.0
+	return maxf(base_radius * _pickup_range_multiplier, 0.0)
 
 
 func _physics_process(_delta: float) -> void:

@@ -9,13 +9,19 @@ extends RefCounted
 var cooldown_multiplier: float = 1.0
 var projectile_count_bonus: int = 0
 var damage_multiplier: float = 1.0
+var bonus_projectile_chance: float = 0.0
+var projectile_lifesteal_ratio: float = 0.0
 
 
 func _init(
 		new_cooldown_multiplier: float = 1.0,
 		new_projectile_count_bonus: int = 0,
-		new_damage_multiplier: float = 1.0
+		new_damage_multiplier: float = 1.0,
+		new_bonus_projectile_chance: float = 0.0,
+		new_projectile_lifesteal_ratio: float = 0.0
 ) -> void:
 	cooldown_multiplier = new_cooldown_multiplier
 	projectile_count_bonus = new_projectile_count_bonus
 	damage_multiplier = new_damage_multiplier
+	bonus_projectile_chance = new_bonus_projectile_chance
+	projectile_lifesteal_ratio = new_projectile_lifesteal_ratio

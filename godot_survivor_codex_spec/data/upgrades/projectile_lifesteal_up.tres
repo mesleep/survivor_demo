@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"projectile_lifesteal_up"
+display_name = "Projectile Lifesteal +3%"
+description = "Projectile hits heal for 3% of damage dealt."
+type = 7
+value = 0.03
+max_stacks = 5
+weight = 1.0

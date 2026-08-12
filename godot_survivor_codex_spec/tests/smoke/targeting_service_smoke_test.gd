@@ -99,6 +99,8 @@ func _run() -> void:
 	await process_frame
 	_expect(service.candidate_parent == null, "候选容器离树后 TargetingService 仍保留引用。")
 	_expect(service.refresh_timer.is_stopped(), "候选容器离树后 TargetingService 仍在刷新。")
+	# 等待致命伤害音效结束，保证无头测试退出前释放音频播放句柄。
+	await create_timer(DamageFeedbackComponent.HIT_SOUND_DURATION_SECONDS + 0.02).timeout
 
 	if not _failed:
 		print("Targeting service smoke test passed: nearest, range, interval, and invalid filtering are valid.")

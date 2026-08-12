@@ -11,6 +11,7 @@ var team_id: StringName = &"neutral"
 var spawn_position: Vector2 = Vector2.ZERO
 var initial_direction: Vector2 = Vector2.RIGHT
 var damage_multiplier: float = 1.0
+var lifesteal_ratio: float = 0.0
 var target: Node2D
 var weapon_id: StringName
 
