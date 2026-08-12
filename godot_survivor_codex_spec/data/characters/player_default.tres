@@ -12,6 +12,7 @@ display_name = "Default Survivor"
 scene = ExtResource("2_player_scene")
 max_health = 100.0
 move_speed = 220.0
+camera_zoom = 0.75
 base_attack_range = 1000.0
 pickup_radius = 96.0
 starting_weapons = Array[ExtResource("4_weapon_definition")]([ExtResource("3_starter_weapon")])

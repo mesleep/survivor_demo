@@ -323,45 +323,71 @@
 
 ### P3-01 等级与经验
 
-- [ ] 玩家运行时状态
-- [ ] 经验阈值方法
-- [ ] 升级信号
-- [ ] 支持连续升级
-- [ ] HUD 等级和经验条
+- [x] 玩家运行时状态
+- [x] 经验阈值方法
+- [x] 升级信号
+- [x] 支持连续升级
+- [x] HUD 等级和经验条
 
 ### P3-02 升级系统
 
-- [ ] 创建 UpgradeDefinition
-- [ ] 创建 UpgradeSystem
-- [ ] 随机无重复三选一
-- [ ] 最大层数过滤
-- [ ] 权重字段预留
+- [x] 创建 UpgradeDefinition
+- [x] 创建 UpgradeSystem
+- [x] 随机无重复三选一
+- [x] 最大层数过滤
+- [x] 权重字段预留
 
 ### P3-03 升级 UI
 
-- [ ] LevelUpPanel
-- [ ] 升级时暂停
-- [ ] UI 暂停时可操作
-- [ ] 防止重复点击
-- [ ] 选择后恢复
+- [x] LevelUpPanel
+- [x] 升级时暂停
+- [x] UI 暂停时可操作
+- [x] 防止重复点击
+- [x] 选择后恢复
 
 ### P3-04 属性修正
 
-- [ ] 伤害升级
-- [ ] 攻速升级
-- [ ] 子弹数量升级
-- [ ] 移速升级
-- [ ] 最大生命升级
-- [ ] 治疗升级
-- [ ] 不修改共享 Resource
+- [x] 伤害升级
+- [x] 攻速升级
+- [x] 子弹数量升级
+- [x] 移速升级
+- [x] 最大生命升级
+- [x] 治疗升级
+- [x] 不修改共享 Resource
 
 阶段三验收：
 
-- [ ] 拾取经验可升级
-- [ ] 三选一无重复
-- [ ] 强化效果生效
-- [ ] 连续升级不丢失
-- [ ] UI 不承担规则逻辑
+- [x] 拾取经验可升级
+- [x] 三选一无重复
+- [x] 强化效果生效
+- [x] 连续升级不丢失
+- [x] UI 不承担规则逻辑
+
+验证记录：
+
+```text
+日期：2026-08-12
+实现：PlayerActor 新增本局累计经验、等级内经验、等级阈值、待升级队列、升级栈与运行时属性修正；经验曲线统一为 required_xp(level) = 5 + level × 3。新增 UpgradeDefinition、UpgradeSystem、六种升级 Resource、HUD 和 LevelUpPanel；GameSession 串行消费待升级次数并统一暂停/恢复，UI 只展示选项和提交选择。
+执行命令：D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --editor --quit
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --quit-after 300
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/level_progression_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/upgrade_system_smoke_test.gd
+          D:\code\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe --headless --path . --script res://tests/smoke/level_up_flow_smoke_test.gd
+          以及 tests/smoke 下除 120 秒 soak 外的全部快速烟雾测试
+分步验收：验证一级阈值、跨两级经验溢出与待选择队列；验证随机三选一无重复、最大层数过滤、重复提交拒绝；验证暂停态按钮可操作、连续两次选择和结束恢复；验证伤害、攻速、弹数、移速、最大生命与治疗效果，并核对共享角色和武器 Resource 原值不变。
+结果：Godot 4.7.1 解析、主场景 300 帧启动、三个阶段三专项测试及阶段一至阶段二全部快速回归通过；阶段三所有验收项完成。
+修复：P2-05 连续拾取测试在阶段三接入后会被升级暂停阻断，测试改为自动提交升级以保持原有 100 次掉落拾取覆盖；升级属性测试重置随机选择造成的状态后再做精确数值断言。
+已知问题：未执行 GUI 窗口人工游玩；Windows headless 每次启动会报告系统根证书库读取错误，但不影响项目解析、运行或测试退出码；升级权重字段已预留，第一版仍采用均匀随机。
+```
+
+阶段三验收前可视性调整：
+
+```text
+日期：2026-08-12
+实现：CharacterDefinition 新增可编辑 camera_zoom，默认 0.75，以扩大玩家可见世界范围；GameSession 新增可编辑 ui_scale，默认 1.3，统一放大 HUD 字体、进度条以及升级面板标题、边距和按钮。两项设置互不影响，屏幕外刷怪继续根据 Camera2D 实际 zoom 计算可见范围。
+验证：Godot 4.7.1 解析、玩家移动/摄像机、敌人屏幕外生成、升级暂停 UI 专项测试全部通过。
+已知问题：参数通过 Godot Inspector 调节，修改后需重新启动当前运行场景才能完整应用。
+```
 
 ---
 

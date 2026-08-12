@@ -8,6 +8,8 @@ extends Node2D
 @export var player_definition: CharacterDefinition
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var experience_gem_scene: PackedScene
+## HUD 和升级面板的统一尺寸倍率，不影响游戏世界或摄像机。
+@export_range(0.75, 2.0, 0.05) var ui_scale: float = 1.3
 
 var player: PlayerActor
 
@@ -18,6 +20,9 @@ var player: PlayerActor
 @onready var pickups: Node2D = $Pickups
 @onready var enemy_spawner: EnemySpawner = $Systems/EnemySpawner
 @onready var targeting_service: TargetingService = $Systems/TargetingService
+@onready var upgrade_system: UpgradeSystem = $Systems/UpgradeSystem
+@onready var hud: HUD = $CanvasLayer/HUD
+@onready var level_up_panel: LevelUpPanel = $CanvasLayer/LevelUpPanel
 
 
 func _ready() -> void:
@@ -51,6 +56,17 @@ func start_run() -> void:
 	enemy_spawner.initialize(enemy_spawn_settings, player, enemies, arena.get_bounds())
 	targeting_service.initialize(enemies)
 	new_player.configure_weapons(player_definition.starting_weapons, projectiles, targeting_service)
+	upgrade_system.initialize(new_player)
+	hud.set_ui_scale(ui_scale)
+	level_up_panel.set_ui_scale(ui_scale)
+	hud.initialize(new_player)
+	level_up_panel.initialize(upgrade_system)
+	if not new_player.leveled_up.is_connected(_on_player_leveled_up):
+		new_player.leveled_up.connect(_on_player_leveled_up)
+	if not upgrade_system.upgrade_applied.is_connected(_on_upgrade_applied):
+		upgrade_system.upgrade_applied.connect(_on_upgrade_applied)
+	if not upgrade_system.choices_ready.is_connected(_on_upgrade_choices_ready):
+		upgrade_system.choices_ready.connect(_on_upgrade_choices_ready)
 
 
 ## 在指定世界位置创建一颗携带独立经验值的宝石。
@@ -86,3 +102,43 @@ func _on_enemy_died(actor: ActorBase, _event: DamageEvent) -> void:
 	if enemy.definition == null:
 		return
 	spawn_experience_gem(enemy.definition.experience_value, enemy.global_position)
+
+
+func _on_player_leveled_up(_new_level: int, _pending_upgrade_count: int) -> void:
+	if upgrade_system.is_awaiting_choice():
+		return
+	_request_next_upgrade()
+
+
+## 串行消费待升级次数；一次获得大量经验时不会覆盖当前选择。
+func _request_next_upgrade() -> void:
+	if not is_instance_valid(player) or player.get_pending_upgrade_count() <= 0:
+		_resume_after_upgrades()
+		return
+	if not player.consume_pending_upgrade():
+		_resume_after_upgrades()
+		return
+	get_tree().paused = true
+	upgrade_system.request_choices(3)
+
+
+func _on_upgrade_applied(_definition: UpgradeDefinition) -> void:
+	level_up_panel.hide_panel()
+	if player.get_pending_upgrade_count() > 0:
+		call_deferred("_request_next_upgrade")
+	else:
+		_resume_after_upgrades()
+
+
+func _on_upgrade_choices_ready(choices: Array[UpgradeDefinition]) -> void:
+	if not choices.is_empty():
+		return
+	if player.get_pending_upgrade_count() > 0:
+		call_deferred("_request_next_upgrade")
+	else:
+		_resume_after_upgrades()
+
+
+func _resume_after_upgrades() -> void:
+	level_up_panel.hide_panel()
+	get_tree().paused = false

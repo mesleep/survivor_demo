@@ -7,12 +7,21 @@ class_name PlayerActor
 extends ActorBase
 
 signal experience_changed(current_experience: int, gained_amount: int)
+signal level_progress_changed(current_level: int, current_experience: int, required_experience: int)
+signal leveled_up(new_level: int, pending_upgrade_count: int)
+signal upgrade_state_changed(upgrade_id: StringName, stack_count: int)
 
 var definition: CharacterDefinition
 var weapon_controllers: Array[WeaponController] = []
 var _move_speed: float = 0.0
 var _base_attack_range: float = 0.0
 var _current_experience: int = 0
+var _current_level_experience: int = 0
+var _current_level: int = 1
+var _pending_upgrade_count: int = 0
+var _upgrade_stacks: Dictionary[StringName, int] = {}
+var _move_speed_multiplier: float = 1.0
+var _maximum_health_bonus: float = 0.0
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -38,9 +47,18 @@ func initialize(new_definition: Resource) -> void:
 	super.initialize(new_definition)
 	_move_speed = maxf(definition.move_speed, 0.0)
 	_base_attack_range = maxf(definition.base_attack_range, 0.0)
+	var camera_zoom_value: float = clampf(definition.camera_zoom, 0.25, 2.0)
+	camera.zoom = Vector2.ONE * camera_zoom_value
 	_current_experience = 0
+	_current_level_experience = 0
+	_current_level = 1
+	_pending_upgrade_count = 0
+	_upgrade_stacks.clear()
+	_move_speed_multiplier = 1.0
+	_maximum_health_bonus = 0.0
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
+	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
 
 
 ## 使摄像机与场地边界使用同一份范围。
@@ -86,16 +104,89 @@ func clear_weapons() -> void:
 	weapon_controllers.clear()
 
 
-## 增加本局经验并通知 UI 监听方；等级与阈值逻辑属于 P3。
+## 增加本局经验，并将跨越的每个等级转化为一项待选择升级。
+##
+## `_current_experience` 保留本局累计值供统计；HUD 使用独立的等级内经验。
 func add_experience(amount: int) -> void:
 	if amount <= 0:
 		return
 	_current_experience += amount
+	_current_level_experience += amount
+	while _current_level_experience >= get_required_experience():
+		_current_level_experience -= get_required_experience()
+		_current_level += 1
+		_pending_upgrade_count += 1
+		leveled_up.emit(_current_level, _pending_upgrade_count)
 	experience_changed.emit(_current_experience, amount)
+	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
 
 
 func get_current_experience() -> int:
 	return _current_experience
+
+
+func get_current_level_experience() -> int:
+	return _current_level_experience
+
+
+func get_current_level() -> int:
+	return _current_level
+
+
+## 返回当前等级升至下一级所需经验，经验曲线只在此处维护。
+func get_required_experience(level: int = _current_level) -> int:
+	return 5 + maxi(level, 1) * 3
+
+
+func get_pending_upgrade_count() -> int:
+	return _pending_upgrade_count
+
+
+func consume_pending_upgrade() -> bool:
+	if _pending_upgrade_count <= 0:
+		return false
+	_pending_upgrade_count -= 1
+	return true
+
+
+func get_upgrade_stack(upgrade_id: StringName) -> int:
+	return _upgrade_stacks.get(upgrade_id, 0)
+
+
+## 将一个升级效果写入玩家和武器的单局状态，不回写任何共享 Resource。
+func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
+	if upgrade == null or upgrade.id == StringName():
+		return false
+	match upgrade.type:
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + upgrade.value))
+		UpgradeDefinition.UpgradeType.FIRE_RATE_MULTIPLIER:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(maxf(1.0 - upgrade.value, 0.05), 0, 1.0))
+		UpgradeDefinition.UpgradeType.PROJECTILE_COUNT:
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, roundi(upgrade.value), 1.0))
+		UpgradeDefinition.UpgradeType.MOVE_SPEED_MULTIPLIER:
+			_move_speed_multiplier *= maxf(1.0 + upgrade.value, 0.0)
+		UpgradeDefinition.UpgradeType.MAX_HEALTH:
+			_maximum_health_bonus += upgrade.value
+			health_component.set_maximum_health(get_effective_maximum_health(), true)
+		UpgradeDefinition.UpgradeType.HEAL:
+			health_component.heal(upgrade.value)
+		_:
+			return false
+
+	var new_stack_count: int = get_upgrade_stack(upgrade.id) + 1
+	_upgrade_stacks[upgrade.id] = new_stack_count
+	upgrade_state_changed.emit(upgrade.id, new_stack_count)
+	return true
+
+
+func get_effective_move_speed() -> float:
+	return _move_speed * _move_speed_multiplier
+
+
+func get_effective_maximum_health() -> float:
+	var base_health: float = definition.max_health if definition != null else 0.0
+	return maxf(base_health + _maximum_health_bonus, 0.0)
 
 
 func _physics_process(_delta: float) -> void:
@@ -105,7 +196,7 @@ func _physics_process(_delta: float) -> void:
 		&"move_up",
 		&"move_down"
 	)
-	velocity = input_direction * _move_speed
+	velocity = input_direction * get_effective_move_speed()
 	move_and_slide()
 
 
@@ -124,3 +215,9 @@ func _on_pickup_detected(pickup: Area2D) -> void:
 
 func _get_base_max_health() -> float:
 	return definition.max_health if definition != null else 1.0
+
+
+func _apply_weapon_modifier(modifier: WeaponRuntimeModifier) -> void:
+	for controller: WeaponController in weapon_controllers:
+		if is_instance_valid(controller):
+			controller.apply_runtime_modifier(modifier)

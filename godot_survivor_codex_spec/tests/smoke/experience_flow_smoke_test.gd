@@ -38,6 +38,8 @@ func _run() -> void:
 
 	var player: PlayerActor = game_session.player
 	player.experience_changed.connect(_on_experience_changed)
+	# P2-05 专项仍需跨越等级阈值验证 100 次拾取；自动提交升级，避免 P3 暂停阻断物理帧。
+	game_session.upgrade_system.choices_ready.connect(_on_upgrade_choices_ready.bind(game_session.upgrade_system))
 	var enemy_definition: EnemyDefinition = game_session.enemy_spawn_settings.enemy_definition
 	var death_position := Vector2(220.0, 40.0)
 	var enemy: EnemyActor = game_session.enemy_spawner.spawn_enemy(enemy_definition, death_position)
@@ -98,6 +100,11 @@ func _clear_children(parent: Node) -> void:
 
 func _on_experience_changed(_current_experience: int, _gained_amount: int) -> void:
 	_experience_signal_count += 1
+
+
+func _on_upgrade_choices_ready(choices: Array[UpgradeDefinition], upgrade_system: UpgradeSystem) -> void:
+	if not choices.is_empty():
+		upgrade_system.apply_choice(choices[0])
 
 
 func _expect(condition: bool, message: String) -> void:

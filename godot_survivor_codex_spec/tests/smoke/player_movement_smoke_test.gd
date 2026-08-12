@@ -45,6 +45,7 @@ func _run() -> void:
 	_expect(player.motion_mode == CharacterBody2D.MOTION_MODE_FLOATING, "PlayerActor 未使用俯视角 FLOATING 运动模式。")
 	_expect(player.camera.enabled, "PlayerActor 的 Camera2D 未启用。")
 	_expect(player.get_viewport().get_camera_2d() == player.camera, "PlayerActor 的 Camera2D 未成为当前摄像机。")
+	_expect(player.camera.zoom.is_equal_approx(Vector2.ONE * player.definition.camera_zoom), "Camera2D 未使用角色配置的视野缩放。")
 
 	var start_position: Vector2 = player.global_position
 	Input.action_press(&"move_right")

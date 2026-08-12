@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"max_health_up"
+display_name = "Max Health +20"
+description = "Increase maximum health by 20 and gain the same health."
+type = 4
+value = 20.0
+max_stacks = 5
+weight = 1.0

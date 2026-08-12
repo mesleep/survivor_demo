@@ -48,6 +48,18 @@ func heal(amount: float) -> void:
 	health_changed.emit(current_health, maximum_health)
 
 
+## 修改本实例的最大生命值，并可将增加的上限同步转化为当前生命。
+##
+## 供单局升级使用；调用方必须传入计算后的最终值，不修改角色共享 Resource。
+func set_maximum_health(new_maximum_health: float, heal_increase: bool = true) -> void:
+	var previous_maximum: float = maximum_health
+	maximum_health = maxf(new_maximum_health, 0.0)
+	if heal_increase and maximum_health > previous_maximum:
+		current_health += maximum_health - previous_maximum
+	current_health = clampf(current_health, 0.0, maximum_health)
+	health_changed.emit(current_health, maximum_health)
+
+
 func reset() -> void:
 	current_health = maximum_health
 	_dead = false
