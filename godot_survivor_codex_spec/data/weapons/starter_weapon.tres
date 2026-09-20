@@ -1,12 +1,14 @@
-[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/weapons/weapon_definition.gd" id="1_definition"]
 [ext_resource type="Resource" path="res://data/projectiles/basic_projectile.tres" id="2_projectile"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/wand_frames.tres" id="3_visual"]
 
 [resource]
 script = ExtResource("1_definition")
 id = &"starter_weapon"
 display_name = "Starter Weapon"
+visual_frames = ExtResource("3_visual")
 projectile_definition = ExtResource("2_projectile")
 cooldown_seconds = 1.0
 projectile_count = 1

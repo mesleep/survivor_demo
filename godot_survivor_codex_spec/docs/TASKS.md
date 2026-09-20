@@ -1,5 +1,15 @@
 # 开发任务清单
 
+## 用户追加：可爱像素美术（2026-09-20）
+
+- [x] 玩家、基础敌人、快速敌人、Boss 各四张运动帧
+- [x] 武器四帧发射动画与移动跟随起伏
+- [x] 子弹和经验水晶动画
+- [x] 保存原创 PNG、图集裁切配置和生成提示词
+- [x] 动画专项、战斗回归与实际窗口渲染检查
+
+验证：Godot --headless --path . --editor --quit；--script res://tests/smoke/pixel_art_smoke_test.gd；player_movement、enemy_tracking、damage_feedback、weapon_controller、automatic_weapon、projectile_weapon_integration、advanced_upgrade、boss_victory、ending_restart 专项均退出 0。图形验收使用相同像素测试加 -- --capture，检查实际截图。上下移动共用三分之四视角帧，左右镜像；本次未制作独立四方向角色图集。
+
 > 规则：Codex 每次只完成用户明确指定的一个任务。完成后填写验证结果，不自动进入下一任务。
 
 ## 阶段 0：准备

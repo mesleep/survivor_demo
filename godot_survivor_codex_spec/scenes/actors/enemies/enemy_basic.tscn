@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/actors/enemy_actor.gd" id="1_enemy_actor"]
-[ext_resource type="Texture2D" path="res://assets/placeholders/enemy_basic.svg" id="2_enemy_texture"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/slime_frames.tres" id="2_enemy_texture"]
+[ext_resource type="Script" path="res://scripts/visuals/actor_sprite.gd" id="art_script"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="3_health"]
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="4_hurtbox"]
 [ext_resource type="PackedScene" path="res://scenes/components/hitbox_component.tscn" id="5_hitbox"]
@@ -16,8 +17,12 @@ collision_mask = 1
 motion_mode = 1
 script = ExtResource("1_enemy_actor")
 
-[node name="Visual" type="Sprite2D" parent="."]
-texture = ExtResource("2_enemy_texture")
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(0.19, 0.19)
+sprite_frames = ExtResource("2_enemy_texture")
+animation = &"idle"
+script = ExtResource("art_script")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_enemy")

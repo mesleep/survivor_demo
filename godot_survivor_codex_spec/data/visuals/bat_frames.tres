@@ -1,0 +1,36 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/cute_pixel/characters.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="0"]
+atlas = ExtResource("1")
+region = Rect2(0, 690, 352, 235)
+margin = Rect2(24, 165, 48, 165)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("1")
+region = Rect2(352, 690, 280, 235)
+margin = Rect2(60, 165, 120, 165)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("1")
+region = Rect2(632, 690, 312, 235)
+margin = Rect2(44, 165, 88, 165)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("1")
+region = Rect2(944, 690, 310, 235)
+margin = Rect2(45, 165, 90, 165)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("0")}],
+"loop": true, "name": &"idle", "speed": 1.0
+}, {
+"frames": [{"duration": 1.0, "texture": SubResource("0")}, {"duration": 1.0, "texture": SubResource("1")}, {"duration": 1.0, "texture": SubResource("2")}, {"duration": 1.0, "texture": SubResource("3")}],
+"loop": true, "name": &"walk", "speed": 8.0
+}]

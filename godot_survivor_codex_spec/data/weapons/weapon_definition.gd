@@ -8,6 +8,8 @@ extends Resource
 
 @export var id: StringName
 @export var display_name: String
+## 武器动画由配置指定，控制器只驱动表现，不按武器 ID 分支。
+@export var visual_frames: SpriteFrames
 @export var projectile_definition: ProjectileDefinition
 @export_range(0.02, 60.0, 0.01) var cooldown_seconds: float = 1.0
 @export_range(1, 100, 1) var projectile_count: int = 1

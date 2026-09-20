@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### 可爱像素美术（2026-09-20）
+
+- 新增两张原创透明 PNG 图集及八个 SpriteFrames 配置，覆盖玩家、两种敌人、Boss、武器、子弹、经验水晶与预留命中特效。
+- ActorSprite 根据速度切换四帧移动动画、待机和左右朝向，保留原有受伤反馈组件。
+- WeaponDefinition 新增可选 visual_frames；WeaponController 从 Node 扩展为 Node2D，子节点拥有独立武器动画，随发射信号流程触发并随控制器清理。
+- 新增像素动画专项测试，验证帧推进、朝向、待机恢复、裁切边界与武器动画；通过移动、追踪、受伤、武器、弹体、升级、Boss 和三次重开回归。
+- 使用 Godot 图形模式渲染截图，人工检查透明背景、素材比例和裁切；素材来源及完整提示词见 assets/sprites/cute_pixel/README.md。
+
 ### Added
 
 - 初始化 Godot 4.7.1 项目配置与标准目录。

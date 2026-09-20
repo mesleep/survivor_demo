@@ -4,7 +4,7 @@
 ## 输出：实际 ProjectileBase、fire_requested、projectile_spawned 和 weapon_fired 信号。
 ## 扩展点：同一角色可组合多个实例，每个实例拥有独立冷却与修正状态。
 class_name WeaponController
-extends Node
+extends Node2D
 
 signal fire_requested(
 	definition: WeaponDefinition,
@@ -35,6 +35,8 @@ var _runtime_projectile_lifesteal_ratio: float = 0.0
 var _runtime_repeat_shot_chance: float = 0.0
 var _repeat_shot_generation: int = 0
 var _random := RandomNumberGenerator.new()
+var weapon_visual: AnimatedSprite2D
+var _visual_clock: float = 0.0
 
 
 func _ready() -> void:
@@ -42,6 +44,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_update_visual(delta)
 	_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
 	if not can_fire() or not is_instance_valid(targeting_service):
 		return
@@ -74,6 +77,7 @@ func initialize(
 
 	owner_actor.tree_exiting.connect(_on_owner_actor_tree_exiting)
 	projectile_parent.tree_exiting.connect(_on_projectile_parent_tree_exiting)
+	_configure_visual()
 	set_process(true)
 
 
@@ -173,7 +177,44 @@ func spawn_projectile(
 		projectile.queue_free()
 		return null
 	projectile_spawned.emit(projectile)
+	if is_instance_valid(weapon_visual):
+		weapon_visual.rotation = context.initial_direction.angle()
+		weapon_visual.flip_v = context.initial_direction.x < 0.0
+		weapon_visual.play(&"fire")
+		weapon_visual.set_frame_and_progress(0, 0.0)
 	return projectile
+
+
+## 武器作为控制器子节点自动随其清理，多武器各持有独立动画实例。
+func _configure_visual() -> void:
+	if is_instance_valid(weapon_visual):
+		remove_child(weapon_visual)
+		weapon_visual.queue_free()
+	weapon_visual = null
+	if definition.visual_frames == null:
+		return
+	weapon_visual = AnimatedSprite2D.new()
+	weapon_visual.name = "WeaponVisual"
+	weapon_visual.sprite_frames = definition.visual_frames
+	weapon_visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	weapon_visual.scale = Vector2.ONE * 0.16
+	add_child(weapon_visual)
+	weapon_visual.animation_finished.connect(_on_visual_animation_finished)
+	weapon_visual.play(&"idle")
+	_update_visual(0.0)
+
+
+func _update_visual(delta: float) -> void:
+	if not is_instance_valid(weapon_visual) or not is_instance_valid(owner_actor):
+		return
+	_visual_clock += delta
+	var moving: bool = owner_actor.velocity.length_squared() > 1.0
+	var bob: float = sin(_visual_clock * 12.0) * 2.0 if moving else 0.0
+	global_position = owner_actor.global_position + Vector2(24.0, 10.0 + bob)
+
+
+func _on_visual_animation_finished() -> void:
+	weapon_visual.play(&"idle")
 
 
 ## 将单局修正合并到控制器，不回写 WeaponDefinition。
