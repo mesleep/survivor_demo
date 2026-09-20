@@ -40,8 +40,16 @@
 
 - `AGENTS.md`：Codex 工作约束。
 - `docs/PROJECT_SPEC.md`：产品、架构、接口、目录和验收规范。
+- `docs/ARCHITECTURE.md`：当前实现的架构基线（as-built，含场景树、接口、数据流和碰撞层）。
+- `docs/BASELINE.md`：项目基线快照（需求追踪、资源清单、测试矩阵、已知偏差）。
 - `docs/TASKS.md`：分阶段任务清单与验证记录。
 - `docs/CHANGELOG.md`：已完成变更。
 - `CODEX_FIRST_PROMPT.md`：项目初始化指令留档。
 
-详细要求以 `docs/PROJECT_SPEC.md` 为准。
+详细要求以 `docs/PROJECT_SPEC.md` 为准；当前可交付状态以 `docs/BASELINE.md` 为准。
+
+## 基线与提交约定
+
+- 基线版本：`baseline-1.0`，对应提交 `447a787`（2026-09-20）。
+- 变更前先更新 `docs/PROJECT_SPEC.md` 或 `docs/TASKS.md`，再实现、验证、更新 `docs/CHANGELOG.md`。
+- 提交信息一律使用中文，类型前缀保留英文小写，格式为 `type: 中文说明`，例如 `docs: 新增架构与项目基线文档`。

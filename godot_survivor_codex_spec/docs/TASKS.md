@@ -14,10 +14,18 @@
 
 ## 阶段 0：准备
 
-- [ ] P0-01 安装并确认 Godot 4.7.1 stable
-- [ ] P0-02 创建 Git 仓库
-- [ ] P0-03 将 `AGENTS.md` 和 `docs/PROJECT_SPEC.md` 放入仓库
-- [ ] P0-04 确认 Codex 可以读取项目目录
+- [x] P0-01 安装并确认 Godot 4.7.1 stable
+- [x] P0-02 创建 Git 仓库
+- [x] P0-03 将 `AGENTS.md` 和 `docs/PROJECT_SPEC.md` 放入仓库
+- [x] P0-04 确认 Codex 可以读取项目目录
+
+验证记录：
+
+```text
+日期：2026-09-20
+核对：project.godot 声明 Godot 4.7 与 GL Compatibility；仓库位于 git main 分支；AGENTS.md 与 docs/PROJECT_SPEC.md 已入库；只读分析可完整读取项目。
+结果：阶段 0 四项准备条件均已满足；此记录仅补记既有事实，不改变任何代码或后续阶段状态。
+```
 
 ---
 

@@ -1231,15 +1231,17 @@ main
 
 ## 13.2 提交粒度
 
+所有提交信息一律使用中文；类型前缀保留英文小写，格式为 `type: 中文说明`。
+
 推荐：
 
 ```text
-feat: create typed character definition
-feat: add normalized player movement
-feat: add enemy spawn ring
-fix: prevent projectile duplicate hits
-refactor: move damage logic into health component
-docs: mark phase 2 combat loop complete
+feat: 新增强类型角色定义
+feat: 新增归一化玩家移动
+feat: 新增敌人环形生成
+fix: 修复子弹重复命中
+refactor: 将伤害逻辑抽取到生命组件
+docs: 标记阶段二战斗循环完成
 ```
 
 不推荐：
@@ -1249,6 +1251,7 @@ update files
 game changes
 fix stuff
 final version
+p2完成
 ```
 
 ## 13.3 任务状态

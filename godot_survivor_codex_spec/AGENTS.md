@@ -163,11 +163,13 @@ godot --headless --path . --editor --quit
 - 修复分支：`fix/projectile-collision`
 - 重构分支：`refactor/combat-components`
 - 每个提交只包含一个逻辑变更。
+- 提交信息一律使用中文，类型前缀保留英文小写，格式为 `type: 中文说明`。
 - 推荐提交格式：
-  - `feat: add player movement`
-  - `fix: reset projectile collision on reuse`
-  - `refactor: extract health component`
-  - `docs: update phase 2 acceptance criteria`
-  - `test: add combat smoke scene`
+  - `feat: 新增玩家移动`
+  - `fix: 修复子弹复用时残留碰撞`
+  - `refactor: 抽取生命组件`
+  - `docs: 更新阶段二验收标准`
+  - `test: 新增战斗冒烟场景`
+- 不推荐：`update files`、`game changes`、`fix stuff`、`final version`、`p2完成` 等含糊或无类型前缀的信息。
 
 完成一个可验证任务后再提交，不要提交无法启动的中间状态。
