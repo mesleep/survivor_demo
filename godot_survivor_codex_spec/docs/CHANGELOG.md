@@ -12,6 +12,11 @@
 - 统一提交信息为中文，类型前缀保留英文小写（同步更新 `AGENTS.md` 与 `PROJECT_SPEC.md` 第 13.2 节）。
 - 补齐 `TASKS.md` 阶段 0 复选框与验证记录。
 
+### 跨平台启动文档（2026-09-20）
+
+- `README.md` 补充 macOS 与 Windows 命令行启动示例，明确示例路径需替换为本机实际的 Godot 可执行文件。
+- 同步更新 `docs/ARCHITECTURE.md` 验证入口与 `docs/BASELINE.md` 回归命令为跨平台写法，并提示 Windows 使用 `*_console.exe` 查看输出。
+
 ### 可爱像素美术（2026-09-20）
 
 - 新增两张原创透明 PNG 图集及八个 SpriteFrames 配置，覆盖玩家、两种敌人、Boss、武器、子弹、经验水晶与预留命中特效。

@@ -13,11 +13,23 @@
 1. 用 Godot 4.7.1 打开本目录中的 `project.godot`。
 2. 点击“运行项目”或按 `F5`。
 
-也可从命令行启动：
+也可从命令行启动。下面路径均为**示例占位**，请替换为本机实际的 Godot 可执行文件路径：
+
+macOS：
 
 ```bash
-/path/to/Godot --path .
+/Applications/Godot.app/Contents/MacOS/Godot --path .
 ```
+
+Windows（PowerShell 或 CMD，路径含空格时必须加引号）：
+
+```powershell
+"C:\Godot\Godot_v4.7.1-stable_win64.exe" --path .
+```
+
+Windows 若需要控制台输出，改用同目录下的 `Godot_v4.7.1-stable_win64_console.exe`。
+
+提示：在 `project.godot` 所在目录执行时 `--path .` 即当前目录；不要在项目根目录之外运行。
 
 ## 输入
 

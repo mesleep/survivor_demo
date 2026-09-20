@@ -512,16 +512,28 @@ GameSession._process → advance_time(delta)
 
 ## 9. 验证入口
 
+先按平台设置 Godot 可执行文件路径（替换为本机实际路径）：
+
 ```bash
-# 解析与导入（macOS 示例路径）
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --editor --quit
+# macOS
+GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
+
+# Windows（PowerShell）
+# $GODOT = "C:\Godot\Godot_v4.7.1-stable_win64_console.exe"
+
+# Windows（CMD）
+# set GODOT=C:\Godot\Godot_v4.7.1-stable_win64_console.exe
+```
+
+```bash
+# 解析与导入
+"$GODOT" --headless --path . --editor --quit
 
 # 启动主场景 300 帧
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --quit-after 300
+"$GODOT" --headless --path . --quit-after 300
 
 # 单个冒烟测试（SceneTree 脚本仍返回退出码）
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
-  --script res://tests/smoke/<name>_smoke_test.gd
+"$GODOT" --headless --path . --script res://tests/smoke/<name>_smoke_test.gd
 ```
 
 测试清单、覆盖矩阵与已知限制见 `docs/BASELINE.md`。

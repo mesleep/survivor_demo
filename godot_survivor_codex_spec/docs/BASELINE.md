@@ -170,8 +170,17 @@
 
 ### 4.2 建议回归命令
 
+先按平台设置 Godot 路径（替换为本机实际路径）：
+
 ```bash
+# macOS
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
+
+# Windows（PowerShell）
+# $GODOT = "C:\Godot\Godot_v4.7.1-stable_win64_console.exe"
+```
+
+```bash
 "$GODOT" --headless --path . --editor --quit
 "$GODOT" --headless --path . --quit-after 300
 for t in tests/smoke/*_smoke_test.gd; do
@@ -179,7 +188,7 @@ for t in tests/smoke/*_smoke_test.gd; do
 done
 ```
 
-`enemy_spawner_soak_test.gd` 为 120 秒测试，可按需单独执行。
+`enemy_spawner_soak_test.gd` 为 120 秒测试，可按需单独执行。Windows 下建议使用 `*_console.exe` 以便查看输出。
 
 ### 4.3 验证缺口
 
