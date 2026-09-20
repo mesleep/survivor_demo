@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/leaf.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"acquire_leaf"
+display_name = "获得飞叶刃"
+description = "加入一把快速直射的飞叶刃，可与魔杖同时攻击。"
+type = 15
+value = 0
+max_stacks = 1
+required_weapon_id = &""
+weapon_definition = ExtResource("2")

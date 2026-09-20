@@ -46,6 +46,8 @@ func show_choices(choices: Array[UpgradeDefinition]) -> void:
 		button.text = "%s\n%s" % [definition.display_name, definition.description]
 		button.pressed.connect(_on_choice_pressed.bind(definition))
 		choices_container.add_child(button)
+	if choices_container.get_child_count() > 0:
+		(choices_container.get_child(0) as Button).grab_focus()
 
 
 func hide_panel() -> void:

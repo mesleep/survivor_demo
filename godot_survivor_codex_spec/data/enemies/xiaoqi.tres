@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/enemies/enemy_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/actors/enemies/xiaoqi.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"xiaoqi"
+display_name = "小七"
+scene = ExtResource("2")
+max_health = 8.0
+move_speed = 165.0
+contact_damage = 4.0
+experience_value = 2
+spawn_cost = 1.0
+is_boss = false

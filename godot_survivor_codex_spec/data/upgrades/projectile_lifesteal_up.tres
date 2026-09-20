@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"projectile_lifesteal_up"
-display_name = "Projectile Lifesteal +3%"
-description = "Projectile hits heal for 3% of damage dealt."
+display_name = "生命汲取 +3%"
+description = "魔弹命中时恢复实际伤害的 3% 生命。"
 type = 7
 value = 0.03
 max_stacks = 5

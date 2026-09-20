@@ -26,7 +26,7 @@ theme_override_constants/separation = 4
 [node name="HealthLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "HP 100 / 100"
+text = "生命 100 / 100"
 
 [node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -43,7 +43,7 @@ show_percentage = false
 [node name="LevelLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Level 1"
+text = "等级 1"
 
 [node name="ExperienceBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true

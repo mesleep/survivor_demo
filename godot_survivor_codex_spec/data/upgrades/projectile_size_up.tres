@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"projectile_size_up"
+display_name = "巨大魔法 +20%"
+description = "弹体与命中范围增加 20%；铃铛环绕半径同步增大。"
+type = 12
+value = 0.2
+max_stacks = 3
+required_weapon_id = &""

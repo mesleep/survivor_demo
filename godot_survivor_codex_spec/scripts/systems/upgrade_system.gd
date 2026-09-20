@@ -59,6 +59,13 @@ func apply_choice(definition: UpgradeDefinition) -> bool:
 
 
 func can_offer(definition: UpgradeDefinition) -> bool:
+	if definition == null or not is_instance_valid(player):
+		return false
+	if definition.required_weapon_id != StringName() and not player.has_weapon(definition.required_weapon_id):
+		return false
+	if definition.type == UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
+		if definition.weapon_definition == null or player.has_weapon(definition.weapon_definition.id):
+			return false
 	return (
 		definition != null
 		and definition.id != StringName()

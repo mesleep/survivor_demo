@@ -6,6 +6,14 @@
 class_name ProjectileDefinition
 extends Resource
 
+enum MotionType { STRAIGHT, RETURNING, ORBIT }
+
+@export var motion_type: MotionType = MotionType.STRAIGHT
+@export var visual_frames: SpriteFrames
+@export var visual_scale: float = 0.1
+@export var orbit_radius: float = 100.0
+@export var orbit_speed: float = 3.0
+
 @export var id: StringName
 @export var scene: PackedScene
 @export_range(0.0, 1000000.0, 0.1) var damage: float = 10.0

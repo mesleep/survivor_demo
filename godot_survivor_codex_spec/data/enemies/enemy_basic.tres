@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_definition")
 id = &"enemy_basic"
-display_name = "Basic Enemy"
+display_name = "虎妞"
 scene = ExtResource("2_enemy_scene")
 max_health = 10.0
 move_speed = 80.0

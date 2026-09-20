@@ -16,6 +16,26 @@ const BASE_BAR_SIZE := Vector2(300.0, 18.0)
 var _player: PlayerActor
 
 
+func _ready() -> void:
+	_style_bar(health_bar, Color("ed8090"))
+	_style_bar(experience_bar, Color("71dac7"))
+	for label: Label in [health_label, level_label, time_label]:
+		label.add_theme_color_override("font_shadow_color", Color("142a32"))
+		label.add_theme_constant_override("shadow_offset_x", 2)
+		label.add_theme_constant_override("shadow_offset_y", 2)
+
+
+func _style_bar(bar: ProgressBar, color: Color) -> void:
+	var background := StyleBoxFlat.new()
+	background.bg_color = Color("172d39")
+	background.set_corner_radius_all(6)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = color
+	fill.set_corner_radius_all(6)
+	bar.add_theme_stylebox_override("background", background)
+	bar.add_theme_stylebox_override("fill", fill)
+
+
 ## 按统一倍率调整 HUD 字体和进度条，不改变游戏世界缩放。
 func set_ui_scale(ui_scale: float) -> void:
 	var safe_scale: float = clampf(ui_scale, 0.75, 2.0)
@@ -45,11 +65,11 @@ func initialize(player: PlayerActor) -> void:
 func _on_health_changed(current: float, maximum: float) -> void:
 	health_bar.max_value = maxf(maximum, 1.0)
 	health_bar.value = current
-	health_label.text = "HP %d / %d" % [roundi(current), roundi(maximum)]
+	health_label.text = "生命 %d / %d" % [roundi(current), roundi(maximum)]
 
 
 func _on_level_progress_changed(level: int, current: int, required: int) -> void:
-	level_label.text = "Level %d" % level
+	level_label.text = "等级 %d" % level
 	experience_bar.max_value = maxi(required, 1)
 	experience_bar.value = current
 

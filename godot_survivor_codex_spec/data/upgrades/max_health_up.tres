@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"max_health_up"
-display_name = "Max Health +20"
-description = "Increase maximum health by 20 and gain the same health."
+display_name = "强健体魄 +20"
+description = "生命上限增加 20，并恢复等量生命。"
 type = 4
 value = 20.0
 max_stacks = 5

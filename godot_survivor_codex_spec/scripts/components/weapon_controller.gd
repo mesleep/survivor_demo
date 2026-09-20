@@ -37,6 +37,11 @@ var _repeat_shot_generation: int = 0
 var _random := RandomNumberGenerator.new()
 var weapon_visual: AnimatedSprite2D
 var _visual_clock: float = 0.0
+var visual_slot: int = 0
+var _pierce_bonus: int = 0
+var _speed_multiplier: float = 1.0
+var _size_multiplier: float = 1.0
+var _critical_chance: float = 0.0
 
 
 func _ready() -> void:
@@ -119,6 +124,8 @@ func request_fire(target: Node2D) -> bool:
 	var spawned_count: int = 0
 	for index: int in range(requested_count):
 		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
+		if definition.projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
+			direction = Vector2.RIGHT.rotated(TAU * float(index) / requested_count)
 		var context := ProjectileSpawnContext.new(
 			owner_actor,
 			owner_actor.get_team_id(),
@@ -170,6 +177,10 @@ func spawn_projectile(
 		projectile_node.queue_free()
 		return null
 	var projectile: ProjectileBase = projectile_node as ProjectileBase
+	context.pierce_bonus = _pierce_bonus
+	context.speed_multiplier = _speed_multiplier
+	context.size_multiplier = _size_multiplier
+	context.critical_chance = _critical_chance
 	projectile_parent.add_child(projectile)
 	projectile.initialize(projectile_definition, context)
 	projectile.launch(context.initial_direction)
@@ -210,7 +221,7 @@ func _update_visual(delta: float) -> void:
 	_visual_clock += delta
 	var moving: bool = owner_actor.velocity.length_squared() > 1.0
 	var bob: float = sin(_visual_clock * 12.0) * 2.0 if moving else 0.0
-	global_position = owner_actor.global_position + Vector2(24.0, 10.0 + bob)
+	global_position = owner_actor.global_position + Vector2(44.0, 0).rotated(visual_slot * 1.8) + Vector2(0, 10.0 + bob)
 
 
 func _on_visual_animation_finished() -> void:
@@ -221,6 +232,10 @@ func _on_visual_animation_finished() -> void:
 func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 	if modifier == null:
 		return
+	_pierce_bonus += modifier.pierce_bonus
+	_speed_multiplier *= modifier.speed_multiplier
+	_size_multiplier *= modifier.size_multiplier
+	_critical_chance = clampf(_critical_chance + modifier.critical_chance, 0.0, 1.0)
 	_runtime_cooldown_multiplier *= maxf(modifier.cooldown_multiplier, MINIMUM_RUNTIME_MULTIPLIER)
 	_runtime_projectile_count_bonus += modifier.projectile_count_bonus
 	_runtime_damage_multiplier *= maxf(modifier.damage_multiplier, 0.0)
@@ -242,6 +257,10 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 
 
 func reset_runtime_state() -> void:
+	_pierce_bonus = 0
+	_speed_multiplier = 1.0
+	_size_multiplier = 1.0
+	_critical_chance = 0.0
 	_repeat_shot_generation += 1
 	_cooldown_remaining = 0.0
 	_runtime_cooldown_multiplier = 1.0

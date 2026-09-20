@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"enemy_fast"
-display_name = "Fast Enemy"
+display_name = "黑豹"
 scene = ExtResource("2")
 max_health = 6.0
 move_speed = 145.0

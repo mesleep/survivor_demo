@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"heal"
-display_name = "Heal 30"
-description = "Restore 30 health immediately."
+display_name = "暖心治疗"
+description = "立即恢复 30 点生命。"
 type = 5
 value = 30.0
 max_stacks = 99

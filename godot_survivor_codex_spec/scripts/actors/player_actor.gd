@@ -10,6 +10,7 @@ signal experience_changed(current_experience: int, gained_amount: int)
 signal level_progress_changed(current_level: int, current_experience: int, required_experience: int)
 signal leveled_up(new_level: int, pending_upgrade_count: int)
 signal upgrade_state_changed(upgrade_id: StringName, stack_count: int)
+signal weapon_added(controller: WeaponController)
 
 var definition: CharacterDefinition
 var weapon_controllers: Array[WeaponController] = []
@@ -23,6 +24,11 @@ var _upgrade_stacks: Dictionary[StringName, int] = {}
 var _move_speed_multiplier: float = 1.0
 var _maximum_health_bonus: float = 0.0
 var _pickup_range_multiplier: float = 1.0
+var _regeneration: float = 0.0
+var _regeneration_clock: float = 0.0
+var _weapon_modifier_history: Array[Dictionary] = []
+var _projectile_parent: Node
+var _targeting_service: TargetingService
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -58,6 +64,9 @@ func initialize(new_definition: Resource) -> void:
 	_move_speed_multiplier = 1.0
 	_maximum_health_bonus = 0.0
 	_pickup_range_multiplier = 1.0
+	_regeneration = 0.0
+	_regeneration_clock = 0.0
+	_weapon_modifier_history.clear()
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
 	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
@@ -82,19 +91,41 @@ func configure_weapons(
 		targeting_service: TargetingService
 ) -> void:
 	clear_weapons()
+	_projectile_parent = projectile_parent
+	_targeting_service = targeting_service
 	if not is_instance_valid(projectile_parent) or not is_instance_valid(targeting_service):
 		push_error("PlayerActor 武器配置失败：缺少子弹容器或索敌服务。")
 		return
 
 	for weapon_definition: WeaponDefinition in weapon_definitions:
-		if weapon_definition == null:
-			continue
-		var controller := WeaponController.new()
-		controller.name = "WeaponController_%s" % weapon_definition.id
-		weapon_controller_parent.add_child(controller)
-		controller.initialize(weapon_definition, self, projectile_parent)
-		controller.set_targeting_service(targeting_service)
-		weapon_controllers.append(controller)
+		add_weapon(weapon_definition, true)
+
+
+## 新武器继承已选通用强化；只创建控制器，不重复加载角色或重置原武器。
+func add_weapon(weapon_definition: WeaponDefinition, allow_duplicate: bool = false) -> bool:
+	if weapon_definition == null or (not allow_duplicate and has_weapon(weapon_definition.id)):
+		return false
+	if not is_instance_valid(_projectile_parent) or not is_instance_valid(_targeting_service):
+		return false
+	var controller := WeaponController.new()
+	controller.name = "WeaponController_%s" % weapon_definition.id
+	controller.visual_slot = weapon_controllers.size()
+	weapon_controller_parent.add_child(controller)
+	controller.initialize(weapon_definition, self, _projectile_parent)
+	controller.set_targeting_service(_targeting_service)
+	for record: Dictionary in _weapon_modifier_history:
+		if record.target == StringName() or record.target == weapon_definition.id:
+			controller.apply_runtime_modifier(record.modifier as WeaponRuntimeModifier)
+	weapon_controllers.append(controller)
+	weapon_added.emit(controller)
+	return true
+
+
+func has_weapon(weapon_id: StringName) -> bool:
+	for controller: WeaponController in weapon_controllers:
+		if is_instance_valid(controller) and controller.definition.id == weapon_id:
+			return true
+	return false
 
 
 func clear_weapons() -> void:
@@ -159,13 +190,17 @@ func get_upgrade_stack(upgrade_id: StringName) -> int:
 func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 	if upgrade == null or upgrade.id == StringName():
 		return false
+	if get_upgrade_stack(upgrade.id) >= upgrade.max_stacks:
+		return false
+	if upgrade.required_weapon_id != StringName() and not has_weapon(upgrade.required_weapon_id):
+		return false
 	match upgrade.type:
 		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + upgrade.value))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + upgrade.value), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.FIRE_RATE_MULTIPLIER:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(maxf(1.0 - upgrade.value, 0.05), 0, 1.0))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(maxf(1.0 - upgrade.value, 0.05), 0, 1.0), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.PROJECTILE_COUNT:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, roundi(upgrade.value), 1.0))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, roundi(upgrade.value), 1.0), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.MOVE_SPEED_MULTIPLIER:
 			_move_speed_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 		UpgradeDefinition.UpgradeType.MAX_HEALTH:
@@ -174,14 +209,31 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		UpgradeDefinition.UpgradeType.HEAL:
 			health_component.heal(upgrade.value)
 		UpgradeDefinition.UpgradeType.BONUS_PROJECTILE_CHANCE:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, upgrade.value, 0.0))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, upgrade.value, 0.0), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.PROJECTILE_LIFESTEAL:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, upgrade.value))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, upgrade.value), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.PICKUP_RANGE_MULTIPLIER:
 			_pickup_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 			pickup_component.initialize(get_effective_pickup_radius())
 		UpgradeDefinition.UpgradeType.REPEAT_SHOT_CHANCE:
-			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value))
+			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value), upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.PIERCE_COUNT, UpgradeDefinition.UpgradeType.PROJECTILE_SPEED, UpgradeDefinition.UpgradeType.PROJECTILE_SIZE, UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:
+			var modifier := WeaponRuntimeModifier.new()
+			match upgrade.type:
+				UpgradeDefinition.UpgradeType.PIERCE_COUNT:
+					modifier.pierce_bonus = roundi(upgrade.value)
+				UpgradeDefinition.UpgradeType.PROJECTILE_SPEED:
+					modifier.speed_multiplier = 1.0 + upgrade.value
+				UpgradeDefinition.UpgradeType.PROJECTILE_SIZE:
+					modifier.size_multiplier = 1.0 + upgrade.value
+				UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:
+					modifier.critical_chance = upgrade.value
+			_apply_weapon_modifier(modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.REGENERATION:
+			_regeneration += upgrade.value
+		UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
+			if not add_weapon(upgrade.weapon_definition):
+				return false
 		_:
 			return false
 
@@ -206,6 +258,11 @@ func get_effective_pickup_radius() -> float:
 
 
 func _physics_process(_delta: float) -> void:
+	_regeneration_clock += _delta
+	if _regeneration_clock >= 1.0:
+		_regeneration_clock -= 1.0
+		if _regeneration > 0.0:
+			health_component.heal(_regeneration)
 	var input_direction: Vector2 = Input.get_vector(
 		&"move_left",
 		&"move_right",
@@ -233,7 +290,8 @@ func _get_base_max_health() -> float:
 	return definition.max_health if definition != null else 1.0
 
 
-func _apply_weapon_modifier(modifier: WeaponRuntimeModifier) -> void:
+func _apply_weapon_modifier(modifier: WeaponRuntimeModifier, target_weapon_id: StringName = &"") -> void:
+	_weapon_modifier_history.append({"modifier": modifier, "target": target_weapon_id})
 	for controller: WeaponController in weapon_controllers:
-		if is_instance_valid(controller):
+		if is_instance_valid(controller) and (target_weapon_id == StringName() or controller.definition.id == target_weapon_id):
 			controller.apply_runtime_modifier(modifier)

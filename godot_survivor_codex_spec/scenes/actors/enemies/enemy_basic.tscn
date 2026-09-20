@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/actors/enemy_actor.gd" id="1_enemy_actor"]
-[ext_resource type="SpriteFrames" path="res://data/visuals/slime_frames.tres" id="2_enemy_texture"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/huniu_frames.tres" id="2_enemy_texture"]
 [ext_resource type="Script" path="res://scripts/visuals/actor_sprite.gd" id="art_script"]
 [ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="3_health"]
 [ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="4_hurtbox"]

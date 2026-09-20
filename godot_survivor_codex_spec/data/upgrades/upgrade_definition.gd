@@ -16,6 +16,12 @@ enum UpgradeType {
 	PROJECTILE_LIFESTEAL,
 	PICKUP_RANGE_MULTIPLIER,
 	REPEAT_SHOT_CHANCE,
+	PIERCE_COUNT,
+	PROJECTILE_SPEED,
+	PROJECTILE_SIZE,
+	CRITICAL_CHANCE,
+	REGENERATION,
+	ACQUIRE_WEAPON,
 }
 
 @export var id: StringName
@@ -24,5 +30,9 @@ enum UpgradeType {
 @export var icon: Texture2D
 @export var type: UpgradeType
 @export var value: float
+## 非空时只对指定武器生效，未持有时不会进入候选池。
+@export var required_weapon_id: StringName
+## 获取武器类升级所授予的只读配置。
+@export var weapon_definition: WeaponDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0

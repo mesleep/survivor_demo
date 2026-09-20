@@ -37,7 +37,7 @@ func _run() -> void:
 	boss.apply_damage(DamageEvent.new(boss.health_component.maximum_health, session.player, session.player.global_position))
 	_expect(not session.is_run_active and paused, "Boss 死亡后本局未停止并暂停。")
 	_expect(_end_signal_count == 1 and _last_result.outcome == GameResult.Outcome.VICTORY, "Boss 死亡未生成胜利结果。")
-	_expect(session.end_panel.visible and session.end_panel.title.text == "Victory", "胜利结算面板未显示。")
+	_expect(session.end_panel.visible and session.end_panel.title.text == "庭院守护成功", "胜利结算面板未显示。")
 	_expect(_last_result.kill_count == 1 and session.kill_count == 1, "Boss 击杀统计不正确。")
 
 	paused = false

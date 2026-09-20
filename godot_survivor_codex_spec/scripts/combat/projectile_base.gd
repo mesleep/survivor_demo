@@ -18,6 +18,7 @@ var is_active: bool = false
 
 var _remaining_pierces: int = 0
 var _last_hit_frame_by_instance_id: Dictionary[int, int] = {}
+var _age: float = 0.0
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var lifetime_timer: Timer = $LifetimeTimer
@@ -42,12 +43,17 @@ func initialize(new_definition: ProjectileDefinition, new_context: ProjectileSpa
 	if not context.shooter.tree_exiting.is_connected(_on_shooter_tree_exiting):
 		context.shooter.tree_exiting.connect(_on_shooter_tree_exiting)
 	global_position = context.spawn_position
-	_remaining_pierces = maxi(definition.pierce_count, 0)
+	_remaining_pierces = maxi(definition.pierce_count + context.pierce_bonus, 0)
+	var visual: AnimatedSprite2D = get_node("Visual") as AnimatedSprite2D
+	if definition.visual_frames != null:
+		visual.sprite_frames = definition.visual_frames
+		visual.play(&"default")
+	visual.scale = Vector2.ONE * definition.visual_scale * context.size_multiplier
 
 	var source_shape: Shape2D = collision_shape.shape
 	if source_shape is CircleShape2D:
 		var runtime_shape: CircleShape2D = source_shape.duplicate() as CircleShape2D
-		runtime_shape.radius = definition.hit_radius
+		runtime_shape.radius = definition.hit_radius * context.size_multiplier
 		collision_shape.shape = runtime_shape
 
 
@@ -66,7 +72,24 @@ func launch(new_direction: Vector2) -> void:
 func _physics_process(delta: float) -> void:
 	if not is_active or definition == null:
 		return
-	global_position += direction * definition.speed * delta
+	_age += delta
+	if definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
+		if not is_instance_valid(context.shooter):
+			deactivate()
+			return
+		var angle: float = context.initial_direction.angle() + _age * definition.orbit_speed * context.speed_multiplier
+		global_position = context.shooter.global_position + Vector2.RIGHT.rotated(angle) * definition.orbit_radius * context.size_multiplier
+		rotation = angle
+		return
+	if definition.motion_type == ProjectileDefinition.MotionType.RETURNING and _age > definition.lifetime_seconds * 0.45:
+		if not is_instance_valid(context.shooter):
+			deactivate()
+			return
+		direction = global_position.direction_to(context.shooter.global_position)
+		if global_position.distance_to(context.shooter.global_position) < 16.0:
+			deactivate()
+			return
+	global_position += direction * definition.speed * context.speed_multiplier * delta
 
 
 ## 对 Actor 或 Hurtbox 应用一次伤害，并处理同帧去重与穿透。
@@ -101,6 +124,8 @@ func on_hit(target: Node) -> bool:
 		context.shooter,
 		global_position
 	)
+	if randf() < context.critical_chance:
+		event.amount *= 2.0
 	event.tags = [&"projectile"]
 	if context.weapon_id != StringName():
 		event.tags.append(context.weapon_id)
@@ -143,6 +168,7 @@ func deactivate() -> void:
 
 ## 清除全部单次运行状态，复用前必须再次 initialize() 和 launch()。
 func reset_runtime_state() -> void:
+	_age = 0.0
 	if context != null and is_instance_valid(context.shooter) and context.shooter.tree_exiting.is_connected(_on_shooter_tree_exiting):
 		context.shooter.tree_exiting.disconnect(_on_shooter_tree_exiting)
 	is_active = false

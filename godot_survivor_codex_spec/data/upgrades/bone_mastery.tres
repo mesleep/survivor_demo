@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bone_mastery"
+display_name = "回旋骨棒·贯穿"
+description = "仅回旋骨棒：额外穿透 4 个目标。"
+type = 10
+value = 4
+max_stacks = 3
+required_weapon_id = &"bone"

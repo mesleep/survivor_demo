@@ -26,8 +26,8 @@ func _run() -> void:
 	await process_frame
 	session.player.apply_damage(DamageEvent.new(session.player.health_component.maximum_health, null, Vector2.ZERO))
 	_expect(not session.is_run_active and paused, "玩家死亡未结束并暂停本局。")
-	_expect(session.end_panel.visible and session.end_panel.title.text == "Defeat", "失败结算面板未显示。")
-	_expect(session.end_panel.stats_label.text.contains("00:42") and session.end_panel.stats_label.text.contains("Level  2"), "结算统计未显示存活时间和等级。")
+	_expect(session.end_panel.visible and session.end_panel.title.text == "休息一下，再来一局", "失败结算面板未显示。")
+	_expect(session.end_panel.stats_label.text.contains("00:42") and session.end_panel.stats_label.text.contains("等级  2"), "结算统计未显示存活时间和等级。")
 
 	for restart_index: int in range(RESTART_COUNT):
 		var old_session_id: int = session.get_instance_id()

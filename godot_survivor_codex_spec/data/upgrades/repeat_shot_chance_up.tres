@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"repeat_shot_chance_up"
-display_name = "Repeat Shot +15%"
-description = "Each attack interval has +15% chance to fire one additional delayed projectile."
+display_name = "魔法回响 +15%"
+description = "每轮攻击追加一颗延迟魔弹的概率增加 15%。"
 type = 9
 value = 0.15
 max_stacks = 5

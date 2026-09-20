@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/bone.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"acquire_bone"
+display_name = "获得回旋骨棒"
+description = "加入一把能飞出并返回的贯穿骨棒。"
+type = 15
+value = 0
+max_stacks = 1
+required_weapon_id = &""
+weapon_definition = ExtResource("2")

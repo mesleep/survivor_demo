@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="RunDefinition" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="RunDefinition" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://data/waves/run_definition.gd" id="1_run"]
 [ext_resource type="Script" path="res://data/waves/difficulty_stage.gd" id="2_stage"]
@@ -6,6 +6,9 @@
 [ext_resource type="Resource" path="res://data/enemies/enemy_fast.tres" id="4_fast"]
 [ext_resource type="Resource" path="res://data/enemies/boss_default.tres" id="5_boss"]
 [ext_resource type="Script" path="res://data/enemies/enemy_definition.gd" id="6_enemy_type"]
+
+[ext_resource type="Resource" path="res://data/enemies/xiaosi.tres" id="7_cat"]
+[ext_resource type="Resource" path="res://data/enemies/xiaoqi.tres" id="8_cat"]
 
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
@@ -38,7 +41,7 @@ max_alive_enemies = 90
 health_multiplier = 1.6
 move_speed_multiplier = 1.15
 damage_multiplier = 1.35
-enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast")])
+enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat")])
 
 [sub_resource type="Resource" id="Stage3"]
 script = ExtResource("2_stage")
@@ -49,7 +52,7 @@ max_alive_enemies = 140
 health_multiplier = 2.1
 move_speed_multiplier = 1.25
 damage_multiplier = 1.65
-enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast")])
+enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat")])
 
 [resource]
 script = ExtResource("1_run")

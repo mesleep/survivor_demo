@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"critical_up"
+display_name = "会心一击 +10%"
+description = "每次命中有额外 10% 概率造成双倍伤害。"
+type = 13
+value = 0.1
+max_stacks = 5
+required_weapon_id = &""

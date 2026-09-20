@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"leaf_mastery"
+display_name = "飞叶刃·疾风"
+description = "仅飞叶刃：弹速增加 35%。"
+type = 11
+value = 0.35
+max_stacks = 3
+required_weapon_id = &"leaf"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bell_mastery"
+display_name = "环绕铃铛·共鸣"
+description = "仅铃铛：体积与环绕半径增加 30%。"
+type = 12
+value = 0.3
+max_stacks = 3
+required_weapon_id = &"bell"

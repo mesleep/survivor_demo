@@ -7,10 +7,10 @@
 [resource]
 script = ExtResource("1_definition")
 id = &"starter_weapon"
-display_name = "Starter Weapon"
+display_name = "星光魔杖"
 visual_frames = ExtResource("3_visual")
 projectile_definition = ExtResource("2_projectile")
 cooldown_seconds = 1.0
 projectile_count = 1
-spread_degrees = 0.0
+spread_degrees = 18.0
 target_range = 900.0

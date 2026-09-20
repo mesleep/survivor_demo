@@ -537,3 +537,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 ```
 
 测试清单、覆盖矩阵与已知限制见 `docs/BASELINE.md`。
+
+## 四宠庭院增量（2026-09-20）
+
+在既有组合结构上增加 `GameAudio` 和 `SessionControls`，由 GameSession 显式注入依赖。PlayerActor 通过武器修正历史让后加入的控制器继承通用强化；UpgradeDefinition 标明获取武器与专属武器约束；ProjectileDefinition 通过轨迹枚举复用直射、返回、环绕，不按武器 ID 分支。四只宠物继续共享 EnemyActor。新增接口与测试说明见 `docs/PET_PLAYTEST.md`，冻结基线内容不改写。

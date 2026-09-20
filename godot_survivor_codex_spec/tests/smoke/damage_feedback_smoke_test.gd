@@ -15,6 +15,8 @@ func _run() -> void:
 	var main_node: Node = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
 	root.add_child(main_node)
 	await process_frame
+	# 跳过资源加载首帧，避免启动耗时被新建 Timer 消耗而 Tween 尚未开始。
+	await process_frame
 	var session: GameSession = main_node.get_node("GameSession") as GameSession
 	session.enemy_spawner.stop()
 	var player: PlayerActor = session.player

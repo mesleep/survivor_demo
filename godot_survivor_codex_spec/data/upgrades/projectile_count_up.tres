@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"projectile_count_up"
-display_name = "Projectile +1"
-description = "Fire one additional projectile."
+display_name = "多重魔弹 +1"
+description = "每轮攻击多发射一颗魔弹。"
 type = 2
 value = 1.0
 max_stacks = 3

@@ -30,8 +30,8 @@ func set_ui_scale(ui_scale: float) -> void:
 func show_result(result: GameResult) -> void:
 	if result == null:
 		return
-	title.text = "Victory" if result.outcome == GameResult.Outcome.VICTORY else "Defeat"
-	stats_label.text = "Survival Time  %s\nLevel  %d\nKills  %d" % [
+	title.text = "庭院守护成功" if result.outcome == GameResult.Outcome.VICTORY else "休息一下，再来一局"
+	stats_label.text = "生存时间  %s\n等级  %d\n击退数量  %d" % [
 		_format_time(result.elapsed_seconds),
 		result.level,
 		result.kill_count,

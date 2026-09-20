@@ -14,6 +14,10 @@ var damage_multiplier: float = 1.0
 var lifesteal_ratio: float = 0.0
 var target: Node2D
 var weapon_id: StringName
+var pierce_bonus: int = 0
+var speed_multiplier: float = 1.0
+var size_multiplier: float = 1.0
+var critical_chance: float = 0.0
 
 
 func _init(

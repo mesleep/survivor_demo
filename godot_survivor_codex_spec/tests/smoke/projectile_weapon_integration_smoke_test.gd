@@ -33,6 +33,7 @@ func _run() -> void:
 	game_session.enemy_spawner.stop()
 
 	var player: PlayerActor = game_session.player
+	var original_spread: float = player.definition.starting_weapons[0].spread_degrees
 	var controller: WeaponController = player.weapon_controllers[0]
 	controller.set_process(false)
 	for projectile: Node in game_session.projectiles.get_children():
@@ -100,7 +101,7 @@ func _run() -> void:
 		_expect(is_equal_approx(rad_to_deg(_spawned_directions[0].angle()), -10.0), "首个子弹扩散角不是 -10 度。")
 		_expect(is_equal_approx(rad_to_deg(_spawned_directions[1].angle()), 0.0), "中间子弹扩散角不是 0 度。")
 		_expect(is_equal_approx(rad_to_deg(_spawned_directions[2].angle()), 10.0), "末个子弹扩散角不是 10 度。")
-	_expect(player.definition.starting_weapons[0].spread_degrees == 0.0, "运行时扩散配置回写了共享武器 Resource。")
+	_expect(player.definition.starting_weapons[0].spread_degrees == original_spread, "运行时扩散配置回写了共享武器 Resource。")
 	_expect(player.definition.starting_weapons[0].projectile_count == 1, "运行时弹数回写了共享武器 Resource。")
 
 	if not _failed:

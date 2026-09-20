@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"damage_up"
-display_name = "Damage +20%"
-description = "Increase projectile damage by 20%."
+display_name = "魔力增强 +20%"
+description = "魔弹伤害增加 20%。"
 type = 0
 value = 0.2
 max_stacks = 5

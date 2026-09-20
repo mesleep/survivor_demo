@@ -30,7 +30,7 @@ func _run() -> void:
 	_expect(session.level_up_panel.visible, "升级面板未显示。")
 	_expect(session.level_up_panel.process_mode == Node.PROCESS_MODE_ALWAYS, "升级 UI 暂停时不可处理输入。")
 	_expect(session.level_up_panel.choices_container.get_child_count() == 3, "升级面板未生成三个按钮。")
-	_expect(session.hud.level_label.text == "Level 3", "HUD 等级显示未更新。")
+	_expect(session.hud.level_label.text == "等级 3", "HUD 等级显示未更新。")
 	_expect(roundi(session.hud.experience_bar.value) == 3 and roundi(session.hud.experience_bar.max_value) == 14, "HUD 经验条未更新。")
 	_expect(session.hud.health_bar.custom_minimum_size.is_equal_approx(Vector2(390.0, 23.4)), "HUD 未应用 GameSession.ui_scale。")
 

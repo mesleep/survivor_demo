@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"move_speed_up"
-display_name = "Move Speed +10%"
-description = "Increase movement speed by 10%."
+display_name = "轻盈步伐 +10%"
+description = "移动速度增加 10%。"
 type = 3
 value = 0.1
 max_stacks = 5

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"fire_rate_up"
-display_name = "Fire Rate +10%"
-description = "Reduce weapon cooldown by 10%."
+display_name = "迅捷施法 +10%"
+description = "武器冷却时间减少 10%。"
 type = 1
 value = 0.1
 max_stacks = 5

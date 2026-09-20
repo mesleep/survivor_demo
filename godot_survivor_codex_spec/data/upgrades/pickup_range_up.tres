@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"pickup_range_up"
-display_name = "Pickup Range +25%"
-description = "Increase experience pickup radius by 25%."
+display_name = "宝石磁铁 +25%"
+description = "经验宝石拾取半径增加 25%。"
 type = 8
 value = 0.25
 max_stacks = 5

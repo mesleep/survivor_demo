@@ -11,6 +11,8 @@ const GRID_COLOR := Color("263958")
 const BORDER_COLOR := Color("4f78a8")
 
 @export var size: Vector2 = Vector2(2560.0, 1440.0)
+## 背景仅负责装饰，不改变已有边界和碰撞。
+@export var background_texture: Texture2D
 @export_range(32.0, 512.0, 1.0) var grid_spacing: float = 128.0
 
 
@@ -20,6 +22,10 @@ func get_bounds() -> Rect2:
 
 func _draw() -> void:
 	var bounds: Rect2 = get_bounds()
+	if background_texture != null:
+		draw_texture_rect(background_texture, bounds, false)
+		draw_rect(bounds, BORDER_COLOR, false, 8.0)
+		return
 	draw_rect(bounds, BACKGROUND_COLOR)
 
 	var spacing: int = maxi(roundi(grid_spacing), 1)

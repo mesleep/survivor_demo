@@ -28,7 +28,7 @@ func _run() -> void:
 	Input.action_release(&"move_left")
 	await create_timer(0.05).timeout
 	_expect(sprite.animation == &"idle", "停止移动后没有恢复待机。")
-	for name: String in ["slime", "bat", "boss"]:
+	for name: String in ["huniu", "heibao", "boss"]:
 		var frames: SpriteFrames = load("res://data/visuals/%s_frames.tres" % name) as SpriteFrames
 		_expect(frames.get_frame_count(&"walk") == 4, "%s 缺少运动帧。" % name)
 		for index: int in range(4):
@@ -56,6 +56,9 @@ func _run() -> void:
 		root.get_texture().get_image().save_png("/tmp/survivor_pixel_art_preview.png")
 	if not _failed:
 		print("Pixel art smoke test passed: movement, facing, atlas bounds and weapon animation.")
+	main.queue_free()
+	await process_frame
+	await create_timer(0.1).timeout
 	quit(1 if _failed else 0)
 
 

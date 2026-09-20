@@ -12,6 +12,10 @@ var damage_multiplier: float = 1.0
 var bonus_projectile_chance: float = 0.0
 var projectile_lifesteal_ratio: float = 0.0
 var repeat_shot_chance: float = 0.0
+var pierce_bonus: int = 0
+var speed_multiplier: float = 1.0
+var size_multiplier: float = 1.0
+var critical_chance: float = 0.0
 
 
 func _init(

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1")
 id = &"bonus_projectile_chance_up"
-display_name = "Lucky Shot +15%"
-description = "Each attack has +15% chance to fire one extra projectile."
+display_name = "幸运射击 +15%"
+description = "每次攻击额外发射一颗魔弹的概率增加 15%。"
 type = 6
 value = 0.15
 max_stacks = 5

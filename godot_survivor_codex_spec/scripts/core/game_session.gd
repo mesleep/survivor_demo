@@ -21,6 +21,8 @@ var kill_count: int = 0
 var is_run_active: bool = false
 var boss_has_spawned: bool = false
 var boss: EnemyActor
+var game_audio: GameAudio
+var session_controls: SessionControls
 
 @onready var arena: Arena = $Arena
 @onready var actors: Node2D = $Actors
@@ -37,7 +39,12 @@ var boss: EnemyActor
 
 
 func _ready() -> void:
+	game_audio = GameAudio.new()
+	add_child(game_audio)
 	start_run()
+	session_controls = SessionControls.new()
+	add_child(session_controls)
+	session_controls.initialize(self, game_audio)
 
 
 func _process(delta: float) -> void:
@@ -94,6 +101,10 @@ func start_run() -> void:
 	difficulty_director.initialize(run_definition, enemy_spawner)
 	targeting_service.initialize(enemies)
 	new_player.configure_weapons(player_definition.starting_weapons, projectiles, targeting_service)
+	new_player.weapon_added.connect(_on_weapon_added)
+	for controller: WeaponController in new_player.weapon_controllers:
+		controller.weapon_fired.connect(_on_weapon_fired)
+	new_player.experience_changed.connect(_on_experience_changed)
 	upgrade_system.initialize(new_player)
 	hud.set_ui_scale(ui_scale)
 	level_up_panel.set_ui_scale(ui_scale)
@@ -147,6 +158,7 @@ func _on_enemy_died(actor: ActorBase, _event: DamageEvent) -> void:
 	if enemy.definition == null:
 		return
 	kill_count += 1
+	game_audio.play_cue(&"defeat_enemy")
 	if enemy.definition.is_boss:
 		if is_run_active:
 			end_run(GameResult.Outcome.VICTORY)
@@ -171,6 +183,7 @@ func _request_next_upgrade() -> void:
 		_resume_after_upgrades()
 		return
 	get_tree().paused = true
+	game_audio.play_cue(&"upgrade")
 	upgrade_system.request_choices(3)
 
 
@@ -209,6 +222,7 @@ func end_run(outcome: GameResult.Outcome) -> void:
 	var result := GameResult.new(outcome, elapsed_seconds, player.get_current_level(), kill_count)
 	get_tree().paused = true
 	end_panel.show_result(result)
+	game_audio.finish_run(outcome == GameResult.Outcome.VICTORY)
 	run_ended.emit(result)
 
 
@@ -240,6 +254,7 @@ func _spawn_boss() -> EnemyActor:
 	var spawn_position: Vector2 = enemy_spawner.get_offscreen_spawn_position()
 	boss = enemy_spawner.spawn_enemy(run_definition.boss_definition, spawn_position, true)
 	if is_instance_valid(boss):
+		game_audio.play_cue(&"boss")
 		boss_spawned.emit(boss)
 	else:
 		push_error("GameSession Boss 生成失败。")
@@ -248,6 +263,19 @@ func _spawn_boss() -> EnemyActor:
 
 func _on_player_died(_actor: ActorBase, _event: DamageEvent) -> void:
 	end_run(GameResult.Outcome.DEFEAT)
+
+
+func _on_weapon_fired(_weapon_id: StringName) -> void:
+	game_audio.play_cue(&"shot")
+
+
+func _on_weapon_added(controller: WeaponController) -> void:
+	controller.weapon_fired.connect(_on_weapon_fired)
+
+
+func _on_experience_changed(_current: int, gained: int) -> void:
+	if gained > 0:
+		game_audio.play_cue(&"pickup")
 
 
 func _stop_combat_nodes() -> void:

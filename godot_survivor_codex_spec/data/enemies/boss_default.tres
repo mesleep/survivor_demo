@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1")
 id = &"boss_default"
-display_name = "Survivor Boss"
+display_name = "月夜领主"
 scene = ExtResource("2")
 max_health = 500.0
 move_speed = 55.0
