@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/arena.gd" id="1_arena"]
-[ext_resource type="Texture2D" path="res://assets/backgrounds/月光庭院.png" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/backgrounds/F01_moonlit_courtyard.png" id="2_background"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_horizontal"]
 size = Vector2(2624, 64)
@@ -13,7 +13,7 @@ size = Vector2(64, 1504)
 z_index = -100
 script = ExtResource("1_arena")
 background_texture = ExtResource("2_background")
-texture_filter = 1
+texture_filter = 2
 
 [node name="Bounds" type="StaticBody2D" parent="."]
 collision_layer = 1

@@ -8,6 +8,7 @@ const BASE_BUTTON_SIZE := Vector2(420.0, 64.0)
 const BASE_BUTTON_FONT_SIZE := 16
 const BASE_TITLE_FONT_SIZE := 24
 const BASE_PANEL_MARGIN := 24
+const BUTTON_STYLE: StyleBox = preload("res://data/visuals/v2_dark_comic/button_style.tres")
 
 @onready var choices_container: VBoxContainer = %ChoicesContainer
 @onready var title: Label = %Title
@@ -43,6 +44,8 @@ func show_choices(choices: Array[UpgradeDefinition]) -> void:
 		var button := Button.new()
 		button.custom_minimum_size = BASE_BUTTON_SIZE * _ui_scale
 		button.add_theme_font_size_override("font_size", maxi(roundi(BASE_BUTTON_FONT_SIZE * _ui_scale), 1))
+		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
+			button.add_theme_stylebox_override(state, BUTTON_STYLE)
 		button.text = "%s\n%s" % [definition.display_name, definition.description]
 		button.pressed.connect(_on_choice_pressed.bind(definition))
 		choices_container.add_child(button)

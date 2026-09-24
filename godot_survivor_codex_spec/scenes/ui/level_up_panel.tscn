@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/level_up_panel.gd" id="1"]
+[ext_resource type="StyleBox" path="res://data/visuals/v2_dark_comic/panel_style.tres" id="2_panel_style"]
 
 [node name="LevelUpPanel" type="Control"]
 process_mode = 3
@@ -34,6 +35,7 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
 layout_mode = 2
+theme_override_styles/panel = ExtResource("2_panel_style")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 unique_name_in_owner = true

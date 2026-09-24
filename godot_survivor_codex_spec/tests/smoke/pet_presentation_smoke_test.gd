@@ -1,4 +1,4 @@
-## 宠物美术、背景、中文、暂停状态隔离和本地音频的回归验证。
+## 新版宠物资源、背景、中文、暂停状态隔离和本地音频的回归验证。
 extends SceneTree
 
 var failed: bool = false
@@ -27,8 +27,8 @@ func _run() -> void:
 		var definition: EnemyDefinition = load("res://data/enemies/%s.tres" % name) as EnemyDefinition
 		var enemy: EnemyActor = session.enemy_spawner.spawn_enemy(definition, Vector2(300, 0), true)
 		var frames: SpriteFrames = (enemy.visual as AnimatedSprite2D).sprite_frames
-		check(frames.get_frame_count(&"walk") == 4, "宠物运动帧缺失")
-		check((frames.get_frame_texture(&"walk", 0) as AtlasTexture).atlas.resource_path.contains("/pets/"), "未替换为宠物图集")
+		check(frames.get_frame_count(&"walk") == 4, "宠物移动播放槽缺失")
+		check(frames.get_frame_texture(&"walk", 0).resource_path.contains("/v2_dark_comic/actors/"), "未切换到新版宠物资源")
 	session.session_controls.toggle_pause()
 	check(paused, "暂停未生效")
 	var before: float = session.elapsed_seconds

@@ -13,6 +13,7 @@ const FEEDBACK_DURATION_SECONDS := 0.14
 const HIT_SOUND_DURATION_SECONDS := 0.09
 const HIT_SOUND_MIX_RATE := 22050
 const FLASH_COLOR := Color(1.0, 0.28, 0.28, 1.0)
+const HIT_SPARK: Texture2D = preload("res://assets/v2_dark_comic/fx/hit_spark.png")
 
 static var _cached_hit_stream: AudioStreamWAV
 static var _live_component_count: int = 0
@@ -76,6 +77,7 @@ func play_feedback(event: DamageEvent) -> void:
 	_feedback_tween.tween_property(_visual, "modulate", _base_modulate, FEEDBACK_DURATION_SECONDS)
 	_feedback_tween.tween_property(_visual, "scale", _base_scale, FEEDBACK_DURATION_SECONDS).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_feedback_tween.tween_property(_visual, "position", _base_position, FEEDBACK_DURATION_SECONDS).set_trans(Tween.TRANS_SINE)
+	_spawn_hit_spark()
 	if play_sound and audio_player.stream != null:
 		audio_player.play()
 	feedback_started.emit(event)
@@ -93,6 +95,21 @@ func _reset_visual() -> void:
 	_visual.position = _base_position
 	_visual.scale = _base_scale
 	_visual.modulate = _base_modulate
+
+
+func _spawn_hit_spark() -> void:
+	var spark := Sprite2D.new()
+	spark.texture = HIT_SPARK
+	spark.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	spark.scale = Vector2.ONE * 0.22
+	spark.position = _base_position + Vector2(16.0, -12.0)
+	spark.z_index = 2
+	get_parent().add_child(spark)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(spark, "scale", Vector2.ONE * 0.32, 0.18)
+	tween.tween_property(spark, "modulate:a", 0.0, 0.18)
+	tween.finished.connect(spark.queue_free)
 
 
 func _disconnect_health() -> void:

@@ -6,6 +6,9 @@ extends Control
 
 const BASE_LABEL_FONT_SIZE := 16
 const BASE_BAR_SIZE := Vector2(300.0, 18.0)
+const BAR_TRACK: Texture2D = preload("res://assets/v2_dark_comic/ui/ui_progress_track.png")
+const HEALTH_FILL: Texture2D = preload("res://assets/v2_dark_comic/ui/ui_progress_fill_health.png")
+const XP_FILL: Texture2D = preload("res://assets/v2_dark_comic/ui/ui_progress_fill_xp.png")
 
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var health_label: Label = %HealthLabel
@@ -17,21 +20,26 @@ var _player: PlayerActor
 
 
 func _ready() -> void:
-	_style_bar(health_bar, Color("ed8090"))
-	_style_bar(experience_bar, Color("71dac7"))
+	_style_bar(health_bar, HEALTH_FILL)
+	_style_bar(experience_bar, XP_FILL)
 	for label: Label in [health_label, level_label, time_label]:
 		label.add_theme_color_override("font_shadow_color", Color("142a32"))
 		label.add_theme_constant_override("shadow_offset_x", 2)
 		label.add_theme_constant_override("shadow_offset_y", 2)
 
 
-func _style_bar(bar: ProgressBar, color: Color) -> void:
-	var background := StyleBoxFlat.new()
-	background.bg_color = Color("172d39")
-	background.set_corner_radius_all(6)
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = color
-	fill.set_corner_radius_all(6)
+func _style_bar(bar: ProgressBar, fill_texture: Texture2D) -> void:
+	var background := StyleBoxTexture.new()
+	background.texture = BAR_TRACK
+	background.texture_margin_left = 20.0
+	background.texture_margin_right = 20.0
+	background.texture_margin_top = 8.0
+	background.texture_margin_bottom = 8.0
+	var fill := StyleBoxTexture.new()
+	fill.texture = fill_texture
+	fill.texture_margin_left = 12.0
+	fill.texture_margin_right = 12.0
+	bar.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	bar.add_theme_stylebox_override("background", background)
 	bar.add_theme_stylebox_override("fill", fill)
 

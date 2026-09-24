@@ -207,8 +207,8 @@ func _configure_visual() -> void:
 	weapon_visual = AnimatedSprite2D.new()
 	weapon_visual.name = "WeaponVisual"
 	weapon_visual.sprite_frames = definition.visual_frames
-	weapon_visual.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	weapon_visual.scale = Vector2.ONE * 0.16
+	weapon_visual.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	weapon_visual.scale = Vector2.ONE * 0.22
 	add_child(weapon_visual)
 	weapon_visual.animation_finished.connect(_on_visual_animation_finished)
 	weapon_visual.play(&"idle")

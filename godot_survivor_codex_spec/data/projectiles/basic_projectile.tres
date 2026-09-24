@@ -12,4 +12,5 @@ speed = 600.0
 lifetime_seconds = 2.0
 pierce_count = 0
 hit_radius = 8.0
+visual_scale = 0.2
 knockback_strength = 0.0

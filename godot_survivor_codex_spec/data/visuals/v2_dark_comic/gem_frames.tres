@@ -1,0 +1,8 @@
+[gd_resource type="SpriteFrames" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/pickups/experience_gem.png" id="1"]
+
+[resource]
+animations = [
+{"frames": [{"duration": 1.0, "texture": ExtResource("1")}, {"duration": 1.0, "texture": ExtResource("1")}, {"duration": 1.0, "texture": ExtResource("1")}, {"duration": 1.0, "texture": ExtResource("1")}], "loop": true, "name": &"default", "speed": 8.0}
+]
