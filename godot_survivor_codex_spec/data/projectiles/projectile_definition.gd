@@ -11,6 +11,8 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export var motion_type: MotionType = MotionType.STRAIGHT
 @export var visual_frames: SpriteFrames
 @export var visual_scale: float = 0.1
+## 弹体着色；敌人弹体可借此区分敌我（不修改共享素材）。
+@export var visual_modulate: Color = Color.WHITE
 @export var orbit_radius: float = 100.0
 @export var orbit_speed: float = 3.0
 
@@ -22,6 +24,8 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export_range(0, 1000, 1) var pierce_count: int = 0
 @export_range(1.0, 1000.0, 0.5) var hit_radius: float = 8.0
 @export_range(0.0, 100000.0, 0.1) var knockback_strength: float = 0.0
+## 命中检测的物理层；玩家武器默认 4（敌人受击层），敌人弹体为 2（玩家受击层）。
+@export_flags_2d_physics var collision_mask: int = 4
 ## 命中后的一次性范围爆炸配置；为空表示不爆炸（T16）。
 @export var explosion: ExplosionDefinition
 ## 命中后施加的持续伤害效果；为空表示无 DoT（T17）。

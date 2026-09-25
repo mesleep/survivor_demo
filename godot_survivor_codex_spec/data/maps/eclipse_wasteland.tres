@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArenaDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/maps/arena_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"eclipse_wasteland"
+display_name = "月蚀荒原"
+size = Vector2(2560, 1440)
+grid_spacing = 160.0
+background_color = Color(0.1, 0.07, 0.12, 1)
+grid_color = Color(0.22, 0.14, 0.2, 1)
+border_color = Color(0.55, 0.35, 0.5, 1)

@@ -45,12 +45,15 @@ func initialize(new_definition: ProjectileDefinition, new_context: ProjectileSpa
 	if not context.shooter.tree_exiting.is_connected(_on_shooter_tree_exiting):
 		context.shooter.tree_exiting.connect(_on_shooter_tree_exiting)
 	global_position = context.spawn_position
+	# 由数据决定命中层：玩家武器打敌人（4），敌人弹体打玩家（2）。
+	collision_mask = definition.collision_mask
 	_remaining_pierces = maxi(definition.pierce_count + context.pierce_bonus, 0)
 	var visual: AnimatedSprite2D = get_node("Visual") as AnimatedSprite2D
 	if definition.visual_frames != null:
 		visual.sprite_frames = definition.visual_frames
 		visual.play(&"default")
 	visual.scale = Vector2.ONE * definition.visual_scale * context.size_multiplier
+	visual.modulate = definition.visual_modulate
 
 	var source_shape: Shape2D = collision_shape.shape
 	if source_shape is CircleShape2D:

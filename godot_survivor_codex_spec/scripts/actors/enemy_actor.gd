@@ -8,10 +8,13 @@ extends ActorBase
 
 var definition: EnemyDefinition
 var target_player: PlayerActor
+## 远程敌人发射弹体的容器（由 EnemySpawner 注入）；近战敌人可为空。
+var projectile_parent: Node
 var _move_speed: float = 0.0
 var _health_multiplier: float = 1.0
 var _move_speed_multiplier: float = 1.0
 var _damage_multiplier: float = 1.0
+var _attack_cooldown_remaining: float = 0.0
 
 @onready var contact_hitbox: HitboxComponent = %ContactHitbox
 
@@ -33,7 +36,13 @@ func initialize(new_definition: Resource) -> void:
 
 	definition = new_definition as EnemyDefinition
 	super.initialize(new_definition)
+	_attack_cooldown_remaining = 0.0
 	apply_difficulty_multipliers(1.0, 1.0, 1.0)
+
+
+## 注入远程弹体容器（T33）；近战敌人可忽略。
+func set_projectile_parent(parent: Node) -> void:
+	projectile_parent = parent
 
 
 ## 将难度倍率应用到当前敌人实例，不修改共享 EnemyDefinition。
@@ -64,14 +73,52 @@ func set_target_player(player: PlayerActor) -> void:
 	set_physics_process(true)
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not is_instance_valid(target_player):
 		_stop_tracking()
 		return
 
+	_attack_cooldown_remaining = maxf(_attack_cooldown_remaining - delta, 0.0)
+	var to_player: Vector2 = target_player.global_position - global_position
+	var distance: float = to_player.length()
+	var move_multiplier: float = get_status_move_speed_multiplier()
+
+	# 远程敌人：靠近到攻击范围、过近则后退，否则停下射击（T33）。
+	if definition != null and definition.attack_type == EnemyDefinition.AttackType.RANGED \
+			and definition.projectile_definition != null:
+		if distance > definition.attack_range:
+			velocity = to_player.normalized() * _move_speed * move_multiplier
+		elif distance < definition.preferred_distance and distance > 0.0:
+			velocity = -to_player.normalized() * _move_speed * move_multiplier
+		else:
+			velocity = Vector2.ZERO
+			if _attack_cooldown_remaining <= 0.0:
+				_fire_projectile(to_player.normalized())
+				_attack_cooldown_remaining = definition.attack_cooldown_seconds
+		move_and_slide()
+		return
+
 	var direction: Vector2 = global_position.direction_to(target_player.global_position)
-	velocity = direction * _move_speed * get_status_move_speed_multiplier()
+	velocity = direction * _move_speed * move_multiplier
 	move_and_slide()
+
+
+## 朝玩家方向发射一枚敌人弹体；弹体命中层由 ProjectileDefinition.collision_mask 决定。
+func _fire_projectile(direction: Vector2) -> void:
+	if definition == null or definition.projectile_definition == null:
+		return
+	if definition.projectile_definition.scene == null or not is_instance_valid(projectile_parent):
+		return
+	var projectile_node: Node = definition.projectile_definition.scene.instantiate()
+	if projectile_node is not ProjectileBase:
+		projectile_node.queue_free()
+		return
+	var projectile: ProjectileBase = projectile_node as ProjectileBase
+	projectile_parent.add_child(projectile)
+	var context := ProjectileSpawnContext.new(self, get_team_id(), global_position, direction)
+	context.weapon_id = definition.id
+	projectile.initialize(definition.projectile_definition, context)
+	projectile.launch(context.initial_direction)
 
 
 ## 目标失效后只执行一次停止，避免空引用错误每帧刷屏。

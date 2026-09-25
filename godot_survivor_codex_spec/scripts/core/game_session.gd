@@ -23,6 +23,8 @@ signal run_started(player: PlayerActor)
 @export var coin_pickup_scene: PackedScene
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var run_definition: RunDefinition
+## 地图定义（T33）；为空时使用 arena 场景自带配置。
+@export var arena_definition: ArenaDefinition
 @export var experience_gem_scene: PackedScene
 ## HUD 和升级面板的统一尺寸倍率，不影响游戏世界或摄像机。
 @export_range(0.75, 2.0, 0.05) var ui_scale: float = 1.3
@@ -130,6 +132,7 @@ func start_run() -> void:
 	boss_has_spawned = false
 	boss = null
 
+	arena.configure(arena_definition)
 	var player_node: Node = effective_character.scene.instantiate()
 	if player_node is not PlayerActor:
 		push_error("GameSession 启动失败：CharacterDefinition.scene 必须生成 PlayerActor。")
@@ -145,7 +148,7 @@ func start_run() -> void:
 	player = new_player
 	if not enemy_spawner.enemy_spawned.is_connected(_on_enemy_spawned):
 		enemy_spawner.enemy_spawned.connect(_on_enemy_spawned)
-	enemy_spawner.initialize(enemy_spawn_settings, player, enemies, arena.get_bounds())
+	enemy_spawner.initialize(enemy_spawn_settings, player, enemies, arena.get_bounds(), projectiles)
 	difficulty_director.initialize(run_definition, enemy_spawner)
 	targeting_service.initialize(enemies)
 	new_player.configure_equipment(_resolve_candidate_weapon_ids())

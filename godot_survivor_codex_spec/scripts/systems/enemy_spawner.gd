@@ -14,6 +14,8 @@ const ARENA_EDGE_MARGIN := 48.0
 var settings: EnemySpawnSettings
 var target_player: PlayerActor
 var enemy_parent: Node2D
+## 远程敌人弹体容器（T33）；可为空。
+var projectile_parent: Node
 var spawn_bounds: Rect2
 var _random := RandomNumberGenerator.new()
 var _enemy_pool: Array[EnemyDefinition] = []
@@ -33,13 +35,15 @@ func initialize(
 		new_settings: EnemySpawnSettings,
 		player: PlayerActor,
 		new_enemy_parent: Node2D,
-		new_spawn_bounds: Rect2
+		new_spawn_bounds: Rect2,
+		new_projectile_parent: Node = null
 ) -> void:
 	stop()
 	settings = new_settings
 	target_player = player
 	enemy_parent = new_enemy_parent
 	spawn_bounds = new_spawn_bounds
+	projectile_parent = new_projectile_parent
 	_enemy_pool.clear()
 	if settings != null and settings.enemy_definition != null:
 		_enemy_pool.append(settings.enemy_definition)
@@ -105,6 +109,7 @@ func spawn_enemy(definition: EnemyDefinition, position: Vector2, ignore_alive_li
 	enemy_parent.add_child(enemy)
 	enemy.initialize(definition)
 	enemy.apply_difficulty_multipliers(_health_multiplier, _move_speed_multiplier, _damage_multiplier)
+	enemy.set_projectile_parent(projectile_parent)
 	enemy.set_target_player(target_player)
 	enemy_spawned.emit(enemy)
 	return enemy
