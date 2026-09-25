@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TechSetDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/armor/tech_set_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/weapons/tech_launcher.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+required_equipment_ids = Array[StringName]([&"armor_basic", &"armor_helmet", &"armor_gloves"])
+required_branch_id = &"tech"
+move_speed_multiplier = 1.4
+float_visual_offset = 12.0
+launcher_weapon = ExtResource("2")

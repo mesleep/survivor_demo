@@ -13,6 +13,8 @@ signal run_started(player: PlayerActor)
 @export var player_definition: CharacterDefinition
 @export var content_catalog: ContentCatalog
 @export var combat_rules: CombatRules
+## 科技三件套配置（T25）；为空则不启用套装。
+@export var tech_set_definition: TechSetDefinition
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var run_definition: RunDefinition
 @export var experience_gem_scene: PackedScene
@@ -124,6 +126,7 @@ func start_run() -> void:
 	targeting_service.initialize(enemies)
 	new_player.configure_equipment(_resolve_candidate_weapon_ids())
 	new_player.configure_weapons(starting_weapons, projectiles, targeting_service)
+	new_player.configure_tech_set(tech_set_definition)
 	new_player.weapon_added.connect(_on_weapon_added)
 	for controller: WeaponController in new_player.weapon_controllers:
 		controller.weapon_fired.connect(_on_weapon_fired)

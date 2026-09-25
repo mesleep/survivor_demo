@@ -188,7 +188,19 @@ func _fire_volley(
 		return 0
 	var spawned_count: int = 0
 	for index: int in range(requested_count):
+		var aim_target: Node2D = target
 		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
+		# 随机索敌：每一发各自取一个范围内目标（T25 导弹），取不到则退回基础方向。
+		if definition.target_mode == WeaponDefinition.TargetMode.RANDOM \
+				and is_instance_valid(targeting_service) and is_instance_valid(owner_actor):
+			var random_target: ActorBase = targeting_service.get_random_target(
+				owner_actor.get_aim_position(), get_effective_target_range(), &"enemy"
+			)
+			if random_target != null:
+				aim_target = random_target
+				direction = owner_actor.get_aim_position().direction_to(random_target.get_aim_position())
+				if direction.is_zero_approx():
+					direction = base_direction
 		if projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
 			direction = Vector2.RIGHT.rotated(TAU * float(index) / requested_count)
 		var context := ProjectileSpawnContext.new(
@@ -199,7 +211,7 @@ func _fire_volley(
 		)
 		context.damage_multiplier = damage_multiplier
 		context.lifesteal_ratio = clampf(_runtime_projectile_lifesteal_ratio + owner_actor.get_bonus_lifesteal_ratio(), 0.0, 1.0)
-		context.target = target
+		context.target = aim_target
 		context.weapon_id = definition.id
 		context.explosion_radius_multiplier = _explosion_radius_multiplier
 		context.explosion_damage_multiplier = _explosion_damage_multiplier

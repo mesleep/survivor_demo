@@ -1,4 +1,4 @@
-[gd_scene load_steps=93 format=3]
+[gd_scene load_steps=94 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
@@ -93,12 +93,14 @@
 [ext_resource type="Resource" path="res://data/upgrades/armor_tech.tres" id="90_upgrade"]
 [ext_resource type="Resource" path="res://data/upgrades/helmet_tech.tres" id="91_upgrade"]
 [ext_resource type="Resource" path="res://data/upgrades/gloves_tech.tres" id="92_upgrade"]
+[ext_resource type="Resource" path="res://data/armor/tech_set_default.tres" id="93_tech_set"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
 player_definition = ExtResource("2_player_definition")
 content_catalog = ExtResource("36_catalog")
 combat_rules = ExtResource("46_combat")
+tech_set_definition = ExtResource("93_tech_set")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
 run_definition = ExtResource("18_run")
 experience_gem_scene = ExtResource("7_experience_gem")

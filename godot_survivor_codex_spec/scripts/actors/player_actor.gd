@@ -17,6 +17,9 @@ signal equipment_changed(equipped_ids: Array[StringName])
 signal equipment_progress_changed(equipment_id: StringName, snapshot: EquipmentProgress)
 ## 获得防具；防具不创建 WeaponController，只登记清单与类别。
 signal armor_acquired(definition: ArmorDefinition)
+## 科技三件套激活/失活（T25）；只在状态真正变化时各发一次。
+signal tech_set_activated()
+signal tech_set_deactivated()
 
 ## D02：武器与防具共用六格，同一 ID 不重复装备；升级不占新格。
 const MAX_EQUIPMENT_SLOTS := 6
@@ -42,6 +45,10 @@ var _glove_cooldown_multiplier: float = 1.0
 var _glove_range_multiplier: float = 1.0
 var _tech_pieces: Dictionary[StringName, TechArmorDefinition] = {}
 var _tech_experience_clock: float = 0.0
+var _tech_set_definition: TechSetDefinition
+var _tech_set_active: bool = false
+var _tech_set_move_multiplier: float = 1.0
+var _set_weapon_controller: WeaponController
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
@@ -102,6 +109,9 @@ func initialize(new_definition: Resource) -> void:
 	_glove_range_multiplier = 1.0
 	_tech_pieces.clear()
 	_tech_experience_clock = 0.0
+	_tech_set_active = false
+	_tech_set_move_multiplier = 1.0
+	_set_weapon_controller = null
 	set_defense(0.0)
 	set_immune_chance(0.0)
 	set_damage_reflect_ratio(0.0)
@@ -435,6 +445,7 @@ func clear_weapons() -> void:
 		controller.set_process(false)
 		controller.queue_free()
 	weapon_controllers.clear()
+	_set_weapon_controller = null
 
 
 ## 增加本局经验，并将跨越的每个等级转化为一项待选择升级。
@@ -639,7 +650,12 @@ func _finalize_upgrade(upgrade: UpgradeDefinition) -> bool:
 
 
 func get_effective_move_speed() -> float:
-	return _move_speed * _move_speed_multiplier * (1.0 - _armor_move_penalty_ratio)
+	return (
+		_move_speed
+		* _move_speed_multiplier
+		* (1.0 - _armor_move_penalty_ratio)
+		* _tech_set_move_multiplier
+	)
 
 
 func get_effective_maximum_health() -> float:
@@ -730,6 +746,96 @@ func _enable_tech_armor(equipment_id: StringName, definition: TechArmorDefinitio
 	if equipment_id == StringName() or definition == null:
 		return
 	_tech_pieces[equipment_id] = definition
+	_evaluate_tech_set()
+
+
+## 注入科技三件套配置（T25）；可在装备/分支变化前调用，之后自动重算。
+func configure_tech_set(definition: TechSetDefinition) -> void:
+	_tech_set_definition = definition
+	_evaluate_tech_set()
+
+
+func is_tech_set_active() -> bool:
+	return _tech_set_active
+
+
+func get_set_weapon() -> WeaponController:
+	return _set_weapon_controller
+
+
+## 只在套装状态真正变化时应用/撤销一次，避免重复叠加移速或生成多个发射器。
+func _evaluate_tech_set() -> void:
+	var should_active: bool = _is_tech_set_satisfied()
+	if should_active == _tech_set_active:
+		return
+	if should_active:
+		_apply_tech_set()
+	else:
+		_remove_tech_set()
+
+
+func _is_tech_set_satisfied() -> bool:
+	if _tech_set_definition == null or _tech_set_definition.required_equipment_ids.is_empty():
+		return false
+	for equipment_id: StringName in _tech_set_definition.required_equipment_ids:
+		var progress: EquipmentProgress = _equipment_progress.get(equipment_id)
+		if progress == null or progress.branch_id != _tech_set_definition.required_branch_id:
+			return false
+	return true
+
+
+func _apply_tech_set() -> void:
+	_tech_set_active = true
+	_tech_set_move_multiplier = maxf(_tech_set_definition.move_speed_multiplier, 1.0)
+	_apply_float_visual(true)
+	grant_set_weapon(_tech_set_definition.launcher_weapon)
+	tech_set_activated.emit()
+
+
+func _remove_tech_set() -> void:
+	_tech_set_active = false
+	_tech_set_move_multiplier = 1.0
+	_apply_float_visual(false)
+	remove_set_weapon()
+	tech_set_deactivated.emit()
+
+
+## 飞行仅改视觉高度，不绕过 World 碰撞（T25）。
+func _apply_float_visual(active: bool) -> void:
+	if not is_instance_valid(visual):
+		return
+	var offset: float = _tech_set_definition.float_visual_offset if active else 0.0
+	visual.position.y = -offset
+
+
+## 授予套装武器：不占六格、不登记装备，仅供套装的发射器使用。
+func grant_set_weapon(definition: WeaponDefinition) -> bool:
+	if definition == null or definition.id == StringName():
+		return false
+	if is_instance_valid(_set_weapon_controller):
+		return false
+	if not is_instance_valid(_projectile_parent) or not is_instance_valid(_targeting_service):
+		return false
+	var controller := WeaponController.new()
+	controller.name = "SetWeapon_%s" % definition.id
+	controller.visual_slot = weapon_controllers.size()
+	weapon_controller_parent.add_child(controller)
+	controller.initialize(definition, self, _projectile_parent)
+	controller.set_targeting_service(_targeting_service)
+	weapon_controllers.append(controller)
+	_set_weapon_controller = controller
+	weapon_added.emit(controller)
+	return true
+
+
+func remove_set_weapon() -> void:
+	if not is_instance_valid(_set_weapon_controller):
+		_set_weapon_controller = null
+		return
+	weapon_controllers.erase(_set_weapon_controller)
+	_set_weapon_controller.set_process(false)
+	_set_weapon_controller.queue_free()
+	_set_weapon_controller = null
 
 
 func _clear_berserk_drain() -> void:

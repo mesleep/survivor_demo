@@ -14,11 +14,13 @@ const DEFAULT_REFRESH_INTERVAL_SECONDS := 0.1
 
 var candidate_parent: Node
 var _candidates: Array[ActorBase] = []
+var _random := RandomNumberGenerator.new()
 
 @onready var refresh_timer: Timer = $RefreshTimer
 
 
 func _ready() -> void:
+	_random.randomize()
 	if not refresh_timer.timeout.is_connected(_on_refresh_timer_timeout):
 		refresh_timer.timeout.connect(_on_refresh_timer_timeout)
 
@@ -67,6 +69,39 @@ func get_nearest_target(
 		nearest_target = candidate
 		nearest_distance_squared = distance_squared
 	return nearest_target
+
+
+## 从缓存的范围内候选中随机取一个有效目标；找不到返回 null（T25 导弹用）。
+##
+## 与 get_nearest_target 一样只遍历缓存，不搜索场景树。
+func get_random_target(
+		origin: Vector2,
+		maximum_range: float,
+		target_team: StringName = &"enemy"
+) -> ActorBase:
+	if maximum_range <= 0.0:
+		return null
+	var valid: Array[ActorBase] = []
+	var range_squared: float = maximum_range * maximum_range
+	for index: int in range(_candidates.size() - 1, -1, -1):
+		var candidate_value: Variant = _candidates[index]
+		if not _is_live_actor(candidate_value):
+			_candidates.remove_at(index)
+			continue
+		var candidate: ActorBase = candidate_value as ActorBase
+		if target_team != StringName() and candidate.get_team_id() != target_team:
+			continue
+		if origin.distance_squared_to(candidate.get_aim_position()) > range_squared:
+			continue
+		valid.append(candidate)
+	if valid.is_empty():
+		return null
+	return valid[_random.randi_range(0, valid.size() - 1)]
+
+
+## 固定随机种子，供测试确定随机目标选择。
+func set_random_seed(seed_value: int) -> void:
+	_random.seed = seed_value
 
 
 ## 重新读取注入容器的直接子节点，缓存所有仍存活的 Actor。

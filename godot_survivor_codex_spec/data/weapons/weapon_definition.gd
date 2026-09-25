@@ -6,6 +6,9 @@
 class_name WeaponDefinition
 extends Resource
 
+## 索敌方式：最近目标；或每一发从范围内候选中随机取目标（T25 科技导弹）。
+enum TargetMode { NEAREST, RANDOM }
+
 @export var id: StringName
 @export var display_name: String
 ## 武器动画由配置指定，控制器只驱动表现，不按武器 ID 分支。
@@ -21,3 +24,5 @@ extends Resource
 @export_range(0.0, 10.0, 0.05) var charge_seconds: float = 0.0
 ## 蓄力完成后的伤害倍率（1 = 不额外加成）。
 @export_range(1.0, 20.0, 0.1) var charge_damage_multiplier: float = 1.0
+## 索敌方式；RANDOM 时每一发各自从 TargetingService 候选中随机取目标。
+@export var target_mode: TargetMode = TargetMode.NEAREST
