@@ -23,6 +23,13 @@
 - `SessionControls` 改为经 `run_started` 延迟连接玩家，兼容菜单先创建 UI 再开局的流程。
 - 新增 `run_loadout_smoke_test.gd`；解析、启动与 28 项快速冒烟通过。
 
+### T03 主菜单选择与兼容启动（2026-09-25）
+
+- 新增 `MainMenu`（`scripts/ui/main_menu.gd`、`scenes/ui/main_menu.tscn`）：按目录生成角色与候选武器按钮，校验后发出 `start_requested(loadout)`；起始武器自动保留、候选上限 10。
+- 新增 `GameEntry`（`scripts/core/game_entry.gd`、`scenes/bootstrap/game_entry.tscn`）：主菜单与单局之间的路由，在 `start_run()` 前注入 `RunLoadout`，并跨重载记住上次选择。
+- `project.godot` 主场景切换为 `game_entry.tscn`；`main.tscn` 保留为默认直启入口，既有测试与直接启动不受影响。
+- 新增 `main_menu_smoke_test.gd`；解析、启动与 29 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。
