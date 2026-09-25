@@ -1,5 +1,16 @@
 # 开发任务清单
 
+## 用户追加：菜单按钮修复与剩余素材接入（2026-09-26）
+
+- [x] 修复「退出游戏」加入后菜单/暂停按钮被压扁：按钮样式保留上下纹理边距、只收窄左右内容边距
+- [x] 主菜单地图区改横排，恢复卡片列表高度且 1280 宽不溢出
+- [x] 接入 11 个通用属性升级图标（fire_rate/projectile_count/projectile_size/projectile_speed/repeat_shot/bonus_projectile/max_health/heal/dodge/immune/pierce）
+- [x] 修正 `wire_combat_visuals.py` 的 `icon` 插入顺序，`v2_art_validation` 增加“升级必须有新版图标”检查
+- [x] 主菜单卡片应用 `menu_card_base`，分区标题应用 `menu_tab`
+- [x] 升级三选一改竖版卡面并应用 `ui_upgrade_card`
+- [x] 解析、启动、68 项快速冒烟、120 秒 soak 通过；实拍 `art_review/v2_main_menu_preview.png`、`v2_settings_preview.png`、`v2_upgrade_panel_preview.png`
+- [ ] 真实窗口人工点击与十分钟完整游玩验收（T35）
+
 ## 用户追加：装备显示/设置/金币兜底/地图选择（2026-09-25）
 
 - [x] 装备栏显示图标；质变后显示“基础名·分支名”并使用质变图标
@@ -25,7 +36,7 @@
 - [x] 为 46 个升级卡补图标（获取/基础/质变/专属/金币）
 - [x] 列出仍缺图标的通用升级并保留空位
 - [x] 解析、启动、68 项快速冒烟、120 秒 soak 通过；实拍 `art_review/v2_upgrade_panel_preview.png`
-- [ ] 待生成 11 个通用属性图标：fire_rate、projectile_count、projectile_size、projectile_speed、repeat_shot、bonus_projectile、max_health、heal、dodge、immune、pierce
+- [x] 11 个通用属性图标已生成并于 2026-09-26 接入（fire_rate、projectile_count、projectile_size、projectile_speed、repeat_shot、bonus_projectile、max_health、heal、dodge、immune、pierce）
 
 ## 用户追加：十分钟终局与后期升级节奏（2026-09-25）
 
