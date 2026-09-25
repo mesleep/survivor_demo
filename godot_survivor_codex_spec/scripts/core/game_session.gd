@@ -26,6 +26,8 @@ signal run_started(player: PlayerActor)
 @export_range(0.75, 2.0, 0.05) var ui_scale: float = 1.3
 ## 为 false 时等待外部先注入 RunLoadout 再调用 start_run()，供主菜单流程使用。
 @export var auto_start: bool = true
+## 每局基础升级刷新次数（T28）；永久加成由入口叠加。
+@export var base_refresh_count: int = 1
 
 var player: PlayerActor
 var elapsed_seconds: float = 0.0
@@ -38,6 +40,8 @@ var session_controls: SessionControls
 ## 单局开局配置快照；为空时沿用导出 player_definition 的旧直启行为。
 var run_loadout: RunLoadout
 var _economy_random := RandomNumberGenerator.new()
+## 入口注入的本局刷新次数；-1 表示使用导出默认值。
+var _initial_refresh_count: int = -1
 
 @onready var arena: Arena = $Arena
 @onready var actors: Node2D = $Actors
@@ -72,6 +76,11 @@ func set_run_loadout(loadout: RunLoadout) -> void:
 		push_error("GameSession 已开始，无法替换单局配置。")
 		return
 	run_loadout = loadout.copy() if loadout != null else null
+
+
+## 注入本局升级刷新次数（T28）；入口按“基础 + 永久加成”计算后传入。
+func set_initial_refresh_count(count: int) -> void:
+	_initial_refresh_count = maxi(count, 0)
 
 
 func _process(delta: float) -> void:
@@ -138,6 +147,9 @@ func start_run() -> void:
 		controller.weapon_fired.connect(_on_weapon_fired)
 	new_player.experience_changed.connect(_on_experience_changed)
 	upgrade_system.initialize(new_player)
+	upgrade_system.set_refresh_count(
+		_initial_refresh_count if _initial_refresh_count >= 0 else base_refresh_count
+	)
 	hud.set_ui_scale(ui_scale)
 	level_up_panel.set_ui_scale(ui_scale)
 	end_panel.set_ui_scale(ui_scale)

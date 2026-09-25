@@ -209,6 +209,13 @@
 - `WeaponDefinition` 新增可配置 `visual_scale`（迁移原控制器硬编码的手持缩放）；按实拍结果调整弹体显示比例。
 - 图形模式实拍证据：`art_review/v2_new_combat_art_preview.png`、`v2_asset_sheet_preview.png`；解析、启动与 55 项快速冒烟、120 秒 soak 通过。
 
+### T28 升级选项刷新次数（2026-09-25）
+
+- 每局刷新次数 = `GameSession.base_refresh_count`（默认 1）+ `Profile.refresh_bonus`，由 GameEntry 开局注入（D25）。
+- `UpgradeSystem` 新增刷新接口：消耗一次并优先换出不同可用卡，不自动应用、不改变已选层数；次数跨升级保留、重开归零。
+- `LevelUpPanel` 卡列表下方新增“刷新（剩余 N）”按钮，按状态启用/禁用。
+- 新增 `upgrade_refresh_smoke_test.gd`；解析、启动与 56 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

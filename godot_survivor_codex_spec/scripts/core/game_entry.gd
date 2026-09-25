@@ -106,6 +106,9 @@ func _start_session(loadout: RunLoadout) -> void:
 	_session.auto_start = false
 	add_child(_session)
 	_session.set_run_loadout(loadout)
+	# 开局刷新次数 = 基础 + 档案永久加成（T28；永久加成由 T30 购买）。
+	var bonus: int = profile.refresh_bonus if profile != null else 0
+	_session.set_initial_refresh_count(_session.base_refresh_count + bonus)
 	if not _session.run_ended.is_connected(_on_run_ended):
 		_session.run_ended.connect(_on_run_ended)
 	_session.start_run()

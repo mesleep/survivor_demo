@@ -17,6 +17,7 @@ const BUTTON_STYLE: StyleBox = preload("res://data/visuals/v2_dark_comic/button_
 var _upgrade_system: UpgradeSystem
 var _accepting_input: bool = false
 var _ui_scale: float = 1.0
+var _refresh_button: Button
 
 
 ## 调整居中面板内部控件尺寸，保持全屏根节点和居中锚点不受缩放影响。
@@ -26,6 +27,9 @@ func set_ui_scale(ui_scale: float) -> void:
 	var margin_size: int = maxi(roundi(BASE_PANEL_MARGIN * _ui_scale), 1)
 	for side: StringName in [&"margin_left", &"margin_top", &"margin_right", &"margin_bottom"]:
 		panel_margin.add_theme_constant_override(side, margin_size)
+	if is_instance_valid(_refresh_button):
+		_refresh_button.custom_minimum_size = BASE_BUTTON_SIZE * _ui_scale
+		_refresh_button.add_theme_font_size_override("font_size", maxi(roundi(BASE_BUTTON_FONT_SIZE * _ui_scale), 1))
 
 
 func initialize(upgrade_system: UpgradeSystem) -> void:
@@ -33,7 +37,22 @@ func initialize(upgrade_system: UpgradeSystem) -> void:
 	_upgrade_system = upgrade_system
 	if is_instance_valid(_upgrade_system):
 		_upgrade_system.choices_ready.connect(show_choices)
+	_ensure_refresh_button()
 	hide_panel()
+
+
+## 刷新按钮放在卡列表下方，切换升级时不被 _clear_buttons 清除（T28）。
+func _ensure_refresh_button() -> void:
+	if is_instance_valid(_refresh_button):
+		return
+	_refresh_button = Button.new()
+	_refresh_button.text = "刷新"
+	_refresh_button.custom_minimum_size = BASE_BUTTON_SIZE * _ui_scale
+	_refresh_button.add_theme_font_size_override("font_size", maxi(roundi(BASE_BUTTON_FONT_SIZE * _ui_scale), 1))
+	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
+		_refresh_button.add_theme_stylebox_override(state, BUTTON_STYLE)
+	_refresh_button.pressed.connect(_on_refresh_pressed)
+	choices_container.get_parent().add_child(_refresh_button)
 
 
 func show_choices(choices: Array[UpgradeDefinition]) -> void:
@@ -55,8 +74,26 @@ func show_choices(choices: Array[UpgradeDefinition]) -> void:
 			button.add_theme_constant_override("icon_max_width", maxi(roundi(40.0 * _ui_scale), 1))
 		button.pressed.connect(_on_choice_pressed.bind(definition))
 		choices_container.add_child(button)
+	_update_refresh_button()
 	if choices_container.get_child_count() > 0:
 		(choices_container.get_child(0) as Button).grab_focus()
+
+
+func _update_refresh_button() -> void:
+	if not is_instance_valid(_refresh_button):
+		return
+	var awaiting: bool = is_instance_valid(_upgrade_system) and _upgrade_system.is_awaiting_choice()
+	_refresh_button.visible = awaiting
+	_refresh_button.disabled = not (awaiting and _upgrade_system.can_refresh())
+	_refresh_button.text = "刷新（剩余 %d）" % (
+		_upgrade_system.get_remaining_refreshes() if is_instance_valid(_upgrade_system) else 0
+	)
+
+
+func _on_refresh_pressed() -> void:
+	if not is_instance_valid(_upgrade_system):
+		return
+	_upgrade_system.refresh_choices()
 
 
 func hide_panel() -> void:
