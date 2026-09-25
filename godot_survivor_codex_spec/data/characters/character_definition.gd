@@ -16,3 +16,5 @@ extends Resource
 @export_range(1.0, 5000.0, 1.0) var base_attack_range: float = 1000.0
 @export_range(0.0, 2000.0, 1.0) var pickup_radius: float = 96.0
 @export var starting_weapons: Array[WeaponDefinition] = []
+## 解锁所需金币；0 表示默认解锁（T29）。
+@export_range(0, 1000000, 1) var unlock_cost: int = 0

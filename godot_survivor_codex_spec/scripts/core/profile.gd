@@ -88,6 +88,28 @@ func is_weapon_unlocked(weapon_id: StringName) -> bool:
 	return unlocked_weapon_ids.has(weapon_id)
 
 
+## 尝试扣除金币并解锁角色；已解锁或余额不足返回 false（T29）。
+func try_unlock_character(character_id: StringName, cost: int) -> bool:
+	if character_id == StringName() or is_character_unlocked(character_id):
+		return false
+	if coins < maxi(cost, 0):
+		return false
+	coins -= maxi(cost, 0)
+	unlocked_character_ids.append(character_id)
+	return true
+
+
+## 尝试扣除金币并解锁武器；已解锁或余额不足返回 false（T29）。
+func try_unlock_weapon(weapon_id: StringName, cost: int) -> bool:
+	if weapon_id == StringName() or is_weapon_unlocked(weapon_id):
+		return false
+	if coins < maxi(cost, 0):
+		return false
+	coins -= maxi(cost, 0)
+	unlocked_weapon_ids.append(weapon_id)
+	return true
+
+
 static func _as_int(value: Variant) -> int:
 	if value is int:
 		return value

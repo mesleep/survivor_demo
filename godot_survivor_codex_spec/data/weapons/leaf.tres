@@ -8,6 +8,7 @@
 script = ExtResource("1")
 id = &"leaf"
 display_name = "飞叶刃"
+unlock_cost = 40
 visual_frames = ExtResource("3")
 projectile_definition = ExtResource("2")
 cooldown_seconds = 0.65

@@ -9,6 +9,7 @@ script = ExtResource("1")
 id = &"staff"
 visual_scale = 0.3
 display_name = "蓄力法杖"
+unlock_cost = 80
 visual_frames = ExtResource("3")
 projectile_definition = ExtResource("2")
 cooldown_seconds = 2.0

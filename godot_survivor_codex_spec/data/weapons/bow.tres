@@ -9,6 +9,7 @@ script = ExtResource("1")
 id = &"bow"
 visual_scale = 0.3
 display_name = "长弓"
+unlock_cost = 60
 visual_frames = ExtResource("3")
 projectile_definition = ExtResource("2")
 cooldown_seconds = 1.2

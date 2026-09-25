@@ -16,6 +16,8 @@ static var _remembered_loadout: RunLoadout
 ## 跨局档案存储；测试可在入树前注入临时路径（T27）。
 var profile_store: ProfileStore
 var profile: Profile
+## 解锁交易入口（T29）。
+var unlock_service: UnlockService
 
 var _menu: MainMenu
 var _session: GameSession
@@ -25,6 +27,7 @@ var _status_text: String = ""
 func _ready() -> void:
 	_ensure_profile_store()
 	profile = profile_store.load_profile()
+	unlock_service = UnlockService.new(profile, profile_store)
 	if not profile_store.last_error.is_empty():
 		_status_text = "存档提示：%s" % profile_store.last_error
 	show_menu()
@@ -64,6 +67,7 @@ func show_menu() -> void:
 		return
 	_menu = menu_node as MainMenu
 	_menu.catalog = catalog
+	_menu.configure_profile(profile, unlock_service)
 	_menu.start_requested.connect(_on_start_requested)
 	if _remembered_loadout != null:
 		_menu.preselect(_remembered_loadout)
@@ -88,8 +92,28 @@ func get_menu() -> MainMenu:
 func _on_start_requested(loadout: RunLoadout) -> void:
 	if loadout == null:
 		return
+	if not is_loadout_unlocked(loadout):
+		_status_text = "所选角色或武器尚未解锁。"
+		if is_instance_valid(_menu):
+			_menu.set_status(_status_text)
+		return
 	_remembered_loadout = loadout.copy()
 	_start_session(loadout)
+
+
+## 开局配置只接受已解锁内容（T29）；无档案时视为全部可用（旧直启兼容）。
+func is_loadout_unlocked(loadout: RunLoadout) -> bool:
+	if loadout == null or profile == null:
+		return true
+	if not profile.is_character_unlocked(loadout.character_id):
+		return false
+	for weapon_id: StringName in loadout.candidate_weapon_ids:
+		if not profile.is_weapon_unlocked(weapon_id):
+			return false
+	for weapon_id: StringName in loadout.starting_weapon_ids:
+		if not profile.is_weapon_unlocked(weapon_id):
+			return false
+	return true
 
 
 func _start_session(loadout: RunLoadout) -> void:

@@ -11,6 +11,8 @@ enum TargetMode { NEAREST, RANDOM }
 
 @export var id: StringName
 @export var display_name: String
+## 解锁所需金币；0 表示默认解锁（T29）。
+@export_range(0, 1000000, 1) var unlock_cost: int = 0
 ## 武器动画由配置指定，控制器只驱动表现，不按武器 ID 分支。
 @export var visual_frames: SpriteFrames
 ## 手持武器显示缩放（可配置，避免在控制器里写死）。
