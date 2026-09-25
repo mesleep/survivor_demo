@@ -30,6 +30,8 @@ func _run() -> void:
 		quit(1)
 		return
 	game_session.enemy_spawner.stop()
+	# 本测试只验证经验掉落；关闭金币掉落避免随机掉金污染拾取节点计数（T26）。
+	game_session.economy_rules = null
 	for controller: WeaponController in game_session.player.weapon_controllers:
 		controller.set_process(false)
 	_clear_children(game_session.enemies)

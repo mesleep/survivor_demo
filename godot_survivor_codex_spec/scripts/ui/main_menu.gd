@@ -20,6 +20,7 @@ var _character_buttons: Dictionary[StringName, Button] = {}
 var _weapon_buttons: Dictionary[StringName, Button] = {}
 var _pending_loadout: RunLoadout
 var _start_locked: bool = false
+var _status_text: String = ""
 
 
 func _ready() -> void:
@@ -32,6 +33,17 @@ func initialize(new_catalog: ContentCatalog) -> void:
 	catalog = new_catalog
 	if is_inside_tree():
 		_build()
+
+
+## 设置存档/加载状态提示（T27）；为空则清除。
+func set_status(text: String) -> void:
+	_status_text = text
+	if is_inside_tree():
+		_update_hint()
+
+
+func get_status() -> String:
+	return _status_text
 
 
 ## 记住上次配置，下次打开菜单时预选；只复制 ID，不影响原对象。
@@ -212,6 +224,8 @@ func _update_hint() -> void:
 	hint_label.text = "角色：%s ｜ 候选武器 %d/%d（起始武器自动保留）" % [
 		character_name, _selected_weapon_ids.size(), RunLoadout.MAX_CANDIDATE_WEAPONS
 	]
+	if not _status_text.is_empty():
+		hint_label.text += "\n%s" % _status_text
 
 
 func _clear_containers() -> void:
