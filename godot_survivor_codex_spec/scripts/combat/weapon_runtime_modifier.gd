@@ -25,6 +25,10 @@ extends Resource
 @export var ground_area_duration_multiplier: float = 1.0
 ## 单武器索敌射程倍率（T18 威能分支使用，区别于角色级全武器射程）。
 @export var range_multiplier: float = 1.0
+## 冻结持续时间倍率（T19 寒冰分支专属升级使用）。
+@export var freeze_duration_multiplier: float = 1.0
+## 分裂弹体数量加成（T19 寒冰分支专属升级使用）。
+@export var split_count_bonus: int = 0
 
 
 func _init(

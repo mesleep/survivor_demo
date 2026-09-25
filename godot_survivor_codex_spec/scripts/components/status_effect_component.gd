@@ -8,6 +8,8 @@ extends Node
 
 signal dot_applied(effect_id: StringName)
 signal dot_ticked(effect_id: StringName, amount: float)
+signal slow_applied(effect_id: StringName)
+signal freeze_applied(effect_id: StringName)
 
 ## 单个持续伤害效果的运行时状态；同一效果 ID 只保留一份。
 class DotState:
@@ -18,8 +20,22 @@ class DotState:
 	var elapsed: float = 0.0
 	var ticks_done: int = 0
 
+## 单个减速/控制效果的运行时状态；同一效果 ID 只刷新，不叠层。
+class SlowState:
+	var effect: MovementSlowEffect
+	var duration: float = 0.0
+	var elapsed: float = 0.0
+
+## 单个冻结效果的运行时状态；冻结期间移速为 0。
+class FreezeState:
+	var effect: FreezeEffect
+	var duration: float = 0.0
+	var elapsed: float = 0.0
+
 var _owner_actor: ActorBase
 var _dots: Dictionary[StringName, DotState] = {}
+var _slows: Dictionary[StringName, SlowState] = {}
+var _freezes: Dictionary[StringName, FreezeState] = {}
 
 
 func initialize(owner_actor: ActorBase) -> void:
@@ -48,13 +64,89 @@ func apply_dot(effect: DamageOverTimeEffect, source: Node, damage_multiplier: fl
 	return true
 
 
-## 推进指定时间；测试传入固定步长即可精确断言 tick 数。
+## 施加或刷新一个减速效果；控制免疫目标（如 Boss）直接拒绝。
+func apply_slow(effect: MovementSlowEffect) -> bool:
+	if effect == null or effect.id == StringName():
+		return false
+	if not is_instance_valid(_owner_actor) or _owner_actor.health_component.is_dead():
+		return false
+	if _owner_actor.is_control_immune():
+		return false
+	var state: SlowState = _slows.get(effect.id)
+	if state == null:
+		state = SlowState.new()
+		_slows[effect.id] = state
+	state.effect = effect
+	state.duration = maxf(effect.duration_seconds, 0.0)
+	state.elapsed = 0.0
+	slow_applied.emit(effect.id)
+	return true
+
+
+## 施加或刷新一个冻结效果；控制免疫目标直接拒绝。
+func apply_freeze(effect: FreezeEffect, duration_multiplier: float = 1.0) -> bool:
+	if effect == null or effect.id == StringName():
+		return false
+	if not is_instance_valid(_owner_actor) or _owner_actor.health_component.is_dead():
+		return false
+	if _owner_actor.is_control_immune():
+		return false
+	var state: FreezeState = _freezes.get(effect.id)
+	if state == null:
+		state = FreezeState.new()
+		_freezes[effect.id] = state
+	state.effect = effect
+	state.duration = maxf(effect.duration_seconds * maxf(duration_multiplier, 0.0), 0.0)
+	state.elapsed = 0.0
+	freeze_applied.emit(effect.id)
+	return true
+
+
+func is_frozen() -> bool:
+	return not _freezes.is_empty()
+
+
+func get_freeze_remaining(effect_id: StringName) -> float:
+	var state: FreezeState = _freezes.get(effect_id)
+	if state == null:
+		return 0.0
+	return maxf(state.duration - state.elapsed, 0.0)
+
+
+## 当前移速倍率：冻结时为 0；否则取最强减速的比例，多个减速不叠加。
+func get_move_speed_multiplier() -> float:
+	if is_frozen():
+		return 0.0
+	var strongest: float = 0.0
+	for state: SlowState in _slows.values():
+		strongest = maxf(strongest, state.effect.slow_ratio)
+	return clampf(1.0 - strongest, 0.0, 1.0)
+
+
+func has_slow(effect_id: StringName) -> bool:
+	return _slows.has(effect_id)
+
+
+func get_active_slow_count() -> int:
+	return _slows.size()
+
+
+func get_slow_remaining(effect_id: StringName) -> float:
+	var state: SlowState = _slows.get(effect_id)
+	if state == null:
+		return 0.0
+	return maxf(state.duration - state.elapsed, 0.0)
+
+
+## 推进指定时间；测试传入固定步长即可精确断言 tick 数与减速恢复。
 func advance_time(delta: float) -> void:
 	if delta <= 0.0:
 		return
 	if not is_instance_valid(_owner_actor) or _owner_actor.health_component.is_dead():
 		clear()
 		return
+	_advance_slows(delta)
+	_advance_freezes(delta)
 	var expired: Array[StringName] = []
 	for effect_id: StringName in _dots.keys():
 		var state: DotState = _dots[effect_id]
@@ -95,6 +187,30 @@ func get_dot_remaining(effect_id: StringName) -> float:
 ## 清除全部状态；重开、死亡或初始化新一局时调用。
 func clear() -> void:
 	_dots.clear()
+	_slows.clear()
+	_freezes.clear()
+
+
+func _advance_slows(delta: float) -> void:
+	var expired: Array[StringName] = []
+	for effect_id: StringName in _slows.keys():
+		var state: SlowState = _slows[effect_id]
+		state.elapsed += delta
+		if state.elapsed >= state.duration - 0.0001:
+			expired.append(effect_id)
+	for effect_id: StringName in expired:
+		_slows.erase(effect_id)
+
+
+func _advance_freezes(delta: float) -> void:
+	var expired: Array[StringName] = []
+	for effect_id: StringName in _freezes.keys():
+		var state: FreezeState = _freezes[effect_id]
+		state.elapsed += delta
+		if state.elapsed >= state.duration - 0.0001:
+			expired.append(effect_id)
+	for effect_id: StringName in expired:
+		_freezes.erase(effect_id)
 
 
 func _process(delta: float) -> void:

@@ -140,6 +140,13 @@
 - 新增“威能法术”质变（伤害 ×1.4、冷却 ×0.8、射程 ×1.25）及“崩解/疾涌/远震”专属升级，各自 3 级独立上限，并接入升级池。
 - 新增 `staff_might_smoke_test.gd`；解析、启动与 44 项快速冒烟、120 秒 soak 通过。
 
+### T19 寒冰减速/冻结/分裂（2026-09-25）
+
+- 新增可配 `MovementSlowEffect`/`FreezeEffect`，`StatusEffectComponent` 支持减速与冻结（同 ID 刷新不叠层，冻结移速为 0，控制免疫拒绝）。
+- `EnemyDefinition` 新增 `control_immune`，Boss 默认免疫控制；`EnemyActor` 追踪速度乘以状态移速倍率，死亡/重开清理。
+- 冰枪（穿透 3、冰缓、冻结）命中时左右对称分裂小冰枪，小冰枪不再分裂（上下文与资源双层防递归）；新增“寒冰法术”质变与穿刺/冰封/裂冰专属升级并接入升级池。
+- 新增 `ice_slow_smoke_test.gd`、`ice_freeze_smoke_test.gd`、`ice_split_smoke_test.gd`；解析、启动与 47 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

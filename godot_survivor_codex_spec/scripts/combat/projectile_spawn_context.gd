@@ -23,6 +23,12 @@ var explosion_radius_multiplier: float = 1.0
 var explosion_damage_multiplier: float = 1.0
 ## 地面区域持续时间倍率（T17）；只影响本次生成的区域。
 var ground_area_duration_multiplier: float = 1.0
+## 冻结持续时间倍率（T19）；只影响本次施加的冻结。
+var freeze_duration_multiplier: float = 1.0
+## 分裂弹体数量加成（T19 寒冰分支专属升级）。
+var split_count_bonus: int = 0
+## 是否由分裂生成；用于阻止分裂弹再次分裂。
+var is_split_child: bool = false
 
 
 func _init(

@@ -45,6 +45,12 @@ enum UpgradeType {
 	WEAPON_RANGE,
 	## 应用 weapon_modifier 捆绑修正（T18 威能质变），type 分支本身不做数值处理。
 	WEAPON_MODIFIER,
+	## 命中后施加移动减速（T19 寒冰分支）；弹体由 projectile_definition 指定。
+	ICE,
+	## 冻结持续时间倍率（T19 寒冰分支专属升级，value 为每级增量）。
+	FREEZE_DURATION,
+	## 分裂弹体数量加成（T19 寒冰分支专属升级，value 为每级增量）。
+	SPLIT_COUNT,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。

@@ -28,3 +28,13 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export var damage_over_time: DamageOverTimeEffect
 ## 命中后在地面留下的持续伤害区域；为空表示不留火坑（T17）。
 @export var ground_area: GroundDamageAreaDefinition
+## 命中后施加的移动减速；为空表示无减速（T19）。
+@export var on_hit_slow: MovementSlowEffect
+## 命中后施加的冻结；为空表示不冻结（T19）。
+@export var on_hit_freeze: FreezeEffect
+## 命中后分裂出的小弹体；为空表示不分裂（T19）。小弹体自身不应再配置分裂，避免递归。
+@export var split_projectile: ProjectileDefinition
+@export_range(0, 32, 1) var split_count: int = 0
+@export_range(0.0, 360.0, 1.0) var split_spread_degrees: float = 90.0
+@export_range(0.0, 10.0, 0.05) var split_damage_multiplier: float = 1.0
+@export_range(0.1, 10.0, 0.05) var split_speed_multiplier: float = 1.0

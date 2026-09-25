@@ -146,6 +146,7 @@ func on_hit(target: Node) -> bool:
 			)
 	projectile_hit.emit(target_actor, event)
 	_apply_on_hit_effects(target_actor)
+	_spawn_split()
 
 	# 爆炸弹以首击为终点：引爆后立即停用，穿透属性不参与后续飞行。
 	if definition.explosion != null:
@@ -170,8 +171,59 @@ func _apply_on_hit_effects(target_actor: ActorBase) -> void:
 			context.shooter,
 			maxf(context.damage_multiplier, 0.0)
 		)
+	if definition.on_hit_slow != null:
+		target_actor.apply_movement_slow(definition.on_hit_slow)
+	if definition.on_hit_freeze != null:
+		target_actor.apply_freeze(
+			definition.on_hit_freeze,
+			maxf(context.freeze_duration_multiplier, 0.0)
+		)
 	if definition.ground_area != null:
 		_spawn_ground_area(definition.ground_area)
+
+
+## 命中后在命中点分裂出小弹体（T19）；分裂子弹不再触发分裂，避免递归。
+func _spawn_split() -> void:
+	if definition == null or definition.split_projectile == null or context == null:
+		return
+	if context.is_split_child or not is_instance_valid(context.shooter):
+		return
+	var total: int = maxi(definition.split_count + context.split_count_bonus, 0)
+	if total <= 0 or definition.split_projectile.scene == null:
+		return
+	var parent: Node = get_parent()
+	if not is_instance_valid(parent):
+		return
+	var base_angle: float = direction.angle() if not direction.is_zero_approx() else Vector2.RIGHT.angle()
+	for index: int in range(total):
+		var offset: float = _get_split_offset_radians(index, total, definition.split_spread_degrees)
+		var child_context := ProjectileSpawnContext.new(
+			context.shooter,
+			context.team_id,
+			global_position,
+			Vector2.RIGHT.rotated(base_angle + offset)
+		)
+		child_context.damage_multiplier = context.damage_multiplier * maxf(definition.split_damage_multiplier, 0.0)
+		child_context.speed_multiplier = context.speed_multiplier * maxf(definition.split_speed_multiplier, 0.0)
+		child_context.size_multiplier = context.size_multiplier
+		child_context.critical_chance = context.critical_chance
+		child_context.weapon_id = context.weapon_id
+		child_context.is_split_child = true
+		var child_node: Node = definition.split_projectile.scene.instantiate()
+		if child_node is not ProjectileBase:
+			child_node.queue_free()
+			continue
+		var child: ProjectileBase = child_node as ProjectileBase
+		parent.add_child(child)
+		child.initialize(definition.split_projectile, child_context)
+		child.launch(child_context.initial_direction)
+
+
+func _get_split_offset_radians(index: int, total: int, spread_degrees: float) -> float:
+	if total <= 1 or is_zero_approx(spread_degrees):
+		return 0.0
+	var ratio: float = float(index) / float(total - 1)
+	return deg_to_rad(lerpf(-spread_degrees * 0.5, spread_degrees * 0.5, ratio))
 
 
 ## 生成地面持续伤害区域；来源离树后区域仍按自身时长结算。

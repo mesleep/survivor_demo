@@ -15,3 +15,5 @@ extends Resource
 @export_range(0, 100000, 1) var experience_value: int = 1
 @export_range(0.0, 100000.0, 0.1) var spawn_cost: float = 1.0
 @export var is_boss: bool = false
+## 是否免疫减速/冻结等控制（Boss 默认免疫，T19）。
+@export var control_immune: bool = false

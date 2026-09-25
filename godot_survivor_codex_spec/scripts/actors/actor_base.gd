@@ -118,6 +118,36 @@ func apply_damage_over_time(
 	return status_effect_component.apply_dot(effect, source, damage_multiplier)
 
 
+## 施加移动减速状态（T19）；控制免疫目标返回 false。
+func apply_movement_slow(effect: MovementSlowEffect) -> bool:
+	if status_effect_component == null:
+		return false
+	return status_effect_component.apply_slow(effect)
+
+
+## 施加冻结状态（T19）；冻结期间移速为 0，控制免疫目标返回 false。
+func apply_freeze(effect: FreezeEffect, duration_multiplier: float = 1.0) -> bool:
+	if status_effect_component == null:
+		return false
+	return status_effect_component.apply_freeze(effect, duration_multiplier)
+
+
+func is_frozen() -> bool:
+	return status_effect_component != null and status_effect_component.is_frozen()
+
+
+## 当前由状态产生的移速倍率；无状态时为 1.0。
+func get_status_move_speed_multiplier() -> float:
+	if status_effect_component == null:
+		return 1.0
+	return status_effect_component.get_move_speed_multiplier()
+
+
+## 是否免疫减速/冻结等控制；默认不免疫，Boss 等由子类覆盖。
+func is_control_immune() -> bool:
+	return false
+
+
 ## 注入可调伤害规则（通常由 GameSession 下发给玩家）。
 func set_combat_rules(rules: CombatRules) -> void:
 	combat_rules = rules

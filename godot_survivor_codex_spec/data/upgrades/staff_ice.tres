@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/staff_ice_spear.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_ice"
+display_name = "质变：寒冰法术"
+description = "蓄力法杖：发射可穿透的冰枪，沿途造成伤害并减速敌人。"
+type = 29
+category = 3
+value = 0.0
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"ice"
+max_stacks = 1
+weight = 1.0
+projectile_definition = ExtResource("2")

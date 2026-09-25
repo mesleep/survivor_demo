@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_ice_split_up"
+display_name = "寒冰法术·裂冰"
+description = "寒冰法术专属：冰枪命中后额外分裂 1 枚小冰枪。"
+type = 31
+category = 4
+value = 1.0
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"ice"
+max_stacks = 2
+weight = 1.0

@@ -14,3 +14,4 @@ contact_damage = 18.0
 experience_value = 0
 spawn_cost = 100.0
 is_boss = true
+control_immune = true

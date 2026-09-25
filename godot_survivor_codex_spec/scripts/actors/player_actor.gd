@@ -480,7 +480,7 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 				UpgradeDefinition.UpgradeType.VOLLEY_COUNT:
 					modifier.volley_count_bonus = roundi(upgrade.value)
 			_apply_weapon_modifier(modifier, upgrade.required_weapon_id)
-		UpgradeDefinition.UpgradeType.EXPLOSION, UpgradeDefinition.UpgradeType.FLAME:
+		UpgradeDefinition.UpgradeType.EXPLOSION, UpgradeDefinition.UpgradeType.FLAME, UpgradeDefinition.UpgradeType.ICE:
 			_apply_projectile_override(upgrade.projectile_definition, upgrade.get_target_equipment_id())
 		UpgradeDefinition.UpgradeType.AREA_DURATION:
 			var area_duration_modifier := WeaponRuntimeModifier.new()
@@ -490,6 +490,14 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			var range_modifier := WeaponRuntimeModifier.new()
 			range_modifier.range_multiplier = maxf(1.0 + upgrade.value, 0.0)
 			_apply_weapon_modifier(range_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.FREEZE_DURATION:
+			var freeze_modifier := WeaponRuntimeModifier.new()
+			freeze_modifier.freeze_duration_multiplier = maxf(1.0 + upgrade.value, 0.0)
+			_apply_weapon_modifier(freeze_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.SPLIT_COUNT:
+			var split_modifier := WeaponRuntimeModifier.new()
+			split_modifier.split_count_bonus = roundi(upgrade.value)
+			_apply_weapon_modifier(split_modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:

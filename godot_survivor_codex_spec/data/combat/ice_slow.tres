@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MovementSlowEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/combat/movement_slow_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"ice_slow"
+slow_ratio = 0.4
+duration_seconds = 1.5

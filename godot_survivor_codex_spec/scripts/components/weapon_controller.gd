@@ -51,6 +51,8 @@ var _explosion_radius_multiplier: float = 1.0
 var _explosion_damage_multiplier: float = 1.0
 var _ground_area_duration_multiplier: float = 1.0
 var _range_multiplier: float = 1.0
+var _freeze_duration_multiplier: float = 1.0
+var _split_count_bonus: int = 0
 
 
 func _ready() -> void:
@@ -202,6 +204,8 @@ func _fire_volley(
 		context.explosion_radius_multiplier = _explosion_radius_multiplier
 		context.explosion_damage_multiplier = _explosion_damage_multiplier
 		context.ground_area_duration_multiplier = _ground_area_duration_multiplier
+		context.freeze_duration_multiplier = _freeze_duration_multiplier
+		context.split_count_bonus = _split_count_bonus
 		if spawn_projectile(projectile_definition, context) != null:
 			spawned_count += 1
 	return spawned_count
@@ -374,6 +378,8 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 	_explosion_damage_multiplier *= maxf(modifier.explosion_damage_multiplier, 0.0)
 	_ground_area_duration_multiplier *= maxf(modifier.ground_area_duration_multiplier, 0.0)
 	_range_multiplier *= maxf(modifier.range_multiplier, 0.0)
+	_freeze_duration_multiplier *= maxf(modifier.freeze_duration_multiplier, 0.0)
+	_split_count_bonus += modifier.split_count_bonus
 
 
 func reset_runtime_state() -> void:
@@ -386,6 +392,8 @@ func reset_runtime_state() -> void:
 	_explosion_damage_multiplier = 1.0
 	_ground_area_duration_multiplier = 1.0
 	_range_multiplier = 1.0
+	_freeze_duration_multiplier = 1.0
+	_split_count_bonus = 0
 	_repeat_shot_generation += 1
 	_cooldown_remaining = 0.0
 	_runtime_cooldown_multiplier = 1.0
@@ -468,6 +476,14 @@ func get_range_multiplier() -> float:
 	return _range_multiplier
 
 
+func get_freeze_duration_multiplier() -> float:
+	return _freeze_duration_multiplier
+
+
+func get_split_count_bonus() -> int:
+	return _split_count_bonus
+
+
 ## 合并角色攻击范围上限、武器自身射程与全武器射程倍率（D06）。
 ##
 ## 索敌范围取“角色上限与武器射程的较小值”，再乘以角色级全武器射程倍率；
@@ -522,6 +538,8 @@ func _fire_repeat_shot_after_delay(
 	context.explosion_radius_multiplier = _explosion_radius_multiplier
 	context.explosion_damage_multiplier = _explosion_damage_multiplier
 	context.ground_area_duration_multiplier = _ground_area_duration_multiplier
+	context.freeze_duration_multiplier = _freeze_duration_multiplier
+	context.split_count_bonus = _split_count_bonus
 	if spawn_projectile(projectile_definition, context) == null:
 		return
 	fire_requested.emit(

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ProjectileDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="Resource" path="res://data/combat/ice_slow.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_ice_split"
+scene = ExtResource("2")
+visual_frames = ExtResource("3")
+visual_scale = 0.16
+motion_type = 0
+damage = 3.0
+speed = 700.0
+lifetime_seconds = 0.7
+pierce_count = 1
+hit_radius = 8.0
+knockback_strength = 0.0
+on_hit_slow = ExtResource("4")

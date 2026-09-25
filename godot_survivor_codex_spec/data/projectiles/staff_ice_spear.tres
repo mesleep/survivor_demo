@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="ProjectileDefinition" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="Resource" path="res://data/combat/ice_slow.tres" id="4"]
+[ext_resource type="Resource" path="res://data/combat/ice_freeze.tres" id="5"]
+[ext_resource type="Resource" path="res://data/projectiles/staff_ice_split.tres" id="6"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_ice_spear"
+scene = ExtResource("2")
+visual_frames = ExtResource("3")
+visual_scale = 0.2
+motion_type = 0
+damage = 7.0
+speed = 760.0
+lifetime_seconds = 2.0
+pierce_count = 3
+hit_radius = 10.0
+knockback_strength = 0.0
+on_hit_slow = ExtResource("4")
+on_hit_freeze = ExtResource("5")
+split_projectile = ExtResource("6")
+split_count = 2
+split_spread_degrees = 90.0
+split_damage_multiplier = 0.4
+split_speed_multiplier = 1.0

@@ -70,7 +70,7 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var direction: Vector2 = global_position.direction_to(target_player.global_position)
-	velocity = direction * _move_speed
+	velocity = direction * _move_speed * get_status_move_speed_multiplier()
 	move_and_slide()
 
 
@@ -96,9 +96,14 @@ func get_team_id() -> StringName:
 	return &"enemy"
 
 
+## Boss 等由 Resource 标记 control_immune 的敌人免疫减速/冻结。
+func is_control_immune() -> bool:
+	return definition != null and definition.control_immune
+
+
 func _get_base_max_health() -> float:
 	return definition.max_health if definition != null else 1.0
 
 
 func get_effective_move_speed() -> float:
-	return _move_speed
+	return _move_speed * get_status_move_speed_multiplier()
