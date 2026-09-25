@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/pickups/coin_pickup.gd" id="1_coin_pickup"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/gem_frames.tres" id="2_coin_texture"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_coin"]
+radius = 9.0
+
+[node name="CoinPickup" type="Area2D"]
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+script = ExtResource("1_coin_pickup")
+
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+modulate = Color(1, 0.82, 0.32, 1)
+texture_filter = 2
+scale = Vector2(0.14, 0.14)
+sprite_frames = ExtResource("2_coin_texture")
+autoplay = "default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_coin")

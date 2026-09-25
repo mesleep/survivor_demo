@@ -31,10 +31,13 @@ func show_result(result: GameResult) -> void:
 	if result == null:
 		return
 	title.text = "庭院守护成功" if result.outcome == GameResult.Outcome.VICTORY else "休息一下，再来一局"
-	stats_label.text = "生存时间  %s\n等级  %d\n击退数量  %d" % [
+	stats_label.text = "生存时间  %s\n等级  %d\n击退数量  %d\n金币  %d（拾取 %d + 击退 %d）" % [
 		_format_time(result.elapsed_seconds),
 		result.level,
 		result.kill_count,
+		result.total_coins,
+		result.coins_collected,
+		result.coins_from_kills,
 	]
 	restart_button.disabled = false
 	visible = true

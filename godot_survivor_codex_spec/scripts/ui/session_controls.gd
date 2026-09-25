@@ -77,6 +77,8 @@ func _connect_player() -> void:
 		player.equipment_changed.connect(_on_equipment_changed)
 	if not player.armor_acquired.is_connected(_on_armor_acquired):
 		player.armor_acquired.connect(_on_armor_acquired)
+	if not player.coins_changed.is_connected(_on_coins_changed):
+		player.coins_changed.connect(_on_coins_changed)
 
 
 func _process(_delta: float) -> void:
@@ -129,6 +131,10 @@ func _on_armor_acquired(_definition: ArmorDefinition) -> void:
 	_update_loadout()
 
 
+func _on_coins_changed(_current_coins: int) -> void:
+	_update_loadout()
+
+
 func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 	if not is_instance_valid(session) or not is_instance_valid(session.player):
 		_loadout.text = ""
@@ -146,11 +152,12 @@ func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 		parts.append("武器：" + " · ".join(weapon_names))
 	if not armor_names.is_empty():
 		parts.append("防具：" + " · ".join(armor_names))
-	_loadout.text = "装备 %d/%d ｜ 防御 %d ｜ 移速 %d ｜ %s" % [
+	_loadout.text = "装备 %d/%d ｜ 防御 %d ｜ 移速 %d ｜ 金币 %d ｜ %s" % [
 		session.player.get_equipped_count(),
 		PlayerActor.MAX_EQUIPMENT_SLOTS,
 		roundi(session.player.get_defense()),
 		roundi(session.player.get_effective_move_speed()),
+		session.player.get_run_coins(),
 		" ｜ ".join(parts)
 	]
 

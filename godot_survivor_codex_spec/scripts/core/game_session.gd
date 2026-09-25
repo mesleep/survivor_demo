@@ -15,6 +15,10 @@ signal run_started(player: PlayerActor)
 @export var combat_rules: CombatRules
 ## 科技三件套配置（T25）；为空则不启用套装。
 @export var tech_set_definition: TechSetDefinition
+## 单局经济规则（T26）；为空时按 0 奖励处理。
+@export var economy_rules: EconomyRules
+## 金币拾取物场景（T26）。
+@export var coin_pickup_scene: PackedScene
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var run_definition: RunDefinition
 @export var experience_gem_scene: PackedScene
@@ -33,6 +37,7 @@ var game_audio: GameAudio
 var session_controls: SessionControls
 ## 单局开局配置快照；为空时沿用导出 player_definition 的旧直启行为。
 var run_loadout: RunLoadout
+var _economy_random := RandomNumberGenerator.new()
 
 @onready var arena: Arena = $Arena
 @onready var actors: Node2D = $Actors
@@ -49,6 +54,7 @@ var run_loadout: RunLoadout
 
 
 func _ready() -> void:
+	_economy_random.randomize()
 	game_audio = GameAudio.new()
 	add_child(game_audio)
 	if auto_start:
@@ -208,6 +214,41 @@ func spawn_experience_gem(experience_value: int, world_position: Vector2) -> Exp
 	return gem
 
 
+## 在指定世界位置创建一枚携带独立数量的金币拾取物（T26）。
+##
+## 与经验宝石一样延迟入树，避免在 Area 查询回调内启用新碰撞形状。
+func spawn_coin_pickup(amount: int, world_position: Vector2) -> CoinPickup:
+	if amount <= 0 or coin_pickup_scene == null or not is_instance_valid(pickups):
+		return null
+	var coin_node: Node = coin_pickup_scene.instantiate()
+	if coin_node is not CoinPickup:
+		push_error("GameSession 生成金币失败：coin_pickup_scene 必须生成 CoinPickup。")
+		coin_node.queue_free()
+		return null
+	var coin: CoinPickup = coin_node as CoinPickup
+	coin.position = pickups.to_local(world_position)
+	coin.initialize(amount)
+	pickups.call_deferred("add_child", coin)
+	return coin
+
+
+func _spawn_coin_drop(world_position: Vector2) -> void:
+	if economy_rules == null or coin_pickup_scene == null:
+		return
+	if not economy_rules.roll_drop(_economy_random):
+		return
+	spawn_coin_pickup(economy_rules.coins_per_drop, world_position)
+
+
+## 固定本局掉落随机种子，供测试确定掉金结果。
+func set_economy_random_seed(seed_value: int) -> void:
+	_economy_random.seed = seed_value
+
+
+func get_run_coins() -> int:
+	return player.get_run_coins() if is_instance_valid(player) else 0
+
+
 func _on_enemy_spawned(enemy: EnemyActor) -> void:
 	if not is_instance_valid(enemy):
 		return
@@ -228,6 +269,7 @@ func _on_enemy_died(actor: ActorBase, _event: DamageEvent) -> void:
 			end_run(GameResult.Outcome.VICTORY)
 		return
 	spawn_experience_gem(enemy.definition.experience_value, enemy.global_position)
+	_spawn_coin_drop(enemy.global_position)
 
 
 func _on_player_leveled_up(_new_level: int, _pending_upgrade_count: int) -> void:
@@ -283,7 +325,15 @@ func end_run(outcome: GameResult.Outcome) -> void:
 	targeting_service.stop()
 	level_up_panel.hide_panel()
 	_stop_combat_nodes()
-	var result := GameResult.new(outcome, elapsed_seconds, player.get_current_level(), kill_count)
+	var coins_from_kills: int = kill_count * (economy_rules.coins_per_kill if economy_rules != null else 0)
+	var result := GameResult.new(
+		outcome,
+		elapsed_seconds,
+		player.get_current_level(),
+		kill_count,
+		player.get_run_coins(),
+		coins_from_kills
+	)
 	get_tree().paused = true
 	end_panel.show_result(result)
 	game_audio.finish_run(outcome == GameResult.Outcome.VICTORY)

@@ -7,6 +7,8 @@ class_name PlayerActor
 extends ActorBase
 
 signal experience_changed(current_experience: int, gained_amount: int)
+## 本局已拾取金币变化（T26）；结算金币不在此信号内。
+signal coins_changed(current_coins: int)
 signal level_progress_changed(current_level: int, current_experience: int, required_experience: int)
 signal leveled_up(new_level: int, pending_upgrade_count: int)
 signal upgrade_state_changed(upgrade_id: StringName, stack_count: int)
@@ -29,6 +31,8 @@ var weapon_controllers: Array[WeaponController] = []
 var _move_speed: float = 0.0
 var _base_attack_range: float = 0.0
 var _current_experience: int = 0
+## 本局内存金币余额（T26）；持久化由 T27 档案负责。
+var _run_coins: int = 0
 var _current_level_experience: int = 0
 var _current_level: int = 1
 var _pending_upgrade_count: int = 0
@@ -93,6 +97,7 @@ func initialize(new_definition: Resource) -> void:
 	var camera_zoom_value: float = clampf(definition.camera_zoom, 0.25, 2.0)
 	camera.zoom = Vector2.ONE * camera_zoom_value
 	_current_experience = 0
+	_run_coins = 0
 	_current_level_experience = 0
 	_current_level = 1
 	_pending_upgrade_count = 0
@@ -469,6 +474,18 @@ func get_current_experience() -> int:
 	return _current_experience
 
 
+## 累加本局拾取金币（T26）；只写运行时，不接触存档。
+func add_coins(amount: int) -> void:
+	if amount <= 0:
+		return
+	_run_coins += amount
+	coins_changed.emit(_run_coins)
+
+
+func get_run_coins() -> int:
+	return _run_coins
+
+
 func get_current_level_experience() -> int:
 	return _current_level_experience
 
@@ -700,6 +717,8 @@ func get_weapon_range_multiplier() -> float:
 func _on_pickup_detected(pickup: Area2D) -> void:
 	if pickup is ExperienceGem:
 		(pickup as ExperienceGem).collect(self)
+	elif pickup is CoinPickup:
+		(pickup as CoinPickup).collect(self)
 
 
 func _get_base_max_health() -> float:
