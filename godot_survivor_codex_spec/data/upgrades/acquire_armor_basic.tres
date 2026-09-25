@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/armor/armor_basic.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"acquire_armor_basic"
+display_name = "获得基础盔甲"
+description = "装备基础盔甲：防御 +3，移动速度 -8%。"
+type = 16
+category = 1
+value = 0
+max_stacks = 1
+weight = 1.0
+armor_definition = ExtResource("2")

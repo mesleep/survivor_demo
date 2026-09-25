@@ -34,6 +34,9 @@ var _move_speed_multiplier: float = 1.0
 var _maximum_health_bonus: float = 0.0
 var _pickup_range_multiplier: float = 1.0
 var _all_weapon_range_multiplier: float = 1.0
+var _upgrade_defense_bonus: float = 0.0
+var _armor_defense_bonus: float = 0.0
+var _armor_move_penalty_ratio: float = 0.0
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
@@ -80,6 +83,10 @@ func initialize(new_definition: Resource) -> void:
 	_maximum_health_bonus = 0.0
 	_pickup_range_multiplier = 1.0
 	_all_weapon_range_multiplier = 1.0
+	_upgrade_defense_bonus = 0.0
+	_armor_defense_bonus = 0.0
+	_armor_move_penalty_ratio = 0.0
+	set_defense(0.0)
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
 	_weapon_modifier_history.clear()
@@ -230,8 +237,36 @@ func try_acquire_armor(armor_definition: ArmorDefinition) -> bool:
 		return false
 	_armor_definitions[armor_definition.id] = armor_definition
 	_register_equipment(armor_definition.id, &"armor")
+	_refresh_armor_bonuses()
 	armor_acquired.emit(armor_definition)
 	return true
+
+
+## 按已装备防具与其基础等级重算防御与移速惩罚，只改运行时属性。
+func _refresh_armor_bonuses() -> void:
+	var defense_total: float = 0.0
+	var move_multiplier: float = 1.0
+	for armor_id: StringName in _armor_definitions.keys():
+		var armor: ArmorDefinition = _armor_definitions[armor_id]
+		if armor == null:
+			continue
+		var level: int = 1
+		var progress: EquipmentProgress = _equipment_progress.get(armor_id)
+		if progress != null:
+			level = progress.base_level
+		defense_total += armor.get_defense_for_level(level)
+		move_multiplier *= 1.0 - armor.get_move_penalty_for_level(level)
+	_armor_defense_bonus = defense_total
+	_armor_move_penalty_ratio = clampf(1.0 - move_multiplier, 0.0, 1.0)
+	_refresh_defense()
+
+
+func _refresh_defense() -> void:
+	set_defense(_upgrade_defense_bonus + _armor_defense_bonus)
+
+
+func get_armor_move_penalty_ratio() -> float:
+	return _armor_move_penalty_ratio
 
 
 func has_armor(armor_id: StringName) -> bool:
@@ -384,8 +419,12 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 	if upgrade.required_weapon_id != StringName() and not has_weapon(upgrade.required_weapon_id):
 		return false
 	if upgrade.category == UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
-		if not add_equipment_base_level(upgrade.get_target_equipment_id()):
+		var base_target: StringName = upgrade.get_target_equipment_id()
+		if not add_equipment_base_level(base_target):
 			return false
+		_refresh_armor_bonuses()
+		if has_armor(base_target):
+			return _finalize_upgrade(upgrade)
 	elif upgrade.category == UpgradeDefinition.UpgradeCategory.ASCENSION:
 		if not choose_equipment_branch(upgrade.get_target_equipment_id(), upgrade.branch_id):
 			return false
@@ -416,7 +455,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		UpgradeDefinition.UpgradeType.ALL_WEAPON_RANGE:
 			_all_weapon_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 		UpgradeDefinition.UpgradeType.DEFENSE:
-			add_defense(upgrade.value)
+			_upgrade_defense_bonus += upgrade.value
+			_refresh_defense()
 		UpgradeDefinition.UpgradeType.DODGE_CHANCE:
 			add_dodge_chance(upgrade.value)
 		UpgradeDefinition.UpgradeType.IMMUNE_CHANCE:
@@ -461,7 +501,7 @@ func _finalize_upgrade(upgrade: UpgradeDefinition) -> bool:
 
 
 func get_effective_move_speed() -> float:
-	return _move_speed * _move_speed_multiplier
+	return _move_speed * _move_speed_multiplier * (1.0 - _armor_move_penalty_ratio)
 
 
 func get_effective_maximum_health() -> float:

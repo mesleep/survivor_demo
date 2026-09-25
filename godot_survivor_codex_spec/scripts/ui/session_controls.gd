@@ -146,9 +146,11 @@ func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 		parts.append("武器：" + " · ".join(weapon_names))
 	if not armor_names.is_empty():
 		parts.append("防具：" + " · ".join(armor_names))
-	_loadout.text = "装备 %d/%d ｜ %s" % [
+	_loadout.text = "装备 %d/%d ｜ 防御 %d ｜ 移速 %d ｜ %s" % [
 		session.player.get_equipped_count(),
 		PlayerActor.MAX_EQUIPMENT_SLOTS,
+		roundi(session.player.get_defense()),
+		roundi(session.player.get_effective_move_speed()),
 		" ｜ ".join(parts)
 	]
 

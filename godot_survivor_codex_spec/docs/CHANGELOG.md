@@ -80,6 +80,12 @@
 - 新增防御/闪避/免疫升级（数值可在 Resource 调整）并加入升级池；`GameSession` 下发 `CombatRules`。
 - 新增 `damage_resolution_smoke_test.gd`；解析、启动与 36 项快速冒烟通过。
 
+### T11 基础盔甲（2026-09-25）
+
+- `ArmorDefinition` 新增可调数值：基础防御、每级防御、移速惩罚与每级减轻；新增 `armor_basic.tres`、获取卡与强化卡，并加入目录与升级池。
+- `PlayerActor` 按已装备防具及其基础等级汇总防御与移速惩罚，升级即刷新，满级惩罚归零；`SessionControls` 显示防御与当前移速。
+- 新增 `armor_basic_smoke_test.gd`；解析、启动与 37 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。
