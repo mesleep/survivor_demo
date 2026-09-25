@@ -431,6 +431,9 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 	elif upgrade.category == UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE:
 		if not add_equipment_branch_upgrade(upgrade.get_target_equipment_id(), upgrade.id):
 			return false
+	# 捆绑修正（如威能质变一次性提高伤害/攻速/射程）；先于 type 效果应用。
+	if upgrade.weapon_modifier != null:
+		_apply_weapon_modifier(upgrade.weapon_modifier, upgrade.required_weapon_id)
 	match upgrade.type:
 		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER:
 			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + upgrade.value), upgrade.required_weapon_id)
@@ -483,6 +486,12 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			var area_duration_modifier := WeaponRuntimeModifier.new()
 			area_duration_modifier.ground_area_duration_multiplier = maxf(1.0 + upgrade.value, 0.0)
 			_apply_weapon_modifier(area_duration_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.WEAPON_RANGE:
+			var range_modifier := WeaponRuntimeModifier.new()
+			range_modifier.range_multiplier = maxf(1.0 + upgrade.value, 0.0)
+			_apply_weapon_modifier(range_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
+			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
 			var radius_modifier := WeaponRuntimeModifier.new()
 			radius_modifier.explosion_radius_multiplier = maxf(1.0 + upgrade.value, 0.0)

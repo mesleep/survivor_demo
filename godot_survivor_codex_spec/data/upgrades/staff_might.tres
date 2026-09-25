@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/combat/staff_might_modifier.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_might"
+display_name = "质变：威能法术"
+description = "蓄力法杖：大幅提高伤害，缩短攻击间隔并扩大射程。"
+type = 28
+category = 3
+value = 0.0
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"power"
+max_stacks = 1
+weight = 1.0
+weapon_modifier = ExtResource("2")

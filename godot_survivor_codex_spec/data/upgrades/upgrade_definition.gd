@@ -41,6 +41,10 @@ enum UpgradeType {
 	FLAME,
 	## 地面区域持续时间倍率（T17 火焰分支专属升级，value 为每级增量）。
 	AREA_DURATION,
+	## 单武器索敌射程倍率（T18 威能分支专属升级，value 为每级增量）。
+	WEAPON_RANGE,
+	## 应用 weapon_modifier 捆绑修正（T18 威能质变），type 分支本身不做数值处理。
+	WEAPON_MODIFIER,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -73,6 +77,8 @@ enum UpgradeCategory {
 @export var armor_definition: ArmorDefinition
 ## EXPLOSION 质变切换到的弹体配置（T16）。
 @export var projectile_definition: ProjectileDefinition
+## 捆绑武器修正（T18 威能质变等）；非空时在升级应用时合并到目标武器。
+@export var weapon_modifier: WeaponRuntimeModifier
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

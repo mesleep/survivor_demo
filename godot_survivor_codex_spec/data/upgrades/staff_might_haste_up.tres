@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_might_haste_up"
+display_name = "威能法术·疾涌"
+description = "威能法术专属：攻击间隔缩短 10%。"
+type = 1
+category = 4
+value = 0.1
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"power"
+max_stacks = 3
+weight = 1.0
