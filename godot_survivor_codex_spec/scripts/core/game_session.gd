@@ -12,6 +12,7 @@ signal run_started(player: PlayerActor)
 
 @export var player_definition: CharacterDefinition
 @export var content_catalog: ContentCatalog
+@export var combat_rules: CombatRules
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var run_definition: RunDefinition
 @export var experience_gem_scene: PackedScene
@@ -113,6 +114,7 @@ func start_run() -> void:
 	actors.add_child(new_player)
 	new_player.global_position = Vector2.ZERO
 	new_player.initialize(effective_character)
+	new_player.set_combat_rules(combat_rules)
 	new_player.configure_camera_bounds(arena.get_bounds())
 	player = new_player
 	if not enemy_spawner.enemy_spawned.is_connected(_on_enemy_spawned):

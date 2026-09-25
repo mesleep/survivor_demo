@@ -72,6 +72,14 @@
 - `ActorBase.get_weapon_range_multiplier()`（默认 1.0）与 `PlayerActor` 覆盖、`UpgradeType.ALL_WEAPON_RANGE`；新增“全武器射程 +10%”升级并加入池。
 - 新增 `weapon_range_buff_smoke_test.gd`；解析、启动与 35 项快速冒烟通过。
 
+### T10 防御/免疫/反伤伤害结算基座（2026-09-25）
+
+- 新增可调 `CombatRules` Resource（最低伤害比例、闪避/免疫/反伤上限）与 `DamageResult` 结算结果。
+- `ActorBase.apply_damage()` 重写为 免疫 → 闪避 → 防御 → 扣血 → 反伤 的统一管线，返回 `DamageResult`；闪避/免疫不扣血、不反伤、不吸血；`reflect`/`dot` 标签防止反伤递归；防御公式 `max(原始−防御, 原始×最低比例)`。
+- `DamageFeedbackComponent` 绑定 `damage_dodged`/`damage_immune`，以代码文字占位显示“闪避/免疫”提示；正式素材清单见 `docs/整理设计/闪避免疫提示素材清单.md`。
+- 新增防御/闪避/免疫升级（数值可在 Resource 调整）并加入升级池；`GameSession` 下发 `CombatRules`。
+- 新增 `damage_resolution_smoke_test.gd`；解析、启动与 36 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

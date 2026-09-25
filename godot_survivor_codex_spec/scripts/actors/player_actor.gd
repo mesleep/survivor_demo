@@ -415,6 +415,12 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			pickup_component.initialize(get_effective_pickup_radius())
 		UpgradeDefinition.UpgradeType.ALL_WEAPON_RANGE:
 			_all_weapon_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
+		UpgradeDefinition.UpgradeType.DEFENSE:
+			add_defense(upgrade.value)
+		UpgradeDefinition.UpgradeType.DODGE_CHANCE:
+			add_dodge_chance(upgrade.value)
+		UpgradeDefinition.UpgradeType.IMMUNE_CHANCE:
+			add_immune_chance(upgrade.value)
 		UpgradeDefinition.UpgradeType.REPEAT_SHOT_CHANCE:
 			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.PIERCE_COUNT, UpgradeDefinition.UpgradeType.PROJECTILE_SPEED, UpgradeDefinition.UpgradeType.PROJECTILE_SIZE, UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:

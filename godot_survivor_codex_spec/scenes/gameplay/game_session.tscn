@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3]
+[gd_scene load_steps=47 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
@@ -43,11 +43,16 @@
 [ext_resource type="Resource" path="res://data/upgrades/star_wand_scatter_up.tres" id="40_upgrade"]
 [ext_resource type="Resource" path="res://data/upgrades/star_wand_focus_up.tres" id="41_upgrade"]
 [ext_resource type="Resource" path="res://data/upgrades/weapon_range_up.tres" id="42_upgrade"]
+[ext_resource type="Resource" path="res://data/upgrades/defense_up.tres" id="43_upgrade"]
+[ext_resource type="Resource" path="res://data/upgrades/dodge_up.tres" id="44_upgrade"]
+[ext_resource type="Resource" path="res://data/upgrades/immune_up.tres" id="45_upgrade"]
+[ext_resource type="Resource" path="res://data/combat/default_combat_rules.tres" id="46_combat"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
 player_definition = ExtResource("2_player_definition")
 content_catalog = ExtResource("36_catalog")
+combat_rules = ExtResource("46_combat")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
 run_definition = ExtResource("18_run")
 experience_gem_scene = ExtResource("7_experience_gem")
@@ -78,7 +83,7 @@ wait_time = 0.1
 
 [node name="UpgradeSystem" type="Node" parent="Systems"]
 script = ExtResource("8_upgrade_system")
-upgrade_pool = Array[ExtResource("17_upgrade_definition")]([ExtResource("9_damage"), ExtResource("10_fire_rate"), ExtResource("11_projectile_count"), ExtResource("12_move_speed"), ExtResource("13_max_health"), ExtResource("14_heal"), ExtResource("21_bonus_projectile"), ExtResource("22_lifesteal"), ExtResource("23_pickup_range"), ExtResource("24_repeat_shot"), ExtResource("25_upgrade"), ExtResource("26_upgrade"), ExtResource("27_upgrade"), ExtResource("28_upgrade"), ExtResource("29_upgrade"), ExtResource("30_upgrade"), ExtResource("31_upgrade"), ExtResource("32_upgrade"), ExtResource("33_upgrade"), ExtResource("34_upgrade"), ExtResource("35_upgrade"), ExtResource("37_upgrade"), ExtResource("38_upgrade"), ExtResource("39_upgrade"), ExtResource("40_upgrade"), ExtResource("41_upgrade"), ExtResource("42_upgrade")])
+upgrade_pool = Array[ExtResource("17_upgrade_definition")]([ExtResource("9_damage"), ExtResource("10_fire_rate"), ExtResource("11_projectile_count"), ExtResource("12_move_speed"), ExtResource("13_max_health"), ExtResource("14_heal"), ExtResource("21_bonus_projectile"), ExtResource("22_lifesteal"), ExtResource("23_pickup_range"), ExtResource("24_repeat_shot"), ExtResource("25_upgrade"), ExtResource("26_upgrade"), ExtResource("27_upgrade"), ExtResource("28_upgrade"), ExtResource("29_upgrade"), ExtResource("30_upgrade"), ExtResource("31_upgrade"), ExtResource("32_upgrade"), ExtResource("33_upgrade"), ExtResource("34_upgrade"), ExtResource("35_upgrade"), ExtResource("37_upgrade"), ExtResource("38_upgrade"), ExtResource("39_upgrade"), ExtResource("40_upgrade"), ExtResource("41_upgrade"), ExtResource("42_upgrade"), ExtResource("43_upgrade"), ExtResource("44_upgrade"), ExtResource("45_upgrade")])
 
 [node name="DifficultyDirector" type="Node" parent="Systems"]
 script = ExtResource("19_director")

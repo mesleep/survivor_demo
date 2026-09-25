@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"defense_up"
+display_name = "防御 +2"
+description = "受到的每次伤害减少 2 点（至少保留 10%）。"
+type = 18
+category = 0
+value = 2.0
+max_stacks = 5
+weight = 1.0

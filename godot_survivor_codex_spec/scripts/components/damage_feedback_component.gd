@@ -64,6 +64,47 @@ func initialize(health_component: HealthComponent, visual: Node2D) -> void:
 		audio_player.stream = null
 
 
+## 绑定 Actor 的闪避/免疫信号，播放文字提示。
+func bind_actor(actor: ActorBase) -> void:
+	if not is_instance_valid(actor):
+		return
+	if not actor.damage_dodged.is_connected(_on_damage_dodged):
+		actor.damage_dodged.connect(_on_damage_dodged)
+	if not actor.damage_immune.is_connected(_on_damage_immune):
+		actor.damage_immune.connect(_on_damage_immune)
+
+
+func _on_damage_dodged(_event: DamageEvent) -> void:
+	_show_floating_text("闪避", Color(0.55, 0.9, 1.0))
+
+
+func _on_damage_immune(_event: DamageEvent) -> void:
+	_show_floating_text("免疫", Color(1.0, 0.86, 0.4))
+
+
+## 代码绘制的占位提示；正式图标/特效素材见 docs/整理设计/闪避免疫提示素材清单.md。
+func _show_floating_text(text: String, color: Color) -> void:
+	if not is_instance_valid(_visual):
+		return
+	var host: Node = _visual.get_parent()
+	if not is_instance_valid(host):
+		return
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", 18)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	label.position = Vector2(-16.0, -44.0)
+	host.add_child(label)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "position", Vector2(-16.0, -78.0), 0.6)
+	tween.tween_property(label, "modulate:a", 0.0, 0.6)
+	tween.chain().tween_callback(label.queue_free)
+
+
 ## 立即播放一次反馈；重复受伤会重启效果并先恢复基础变换。
 func play_feedback(event: DamageEvent) -> void:
 	if not is_instance_valid(_visual):

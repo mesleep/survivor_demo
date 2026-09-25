@@ -25,6 +25,10 @@ enum UpgradeType {
 	ACQUIRE_ARMOR,
 	## 全武器索敌射程倍率（角色级通用属性，D06 采用“最终索敌值”语义）。
 	ALL_WEAPON_RANGE,
+	## 防御/闪避/免疫（T10 伤害结算基座，数值可在 Resource 调整）。
+	DEFENSE,
+	DODGE_CHANCE,
+	IMMUNE_CHANCE,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。

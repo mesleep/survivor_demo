@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"immune_up"
+display_name = "免疫 +3%"
+description = "有 3% 概率完全免疫一次伤害，并显示“免疫”提示。"
+type = 20
+category = 0
+value = 0.03
+max_stacks = 5
+weight = 1.0
