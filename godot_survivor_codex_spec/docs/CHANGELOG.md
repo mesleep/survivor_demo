@@ -30,6 +30,14 @@
 - `project.godot` 主场景切换为 `game_entry.tscn`；`main.tscn` 保留为默认直启入口，既有测试与直接启动不受影响。
 - 新增 `main_menu_smoke_test.gd`；解析、启动与 29 项快速冒烟通过。
 
+### T04 六格装备清单与升级获取过滤（2026-09-25）
+
+- `PlayerActor` 新增六格装备清单（D02）、`equipment_changed` 信号与统一获取入口 `can_acquire()`/`try_acquire_weapon()`；起始武器同样占格，重复获取不占新格。
+- `UpgradeSystem` 的 `ACQUIRE_WEAPON` 过滤改用 `player.can_acquire()`，同时覆盖候选池（D01）、重复与满格；满格后获取卡消失但通用与专属升级照常。
+- `GameSession.start_run()` 注入本局候选武器 ID；旧直启路径候选为空表示不限制，保持兼容。
+- `SessionControls` 武器栏改为显示“装备 n/6”并监听装备变化。
+- 新增 `equipment_slots_smoke_test.gd`；解析、启动与 30 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

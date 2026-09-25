@@ -11,6 +11,11 @@ signal level_progress_changed(current_level: int, current_experience: int, requi
 signal leveled_up(new_level: int, pending_upgrade_count: int)
 signal upgrade_state_changed(upgrade_id: StringName, stack_count: int)
 signal weapon_added(controller: WeaponController)
+## 装备清单变化（含起始武器）；参数为当前装备 ID 副本，供 UI 只读展示。
+signal equipment_changed(equipped_ids: Array[StringName])
+
+## D02：武器与防具共用六格，同一 ID 不重复装备；升级不占新格。
+const MAX_EQUIPMENT_SLOTS := 6
 
 var definition: CharacterDefinition
 var weapon_controllers: Array[WeaponController] = []
@@ -29,6 +34,8 @@ var _regeneration_clock: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
 var _projectile_parent: Node
 var _targeting_service: TargetingService
+var _candidate_weapon_ids: Array[StringName] = []
+var _equipped_equipment_ids: Array[StringName] = []
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -67,6 +74,8 @@ func initialize(new_definition: Resource) -> void:
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
 	_weapon_modifier_history.clear()
+	_candidate_weapon_ids.clear()
+	_equipped_equipment_ids.clear()
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
 	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
@@ -91,6 +100,7 @@ func configure_weapons(
 		targeting_service: TargetingService
 ) -> void:
 	clear_weapons()
+	_equipped_equipment_ids.clear()
 	_projectile_parent = projectile_parent
 	_targeting_service = targeting_service
 	if not is_instance_valid(projectile_parent) or not is_instance_valid(targeting_service):
@@ -117,6 +127,7 @@ func add_weapon(weapon_definition: WeaponDefinition, allow_duplicate: bool = fal
 		if record.target == StringName() or record.target == weapon_definition.id:
 			controller.apply_runtime_modifier(record.modifier as WeaponRuntimeModifier)
 	weapon_controllers.append(controller)
+	_register_equipment(weapon_definition.id)
 	weapon_added.emit(controller)
 	return true
 
@@ -126,6 +137,62 @@ func has_weapon(weapon_id: StringName) -> bool:
 		if is_instance_valid(controller) and controller.definition.id == weapon_id:
 			return true
 	return false
+
+
+## 注入本局候选武器 ID（来自 RunLoadout）；空数组表示不限制，保持旧直启兼容。
+func configure_equipment(candidate_weapon_ids: Array[StringName]) -> void:
+	_candidate_weapon_ids = candidate_weapon_ids.duplicate()
+
+
+func get_candidate_weapon_ids() -> Array[StringName]:
+	return _candidate_weapon_ids.duplicate()
+
+
+func get_equipped_ids() -> Array[StringName]:
+	return _equipped_equipment_ids.duplicate()
+
+
+func get_equipped_count() -> int:
+	return _equipped_equipment_ids.size()
+
+
+func has_equipment(equipment_id: StringName) -> bool:
+	return _equipped_equipment_ids.has(equipment_id)
+
+
+func is_equipment_full() -> bool:
+	return _equipped_equipment_ids.size() >= MAX_EQUIPMENT_SLOTS
+
+
+## 判断一件武器是否可作为新装备获取：未持有、未满格、且在候选池内。
+##
+## 只读查询，不修改任何状态；UpgradeSystem 与测试都通过它统一过滤 D02/D03。
+func can_acquire(weapon_definition: WeaponDefinition) -> bool:
+	if weapon_definition == null or weapon_definition.id == StringName():
+		return false
+	if has_equipment(weapon_definition.id):
+		return false
+	if is_equipment_full():
+		return false
+	if not _candidate_weapon_ids.is_empty() and not _candidate_weapon_ids.has(weapon_definition.id):
+		return false
+	return true
+
+
+## 新武器获取的唯一入口：先校验槽位/候选/重复，再创建控制器。
+func try_acquire_weapon(weapon_definition: WeaponDefinition) -> bool:
+	if not can_acquire(weapon_definition):
+		return false
+	return add_weapon(weapon_definition, false)
+
+
+func _register_equipment(equipment_id: StringName) -> void:
+	if equipment_id == StringName() or _equipped_equipment_ids.has(equipment_id):
+		return
+	if _equipped_equipment_ids.size() >= MAX_EQUIPMENT_SLOTS:
+		return
+	_equipped_equipment_ids.append(equipment_id)
+	equipment_changed.emit(_equipped_equipment_ids.duplicate())
 
 
 func clear_weapons() -> void:
@@ -232,7 +299,7 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		UpgradeDefinition.UpgradeType.REGENERATION:
 			_regeneration += upgrade.value
 		UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
-			if not add_weapon(upgrade.weapon_definition):
+			if not try_acquire_weapon(upgrade.weapon_definition):
 				return false
 		_:
 			return false

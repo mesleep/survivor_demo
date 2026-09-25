@@ -120,6 +120,7 @@ func start_run() -> void:
 	enemy_spawner.initialize(enemy_spawn_settings, player, enemies, arena.get_bounds())
 	difficulty_director.initialize(run_definition, enemy_spawner)
 	targeting_service.initialize(enemies)
+	new_player.configure_equipment(_resolve_candidate_weapon_ids())
 	new_player.configure_weapons(starting_weapons, projectiles, targeting_service)
 	new_player.weapon_added.connect(_on_weapon_added)
 	for controller: WeaponController in new_player.weapon_controllers:
@@ -173,6 +174,14 @@ func _resolve_run_starting_weapons(character: CharacterDefinition) -> Array[Weap
 	if character == null:
 		return []
 	return character.starting_weapons.duplicate()
+
+
+## 解析本局候选武器 ID；配置无效或旧直启时返回空数组表示“不限制”。
+func _resolve_candidate_weapon_ids() -> Array[StringName]:
+	if run_loadout != null and is_instance_valid(content_catalog):
+		if run_loadout.is_valid(content_catalog):
+			return run_loadout.candidate_weapon_ids.duplicate()
+	return []
 
 
 ## 在指定世界位置创建一颗携带独立经验值的宝石。

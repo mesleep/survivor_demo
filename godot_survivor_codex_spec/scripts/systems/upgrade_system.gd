@@ -64,7 +64,9 @@ func can_offer(definition: UpgradeDefinition) -> bool:
 	if definition.required_weapon_id != StringName() and not player.has_weapon(definition.required_weapon_id):
 		return false
 	if definition.type == UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
-		if definition.weapon_definition == null or player.has_weapon(definition.weapon_definition.id):
+		if definition.weapon_definition == null:
+			return false
+		if not player.can_acquire(definition.weapon_definition):
 			return false
 	return (
 		definition != null

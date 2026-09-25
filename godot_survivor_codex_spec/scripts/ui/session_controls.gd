@@ -73,6 +73,8 @@ func _connect_player() -> void:
 		player.upgrade_state_changed.connect(_update_loadout)
 	if not player.weapon_added.is_connected(_on_weapon_added):
 		player.weapon_added.connect(_on_weapon_added)
+	if not player.equipment_changed.is_connected(_on_equipment_changed):
+		player.equipment_changed.connect(_on_equipment_changed)
 
 
 func _process(_delta: float) -> void:
@@ -117,6 +119,10 @@ func _on_weapon_added(_weapon: WeaponController) -> void:
 	_update_loadout()
 
 
+func _on_equipment_changed(_equipped_ids: Array[StringName]) -> void:
+	_update_loadout()
+
+
 func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 	if not is_instance_valid(session) or not is_instance_valid(session.player):
 		_loadout.text = ""
@@ -124,7 +130,9 @@ func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 	var names: PackedStringArray = []
 	for weapon: WeaponController in session.player.weapon_controllers:
 		names.append("%s ×%d" % [weapon.definition.display_name, weapon.get_effective_projectile_count()])
-	_loadout.text = "当前武器：" + " · ".join(names)
+	_loadout.text = "装备 %d/%d ｜ 当前武器：%s" % [
+		session.player.get_equipped_count(), PlayerActor.MAX_EQUIPMENT_SLOTS, " · ".join(names)
+	]
 
 
 func _update_hint() -> void:
