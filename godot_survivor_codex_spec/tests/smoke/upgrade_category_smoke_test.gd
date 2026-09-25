@@ -25,7 +25,7 @@ func _test_category_filtering() -> void:
 	session.enemy_spawner.stop()
 	var player: PlayerActor = session.player
 	var catalog: ContentCatalog = load(CATALOG_PATH) as ContentCatalog
-	var leaf: WeaponDefinition = catalog.get_weapon(&"leaf")
+	var bow: WeaponDefinition = catalog.get_weapon(&"bow")
 
 	var upgrade_system := UpgradeSystem.new()
 	upgrade_system.initialize(player)
@@ -35,49 +35,49 @@ func _test_category_filtering() -> void:
 	_expect(upgrade_system.can_offer(generic), "通用升级应始终可出。")
 
 	# 获取卡：未持有可出，持有后不可出。
-	var acquire_leaf: UpgradeDefinition = _make_acquire(&"acquire_leaf_test", leaf)
-	_expect(upgrade_system.can_offer(acquire_leaf), "未持有时获取卡应可出。")
-	player.configure_equipment([&"starter_weapon", &"leaf"])
-	_expect(player.try_acquire_weapon(leaf), "应能获取飞叶刃。")
-	_expect(not upgrade_system.can_offer(acquire_leaf), "已持有后获取卡不应再出。")
+	var acquire_bow: UpgradeDefinition = _make_acquire(&"acquire_bow_test", bow)
+	_expect(upgrade_system.can_offer(acquire_bow), "未持有时获取卡应可出。")
+	player.configure_equipment([&"staff", &"bow"])
+	_expect(player.try_acquire_weapon(bow), "应能获取长弓。")
+	_expect(not upgrade_system.can_offer(acquire_bow), "已持有后获取卡不应再出。")
 
 	# 基础升级卡：持有后可出，基础满级后不可出。
-	var base_leaf: UpgradeDefinition = _make_upgrade(
-		&"base_leaf_test", UpgradeDefinition.UpgradeCategory.BASE_UPGRADE,
-		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"leaf", &"", 4
+	var base_bow: UpgradeDefinition = _make_upgrade(
+		&"base_bow_test", UpgradeDefinition.UpgradeCategory.BASE_UPGRADE,
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"bow", &"", 4
 	)
-	_expect(upgrade_system.can_offer(base_leaf), "持有后基础升级应可出。")
+	_expect(upgrade_system.can_offer(base_bow), "持有后基础升级应可出。")
 	for _index: int in range(EquipmentProgress.MAX_BASE_LEVEL - 1):
-		player.add_equipment_base_level(&"leaf")
-	_expect(not upgrade_system.can_offer(base_leaf), "基础满级后基础升级不应可出。")
+		player.add_equipment_base_level(&"bow")
+	_expect(not upgrade_system.can_offer(base_bow), "基础满级后基础升级不应可出。")
 
 	# 质变卡：满级后可出；选一条分支后两条分支均不可再出。
 	var ascension_a: UpgradeDefinition = _make_upgrade(
 		&"ascension_a", UpgradeDefinition.UpgradeCategory.ASCENSION,
-		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"leaf", &"branch_a", 1
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"bow", &"branch_a", 1
 	)
 	var ascension_b: UpgradeDefinition = _make_upgrade(
 		&"ascension_b", UpgradeDefinition.UpgradeCategory.ASCENSION,
-		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"leaf", &"branch_b", 1
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"bow", &"branch_b", 1
 	)
 	_expect(upgrade_system.can_offer(ascension_a), "满级后质变卡应可出。")
-	_expect(player.choose_equipment_branch(&"leaf", &"branch_a"), "应能选择分支 A。")
+	_expect(player.choose_equipment_branch(&"bow", &"branch_a"), "应能选择分支 A。")
 	_expect(not upgrade_system.can_offer(ascension_a), "已选分支后同分支质变不应再出。")
 	_expect(not upgrade_system.can_offer(ascension_b), "已选分支后其它分支质变不应再出。")
 
 	# 分支专属卡：需匹配当前分支；与专属上限独立。
 	var branch_a_up: UpgradeDefinition = _make_upgrade(
 		&"branch_a_up", UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE,
-		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"leaf", &"branch_a", 3
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"bow", &"branch_a", 3
 	)
 	var branch_b_up: UpgradeDefinition = _make_upgrade(
 		&"branch_b_up", UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE,
-		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"leaf", &"branch_b", 3
+		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER, &"bow", &"branch_b", 3
 	)
 	_expect(upgrade_system.can_offer(branch_a_up), "匹配分支的专属升级应可出。")
 	_expect(not upgrade_system.can_offer(branch_b_up), "其它分支专属升级不应可出。")
 	for _index: int in range(EquipmentProgress.MAX_BRANCH_UPGRADE_LEVEL):
-		player.add_equipment_branch_upgrade(&"leaf", &"branch_a_up")
+		player.add_equipment_branch_upgrade(&"bow", &"branch_a_up")
 	_expect(not upgrade_system.can_offer(branch_a_up), "专属升级满级后不应再出。")
 
 	upgrade_system.free()
@@ -110,7 +110,7 @@ func _test_choice_counts() -> void:
 	_expect(upgrade_system.get_current_choices().size() == 2, "不足三张时应返回实际数量。")
 
 	# 全部不可用时返回空，交由 GameSession 安全恢复。
-	player.configure_equipment([&"starter_weapon"])
+	player.configure_equipment([&"staff"])
 	var missing: WeaponDefinition = _make_weapon(&"missing_weapon")
 	var blocked: UpgradeDefinition = _make_acquire(&"blocked_acquire", missing)
 	upgrade_system.upgrade_pool = [blocked]

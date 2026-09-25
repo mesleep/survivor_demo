@@ -15,9 +15,9 @@
 [sub_resource type="Resource" id="Stage0"]
 script = ExtResource("2_stage")
 start_time_seconds = 0.0
-spawn_interval_seconds = 1.0
-batch_size = 1
-max_alive_enemies = 30
+spawn_interval_seconds = 0.7
+batch_size = 2
+max_alive_enemies = 48
 health_multiplier = 1.0
 move_speed_multiplier = 1.0
 damage_multiplier = 1.0
@@ -26,35 +26,35 @@ enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic")])
 [sub_resource type="Resource" id="Stage1"]
 script = ExtResource("2_stage")
 start_time_seconds = 60.0
-spawn_interval_seconds = 0.75
-batch_size = 1
-max_alive_enemies = 50
+spawn_interval_seconds = 0.6
+batch_size = 2
+max_alive_enemies = 72
 health_multiplier = 1.25
 move_speed_multiplier = 1.08
 damage_multiplier = 1.15
-enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("9_shooter")])
+enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("9_shooter")])
 
 [sub_resource type="Resource" id="Stage2"]
 script = ExtResource("2_stage")
 start_time_seconds = 150.0
-spawn_interval_seconds = 0.55
-batch_size = 2
-max_alive_enemies = 90
+spawn_interval_seconds = 0.5
+batch_size = 3
+max_alive_enemies = 112
 health_multiplier = 1.6
 move_speed_multiplier = 1.15
 damage_multiplier = 1.35
-enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat"), ExtResource("9_shooter"), ExtResource("10_brute")])
+enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat"), ExtResource("9_shooter"), ExtResource("10_brute")])
 
 [sub_resource type="Resource" id="Stage3"]
 script = ExtResource("2_stage")
 start_time_seconds = 240.0
-spawn_interval_seconds = 0.35
-batch_size = 3
-max_alive_enemies = 140
+spawn_interval_seconds = 0.4
+batch_size = 4
+max_alive_enemies = 160
 health_multiplier = 2.1
 move_speed_multiplier = 1.25
 damage_multiplier = 1.65
-enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat"), ExtResource("9_shooter"), ExtResource("10_brute")])
+enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("3_basic"), ExtResource("4_fast"), ExtResource("7_cat"), ExtResource("8_cat"), ExtResource("9_shooter"), ExtResource("10_brute")])
 
 [resource]
 script = ExtResource("1_run")

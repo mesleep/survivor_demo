@@ -4,7 +4,7 @@
 ## 分支互斥、晚获取继承通用 Buff 以及共享 Resource 不变。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 const STAFF_PATH := "res://data/weapons/staff.tres"
 const MIGHT_PATH := "res://data/upgrades/staff_might.tres"

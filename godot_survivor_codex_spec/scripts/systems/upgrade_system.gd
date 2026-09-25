@@ -9,6 +9,10 @@ signal choices_ready(choices: Array[UpgradeDefinition])
 signal upgrade_applied(definition: UpgradeDefinition)
 
 @export var upgrade_pool: Array[UpgradeDefinition] = []
+## 装备成长保底：优先质变，否则给一张已持有装备的基础升级。
+@export var guarantee_progression_choice: bool = true
+@export_range(1.0, 30.0, 0.5) var ascension_weight_multiplier: float = 8.0
+@export_range(1.0, 10.0, 0.5) var base_upgrade_weight_multiplier: float = 3.0
 
 var player: PlayerActor
 var _current_choices: Array[UpgradeDefinition] = []
@@ -73,10 +77,22 @@ func _draw_choices(exclude: Array[UpgradeDefinition], count: int) -> void:
 			if not exclude.has(definition):
 				filtered.append(definition)
 		available = filtered
-	_shuffle_available(available)
 	var choice_count: int = mini(requested, available.size())
-	for index: int in range(choice_count):
-		_current_choices.append(available[index])
+	if choice_count > 0 and guarantee_progression_choice:
+		var progression: Array[UpgradeDefinition] = []
+		for definition: UpgradeDefinition in available:
+			if definition.category == UpgradeDefinition.UpgradeCategory.ASCENSION:
+				progression.append(definition)
+		if progression.is_empty():
+			for definition: UpgradeDefinition in available:
+				if definition.category == UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
+					progression.append(definition)
+		if not progression.is_empty():
+			var guaranteed: UpgradeDefinition = _take_weighted(progression)
+			_current_choices.append(guaranteed)
+			available.erase(guaranteed)
+	while _current_choices.size() < choice_count:
+		_current_choices.append(_take_weighted(available))
 	_awaiting_choice = not _current_choices.is_empty()
 	choices_ready.emit(_current_choices.duplicate())
 
@@ -115,6 +131,11 @@ func can_offer(definition: UpgradeDefinition) -> bool:
 	if player.get_upgrade_stack(definition.id) >= definition.max_stacks:
 		return false
 	if definition.required_weapon_id != StringName() and not player.has_weapon(definition.required_weapon_id):
+		return false
+	# 通用卡也可能声明目标装备；任何未持有装备的专属效果都不能提前进入候选。
+	if definition.category != UpgradeDefinition.UpgradeCategory.ACQUIRE_EQUIPMENT \
+			and definition.get_target_equipment_id() != StringName() \
+			and not player.has_equipment(definition.get_target_equipment_id()):
 		return false
 	if definition.required_equipment_id != StringName():
 		var required_progress: EquipmentProgress = player.get_progress(definition.required_equipment_id)
@@ -165,10 +186,26 @@ func get_current_choices() -> Array[UpgradeDefinition]:
 	return _current_choices.duplicate()
 
 
-## 使用系统自己的随机源洗牌，为后续按 weight 抽取保留单一入口。
-func _shuffle_available(available: Array[UpgradeDefinition]) -> void:
-	for index: int in range(available.size() - 1, 0, -1):
-		var swap_index: int = _random.randi_range(0, index)
-		var temporary: UpgradeDefinition = available[index]
-		available[index] = available[swap_index]
-		available[swap_index] = temporary
+## 不放回加权抽取；质变一旦可用便提高权重，且不会重复出现在同轮三选一。
+func _take_weighted(available: Array[UpgradeDefinition]) -> UpgradeDefinition:
+	var total_weight: float = 0.0
+	for definition: UpgradeDefinition in available:
+		total_weight += _effective_weight(definition)
+	if total_weight <= 0.0:
+		return available.pop_at(_random.randi_range(0, available.size() - 1))
+	var roll: float = _random.randf() * total_weight
+	for index: int in range(available.size()):
+		roll -= _effective_weight(available[index])
+		if roll < 0.0:
+			return available.pop_at(index)
+	return available.pop_back()
+
+
+func _effective_weight(definition: UpgradeDefinition) -> float:
+	var result: float = maxf(definition.weight, 0.0)
+	match definition.category:
+		UpgradeDefinition.UpgradeCategory.ASCENSION:
+			result *= ascension_weight_multiplier
+		UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
+			result *= base_upgrade_weight_multiplier
+	return result

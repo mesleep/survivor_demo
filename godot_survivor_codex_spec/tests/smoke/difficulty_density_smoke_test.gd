@@ -20,7 +20,7 @@ func _run() -> void:
 		controller.set_process(false)
 	session.advance_time(240.0)
 	var maximum: int = session.enemy_spawner.get_runtime_max_alive_enemies()
-	_expect(maximum == 140 and session.enemy_spawner.get_runtime_batch_size() == 3, "4:00 高密度阶段参数不正确。")
+	_expect(maximum == 160 and session.enemy_spawner.get_runtime_batch_size() == 4, "4:00 高密度阶段参数不正确。")
 
 	for _batch: int in range(60):
 		session.enemy_spawner.spawn_batch()

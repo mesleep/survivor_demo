@@ -97,6 +97,12 @@ func _physics_process(delta: float) -> void:
 				_attack_cooldown_remaining = definition.attack_cooldown_seconds
 		move_and_slide()
 		return
+	# 混合型 Boss 持续逼近，同时在射程内发射扇形弹幕；接触伤害仍有效。
+	if definition != null and definition.attack_type == EnemyDefinition.AttackType.HYBRID \
+			and definition.projectile_definition != null and distance <= definition.attack_range \
+			and _attack_cooldown_remaining <= 0.0 and distance > 0.0:
+		_fire_projectile(to_player.normalized())
+		_attack_cooldown_remaining = definition.attack_cooldown_seconds
 
 	var direction: Vector2 = global_position.direction_to(target_player.global_position)
 	velocity = direction * _move_speed * move_multiplier
@@ -109,16 +115,21 @@ func _fire_projectile(direction: Vector2) -> void:
 		return
 	if definition.projectile_definition.scene == null or not is_instance_valid(projectile_parent):
 		return
-	var projectile_node: Node = definition.projectile_definition.scene.instantiate()
-	if projectile_node is not ProjectileBase:
-		projectile_node.queue_free()
-		return
-	var projectile: ProjectileBase = projectile_node as ProjectileBase
-	projectile_parent.add_child(projectile)
-	var context := ProjectileSpawnContext.new(self, get_team_id(), global_position, direction)
-	context.weapon_id = definition.id
-	projectile.initialize(definition.projectile_definition, context)
-	projectile.launch(context.initial_direction)
+	var count: int = maxi(definition.projectiles_per_attack, 1)
+	var spread: float = deg_to_rad(definition.projectile_spread_degrees)
+	for index: int in range(count):
+		var projectile_node: Node = definition.projectile_definition.scene.instantiate()
+		if projectile_node is not ProjectileBase:
+			projectile_node.queue_free()
+			return
+		var angle: float = spread * (float(index) / float(count - 1) - 0.5) if count > 1 else 0.0
+		var shot_direction: Vector2 = direction.rotated(angle)
+		var projectile: ProjectileBase = projectile_node as ProjectileBase
+		projectile_parent.add_child(projectile)
+		var context := ProjectileSpawnContext.new(self, get_team_id(), global_position, shot_direction)
+		context.weapon_id = definition.id
+		projectile.initialize(definition.projectile_definition, context)
+		projectile.launch(context.initial_direction)
 
 
 ## 目标失效后只执行一次停止，避免空引用错误每帧刷屏。

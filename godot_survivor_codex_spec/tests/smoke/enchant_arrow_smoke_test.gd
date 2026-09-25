@@ -3,7 +3,7 @@
 ## 覆盖候选资格（需持弓且法杖已质变对应分支）、四分支效果映射、弓分支互斥与共享 Resource。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 const STAFF_PATH := "res://data/weapons/staff.tres"
 const BOW_MULTISHOT_PATH := "res://data/upgrades/bow_multishot.tres"

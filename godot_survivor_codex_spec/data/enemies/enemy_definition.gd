@@ -7,7 +7,7 @@ class_name EnemyDefinition
 extends Resource
 
 ## 攻击方式：接触伤害；或保持距离发射弹体（T33）。
-enum AttackType { MELEE, RANGED }
+enum AttackType { MELEE, RANGED, HYBRID }
 
 @export var id: StringName
 @export var display_name: String
@@ -28,3 +28,6 @@ enum AttackType { MELEE, RANGED }
 @export_range(0.0, 3000.0, 1.0) var preferred_distance: float = 300.0
 ## 远程敌人发射的弹体；attack_type=RANGED 时必填。
 @export var projectile_definition: ProjectileDefinition
+## 一次远程攻击的弹数及扇形总角度；近战敌人不会读取。
+@export_range(1, 9, 1) var projectiles_per_attack: int = 1
+@export_range(0.0, 120.0, 1.0) var projectile_spread_degrees: float = 0.0

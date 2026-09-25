@@ -3,7 +3,7 @@
 ## 验证自动生成、实际物理命中、默认释放，以及运行时弹数和扩散角度。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 
 var _failed: bool = false
 var _spawned_count: int = 0

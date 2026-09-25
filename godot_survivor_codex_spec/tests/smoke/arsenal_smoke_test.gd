@@ -9,7 +9,7 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var main: Node = (load("res://scenes/bootstrap/main.tscn") as PackedScene).instantiate()
+	var main: Node = (load("res://tests/fixtures/legacy_main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
 	await process_frame
 	var session: GameSession = main.get_node("GameSession") as GameSession

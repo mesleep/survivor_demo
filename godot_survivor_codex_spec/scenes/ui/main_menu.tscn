@@ -1,8 +1,28 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1"]
-[ext_resource type="StyleBox" path="res://data/visuals/v2_dark_comic/menu_panel_style.tres" id="2_panel_style"]
-[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/menu_background.png" id="3_background"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/menu_background.png" id="2_background"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/menu_title_ornament.png" id="3_ornament"]
+
+[sub_resource type="SystemFont" id="SystemFont_chinese"]
+font_names = PackedStringArray("PingFang SC", "Heiti SC", "Noto Sans CJK SC", "Microsoft YaHei")
+
+[sub_resource type="Theme" id="Theme_menu"]
+default_font = SubResource("SystemFont_chinese")
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
+bg_color = Color(0.018, 0.035, 0.075, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.36, 0.57, 0.68, 0.78)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.48)
+shadow_size = 8
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -12,6 +32,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+theme = SubResource("Theme_menu")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
@@ -20,77 +41,235 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("3_background")
+texture = ExtResource("2_background")
 expand_mode = 1
 stretch_mode = 6
 mouse_filter = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="Dimmer" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+color = Color(0.005, 0.01, 0.03, 0.53)
 
-[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-layout_mode = 2
-theme_override_styles/panel = ExtResource("2_panel_style")
+[node name="SafeArea" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 44
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 44
+theme_override_constants/margin_bottom = 26
 
-[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+[node name="Page" type="VBoxContainer" parent="SafeArea"]
 layout_mode = 2
-theme_override_constants/margin_left = 28
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 28
-theme_override_constants/margin_bottom = 22
+theme_override_constants/separation = 16
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+[node name="Header" type="HBoxContainer" parent="SafeArea/Page"]
+custom_minimum_size = Vector2(0, 112)
 layout_mode = 2
-theme_override_constants/separation = 28
 
-[node name="LeftColumn" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="TitleArea" type="Control" parent="SafeArea/Page/Header"]
+custom_minimum_size = Vector2(610, 106)
 layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/LeftColumn"]
-layout_mode = 2
+[node name="Ornament" type="TextureRect" parent="SafeArea/Page/Header/TitleArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_ornament")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="SafeArea/Page/Header/TitleArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.96, 0.95, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 33
 text = "月光庭院 · 四宠大作战"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 28
+vertical_alignment = 1
+mouse_filter = 2
 
-[node name="CharacterTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/LeftColumn"]
+[node name="HeaderSpacer" type="Control" parent="SafeArea/Page/Header"]
 layout_mode = 2
-text = "选择角色"
-theme_override_font_sizes/font_size = 18
+size_flags_horizontal = 3
 
-[node name="CharacterContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/LeftColumn"]
-unique_name_in_owner = true
+[node name="HeaderTag" type="Label" parent="SafeArea/Page/Header"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_colors/font_color = Color(0.68, 0.82, 0.89, 1)
+theme_override_font_sizes/font_size = 16
+text = "选择角色  ·  配置装备  ·  迎战月夜"
+vertical_alignment = 1
 
-[node name="WeaponTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/LeftColumn"]
+[node name="Cards" type="HBoxContainer" parent="SafeArea/Page"]
 layout_mode = 2
-text = "选择本局候选武器（最多 10 个）"
-theme_override_font_sizes/font_size = 18
+size_flags_vertical = 3
+theme_override_constants/separation = 18
 
-[node name="WeaponContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/LeftColumn"]
-unique_name_in_owner = true
+[node name="CharacterCard" type="PanelContainer" parent="SafeArea/Page/Cards"]
+custom_minimum_size = Vector2(270, 0)
 layout_mode = 2
-theme_override_constants/separation = 6
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_card")
 
-[node name="RightColumn" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer"]
+[node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/CharacterCard"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
 
-[node name="HintLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/RightColumn"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 0)
+[node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/CharacterCard/Margin"]
 layout_mode = 2
-text = "角色：未选择"
+theme_override_constants/separation = 12
+
+[node name="CharacterTitle" type="Label" parent="SafeArea/Page/Cards/CharacterCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_font_sizes/font_size = 22
+text = "01  选择角色"
+
+[node name="CharacterSubtitle" type="Label" parent="SafeArea/Page/Cards/CharacterCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.77, 0.82, 1)
+text = "不同角色拥有独立起始武器"
 autowrap_mode = 2
 
-[node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/HBoxContainer/RightColumn"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 52)
+[node name="CharacterScroll" type="ScrollContainer" parent="SafeArea/Page/Cards/CharacterCard/Margin/Column"]
 layout_mode = 2
-text = "开始游戏"
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CharacterContainer" type="VBoxContainer" parent="SafeArea/Page/Cards/CharacterCard/Margin/Column/CharacterScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 9
+
+[node name="WeaponCard" type="PanelContainer" parent="SafeArea/Page/Cards"]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/WeaponCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/WeaponCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WeaponTitle" type="Label" parent="SafeArea/Page/Cards/WeaponCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_font_sizes/font_size = 22
+text = "02  本局武器"
+
+[node name="WeaponSubtitle" type="Label" parent="SafeArea/Page/Cards/WeaponCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.77, 0.82, 1)
+text = "只会抽到已选武器；起始武器自动保留"
+autowrap_mode = 2
+
+[node name="WeaponScroll" type="ScrollContainer" parent="SafeArea/Page/Cards/WeaponCard/Margin/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="WeaponContainer" type="VBoxContainer" parent="SafeArea/Page/Cards/WeaponCard/Margin/Column/WeaponScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 9
+
+[node name="ProgressCard" type="PanelContainer" parent="SafeArea/Page/Cards"]
+custom_minimum_size = Vector2(355, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/ProgressCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/ProgressCard/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ProgressTitle" type="Label" parent="SafeArea/Page/Cards/ProgressCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_font_sizes/font_size = 22
+text = "03  永久成长"
+
+[node name="ProgressSubtitle" type="Label" parent="SafeArea/Page/Cards/ProgressCard/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.77, 0.82, 1)
+text = "局外强化永久生效；测试可一键解锁"
+autowrap_mode = 2
+
+[node name="ProgressScroll" type="ScrollContainer" parent="SafeArea/Page/Cards/ProgressCard/Margin/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PermanentContainer" type="VBoxContainer" parent="SafeArea/Page/Cards/ProgressCard/Margin/Column/ProgressScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="SafeArea/Page"]
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="HintLabel" type="Label" parent="SafeArea/Page/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(390, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.89, 0.94, 0.96, 1)
+theme_override_font_sizes/font_size = 16
+text = "角色：未选择"
+autowrap_mode = 2
+vertical_alignment = 1
+
+[node name="UnlockAllButton" type="Button" parent="SafeArea/Page/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(225, 54)
+layout_mode = 2
+text = "测试：一键解锁全部"
+tooltip_text = "立即解锁当前角色、武器与永久强化，并保存到测试档案。"
+
+[node name="StartButton" type="Button" parent="SafeArea/Page/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 62)
+layout_mode = 2
+text = "开始生存挑战  ▶"

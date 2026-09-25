@@ -18,12 +18,13 @@ var profile: Profile
 var unlock_service: UnlockService
 ## 永久强化目录（T30）。
 var permanent_catalog: PermanentUpgradeCatalog
-var _permanent_container: VBoxContainer
+@onready var _permanent_container: VBoxContainer = %PermanentContainer
 
 @onready var character_container: VBoxContainer = %CharacterContainer
 @onready var weapon_container: VBoxContainer = %WeaponContainer
 @onready var hint_label: Label = %HintLabel
 @onready var start_button: Button = %StartButton
+@onready var unlock_all_button: Button = %UnlockAllButton
 
 var _character_id: StringName = &""
 var _selected_weapon_ids: Array[StringName] = []
@@ -36,7 +37,9 @@ var _status_text: String = ""
 
 func _ready() -> void:
 	start_button.pressed.connect(request_start)
+	unlock_all_button.pressed.connect(_on_unlock_all_pressed)
 	_style_button(start_button)
+	_style_button(unlock_all_button)
 	_build()
 
 
@@ -46,6 +49,10 @@ func _style_button(button: Button) -> void:
 	button.add_theme_stylebox_override(&"hover", BUTTON_HOVER)
 	button.add_theme_stylebox_override(&"pressed", BUTTON_PRESSED)
 	button.add_theme_stylebox_override(&"disabled", BUTTON_NORMAL)
+	button.add_theme_color_override(&"font_color", Color(0.91, 0.96, 1.0))
+	button.add_theme_color_override(&"font_hover_color", Color.WHITE)
+	button.add_theme_color_override(&"font_pressed_color", Color.WHITE)
+	button.add_theme_font_size_override(&"font_size", 17)
 
 
 ## 由入口在入树前或入树后注入目录；会重建选项。
@@ -99,8 +106,7 @@ func select_character(character_id: StringName) -> bool:
 	if not _is_character_available(character_id):
 		return false
 	_character_id = character_id
-	if _character_buttons.has(character_id):
-		_character_buttons[character_id].button_pressed = true
+	_sync_character_buttons()
 	for weapon_id: StringName in _starting_weapon_ids():
 		if not _selected_weapon_ids.has(weapon_id):
 			_selected_weapon_ids.append(weapon_id)
@@ -205,6 +211,8 @@ func _attempt_purchase(content_id: StringName, is_character: bool) -> void:
 			_rebuild_preserving_selection(content_id, is_character)
 		_:
 			_status_text = "无效内容，无法解锁。"
+	_sync_character_buttons()
+	_sync_weapon_buttons()
 	_update_hint()
 
 
@@ -253,6 +261,7 @@ func _build() -> void:
 	_selected_weapon_ids.clear()
 	_start_locked = false
 	start_button.disabled = false
+	unlock_all_button.visible = profile != null and unlock_service != null
 	if not is_instance_valid(catalog):
 		hint_label.text = "缺少内容目录，无法开局。"
 		start_button.disabled = true
@@ -279,11 +288,13 @@ func _build() -> void:
 	for character: CharacterDefinition in catalog.characters:
 		var button := Button.new()
 		_style_button(button)
+		button.custom_minimum_size.y = 48.0
 		if _is_character_available(character.id):
 			button.text = character.display_name
 		else:
 			button.text = "%s（未解锁 %d）" % [character.display_name, character.unlock_cost]
 		button.toggle_mode = true
+		button.set_meta(&"base_text", button.text)
 		button.button_group = group
 		button.pressed.connect(_on_character_pressed.bind(character.id))
 		character_container.add_child(button)
@@ -292,11 +303,13 @@ func _build() -> void:
 	for weapon: WeaponDefinition in catalog.weapons:
 		var button := Button.new()
 		_style_button(button)
+		button.custom_minimum_size.y = 48.0
 		if _is_weapon_available(weapon.id):
 			button.text = weapon.display_name
 		else:
 			button.text = "%s（未解锁 %d）" % [weapon.display_name, weapon.unlock_cost]
 		button.toggle_mode = true
+		button.set_meta(&"base_text", button.text)
 		button.pressed.connect(_on_weapon_pressed.bind(weapon.id))
 		weapon_container.add_child(button)
 		_weapon_buttons[weapon.id] = button
@@ -321,7 +334,6 @@ func _build() -> void:
 
 ## 永久强化区：跨角色共享，显示等级/价格，点击购买（T30）。
 func _build_permanent_section() -> void:
-	_ensure_permanent_container()
 	_clear_children(_permanent_container)
 	if permanent_catalog == null or profile == null:
 		_permanent_container.visible = false
@@ -337,6 +349,7 @@ func _build_permanent_section() -> void:
 		var level: int = profile.get_permanent_level(definition.id)
 		var button := Button.new()
 		_style_button(button)
+		button.custom_minimum_size.y = 42.0
 		if level >= definition.max_level:
 			button.text = "%s Lv %d/%d（已满）" % [definition.display_name, level, definition.max_level]
 			button.disabled = true
@@ -346,17 +359,6 @@ func _build_permanent_section() -> void:
 			]
 		button.pressed.connect(_on_permanent_pressed.bind(definition.id))
 		_permanent_container.add_child(button)
-
-
-func _ensure_permanent_container() -> void:
-	if is_instance_valid(_permanent_container):
-		return
-	var parent: Node = hint_label.get_parent()
-	_permanent_container = VBoxContainer.new()
-	_permanent_container.name = "PermanentContainer"
-	_permanent_container.add_theme_constant_override("separation", 6)
-	parent.add_child(_permanent_container)
-	parent.move_child(_permanent_container, hint_label.get_index())
 
 
 func _on_permanent_pressed(upgrade_id: StringName) -> void:
@@ -377,6 +379,31 @@ func _on_permanent_pressed(upgrade_id: StringName) -> void:
 			_status_text = "存档失败，强化已回滚。"
 		_:
 			_status_text = "无效的永久强化项。"
+	_update_hint()
+
+
+## 明确的测试按钮：不扣金币，一次解锁当前目录与永久强化，失败保留旧档。
+func _on_unlock_all_pressed() -> void:
+	if unlock_service == null or catalog == null or permanent_catalog == null:
+		_status_text = "测试解锁失败：缺少档案或目录。"
+		_update_hint()
+		return
+	var result: UnlockService.Result = unlock_service.unlock_all_for_testing(
+		catalog, permanent_catalog
+	)
+	if result == UnlockService.Result.SUCCESS:
+		var previous_character: StringName = _character_id
+		var previous_weapons: Array[StringName] = _selected_weapon_ids.duplicate()
+		_build()
+		if previous_character != StringName():
+			select_character(previous_character)
+		for weapon_id: StringName in previous_weapons:
+			if _weapon_buttons.has(weapon_id) and not _selected_weapon_ids.has(weapon_id):
+				_selected_weapon_ids.append(weapon_id)
+		_sync_weapon_buttons()
+		_status_text = "测试内容已全部解锁，永久强化已升满。"
+	else:
+		_status_text = "测试解锁失败，存档未改变。"
 	_update_hint()
 
 
@@ -412,7 +439,18 @@ func _is_starting_weapon(weapon_id: StringName) -> bool:
 
 func _sync_weapon_buttons() -> void:
 	for weapon_id: StringName in _weapon_buttons.keys():
-		_weapon_buttons[weapon_id].button_pressed = _selected_weapon_ids.has(weapon_id)
+		var button: Button = _weapon_buttons[weapon_id]
+		var selected: bool = _selected_weapon_ids.has(weapon_id)
+		button.button_pressed = selected
+		button.text = ("✓  " if selected else "+  ") + String(button.get_meta(&"base_text"))
+
+
+func _sync_character_buttons() -> void:
+	for character_id: StringName in _character_buttons.keys():
+		var button: Button = _character_buttons[character_id]
+		var selected: bool = character_id == _character_id
+		button.button_pressed = selected
+		button.text = ("◆  " if selected else "◇  ") + String(button.get_meta(&"base_text"))
 
 
 func _update_hint() -> void:

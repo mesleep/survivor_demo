@@ -388,11 +388,10 @@ func _publish_time() -> void:
 func _spawn_boss() -> EnemyActor:
 	if boss_has_spawned or run_definition == null or run_definition.boss_definition == null:
 		return boss
-	boss_has_spawned = true
-	enemy_spawner.stop()
 	var spawn_position: Vector2 = enemy_spawner.get_offscreen_spawn_position()
 	boss = enemy_spawner.spawn_enemy(run_definition.boss_definition, spawn_position, true)
 	if is_instance_valid(boss):
+		boss_has_spawned = true
 		game_audio.play_cue(&"boss")
 		boss_spawned.emit(boss)
 	else:

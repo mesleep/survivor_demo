@@ -106,7 +106,7 @@ func _test_run_snapshot_applies() -> void:
 	_expect(is_equal_approx(player.get_defense(), 1.0), "1 级永久防御应为 1。")
 	_expect(is_equal_approx(player.get_bonus_lifesteal_ratio(), 0.02), "1 级永久吸血应为 0.02。")
 	_expect(is_equal_approx(player.get_permanent_regeneration(), 0.3), "1 级永久恢复应为 0.3。")
-	var starter: WeaponController = _find_controller(player, &"starter_weapon")
+	var starter: WeaponController = _find_controller(player, &"staff")
 	_expect(
 		starter != null and is_equal_approx(starter.get_runtime_damage_multiplier(), 1.05),
 		"1 级永久伤害应使武器伤害 ×1.05。"

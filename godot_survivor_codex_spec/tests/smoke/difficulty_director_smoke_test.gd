@@ -32,7 +32,7 @@ func _run() -> void:
 	_expect(session.difficulty_director.current_stage_index == 2, "2:30 未切换第三阶段。")
 	var stage2_pool: Array[EnemyDefinition] = session.enemy_spawner.get_runtime_enemy_pool()
 	_expect(_pool_has_id(stage2_pool, &"enemy_basic") and _pool_has_id(stage2_pool, &"enemy_fast"), "2:30 的生成池未同时包含基础和快速敌人。")
-	_expect(session.enemy_spawner.get_runtime_batch_size() == 2, "第三阶段同批生成数量不正确。")
+	_expect(session.enemy_spawner.get_runtime_batch_size() == 3, "第三阶段同批生成数量不正确。")
 
 	var basic: EnemyDefinition = load("res://data/enemies/enemy_basic.tres") as EnemyDefinition
 	var fast: EnemyDefinition = load("res://data/enemies/enemy_fast.tres") as EnemyDefinition

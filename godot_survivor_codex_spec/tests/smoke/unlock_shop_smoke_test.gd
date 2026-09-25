@@ -119,12 +119,12 @@ func _test_entry_rejects_locked_and_snapshot() -> void:
 	root.add_child(entry)
 	await process_frame
 
-	var locked_loadout := RunLoadout.new(&"player_default", [&"starter_weapon", &"bow"], [&"starter_weapon"])
+	var locked_loadout := RunLoadout.new(&"player_default", [&"staff", &"bow"], [&"staff"])
 	_expect(not entry.is_loadout_unlocked(locked_loadout), "含未解锁武器的配置应被拒绝。")
 	entry._on_start_requested(locked_loadout)
 	_expect(entry.get_active_session() == null, "未解锁配置不应开始单局。")
 
-	var valid_loadout := RunLoadout.new(&"player_default", [&"starter_weapon"], [&"starter_weapon"])
+	var valid_loadout := RunLoadout.new(&"player_default", [&"staff"], [&"staff"])
 	entry._on_start_requested(valid_loadout)
 	await process_frame
 	var active: GameSession = entry.get_active_session()
@@ -148,7 +148,7 @@ func _make_profile(coins: int) -> Profile:
 	var profile := Profile.new()
 	profile.coins = coins
 	profile.unlocked_character_ids = [&"player_default"]
-	profile.unlocked_weapon_ids = [&"starter_weapon"]
+	profile.unlocked_weapon_ids = [&"staff"]
 	return profile
 
 

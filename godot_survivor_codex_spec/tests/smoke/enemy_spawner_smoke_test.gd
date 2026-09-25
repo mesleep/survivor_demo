@@ -1,12 +1,12 @@
 ## P1-04 敌人生成器烟雾检查。
 ##
-## 启动真实主场景，验证屏幕外环带生成、1 秒间隔、数量上限，
+## 启动真实主场景，验证屏幕外环带生成、当前配置间隔、数量上限，
 ## 以及玩家离树后停止生成。测试不修改共享 EnemySpawnSettings。
 extends SceneTree
 
 const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
-const EXPECTED_INTERVAL_SECONDS := 1.0
-const EXPECTED_MAX_ENEMIES := 30
+const EXPECTED_INTERVAL_SECONDS := 0.7
+const EXPECTED_MAX_ENEMIES := 48
 const POSITION_TOLERANCE := 5.0
 
 var _failed: bool = false
@@ -42,7 +42,7 @@ func _run() -> void:
 		return
 	for controller: WeaponController in game_session.player.weapon_controllers:
 		controller.set_process(false)
-	_expect(is_equal_approx(settings.spawn_interval_seconds, EXPECTED_INTERVAL_SECONDS), "生成间隔不是 1 秒。")
+	_expect(is_equal_approx(settings.spawn_interval_seconds, EXPECTED_INTERVAL_SECONDS), "生成间隔与配置不一致。")
 	_expect(settings.max_alive_enemies == EXPECTED_MAX_ENEMIES, "最大敌人数配置不正确。")
 
 	spawner.stop()
@@ -77,7 +77,7 @@ func _run() -> void:
 	await create_timer(2.2).timeout
 	var timed_count: int = spawner.get_enemy_count()
 	_expect(initial_count == 1, "EnemySpawner 初始化时未立即生成首个敌人。")
-	_expect(timed_count >= 3 and timed_count <= 4, "EnemySpawner 未按约 1 秒间隔持续生成。")
+	_expect(timed_count >= 3 and timed_count <= 5, "EnemySpawner 未按当前间隔持续生成。")
 
 	spawner.stop()
 	for index: int in range(EXPECTED_MAX_ENEMIES + 5):

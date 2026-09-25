@@ -3,7 +3,7 @@
 ## 覆盖命中分裂、分裂弹不递归、分裂数量升级、角度与伤害倍率、共享 Resource 不变。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const PROJECTILE_SCENE_PATH := "res://scenes/combat/projectiles/projectile_base.tscn"
 const ENEMY_SCENE_PATH := "res://scenes/actors/enemies/enemy_basic.tscn"
 const STAFF_PATH := "res://data/weapons/staff.tres"

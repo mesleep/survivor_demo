@@ -1,7 +1,7 @@
 ## T07：星光魔杖样板质变（基础→质变→专属）与晚获取继承的专项回归。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 const BASE_PATH := "res://data/upgrades/star_wand_base.tres"
 const SCATTER_PATH := "res://data/upgrades/star_wand_scatter.tres"
@@ -97,7 +97,7 @@ func _test_late_acquisition_inheritance() -> void:
 	var damage_up: UpgradeDefinition = load(DAMAGE_UP_PATH) as UpgradeDefinition
 	_expect(player.apply_upgrade(damage_up), "通用伤害升级应成功。")
 	var catalog: ContentCatalog = load(CATALOG_PATH) as ContentCatalog
-	var leaf: WeaponDefinition = catalog.get_weapon(&"leaf")
+	var leaf: WeaponDefinition = load("res://data/weapons/leaf.tres") as WeaponDefinition
 	player.configure_equipment([&"starter_weapon", &"leaf"])
 	_expect(player.try_acquire_weapon(leaf), "应能获取飞叶刃。")
 	var leaf_controller: WeaponController = _find_controller(player, &"leaf")

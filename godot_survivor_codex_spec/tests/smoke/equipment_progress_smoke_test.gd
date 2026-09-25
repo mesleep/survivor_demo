@@ -1,7 +1,7 @@
 ## T05：单件装备等级/质变运行时模型与共享 Resource 隔离的专项回归。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 
 var _failed: bool = false

@@ -3,7 +3,7 @@
 ## 覆盖冻结停止移动与恢复、减速叠加时的恢复顺序、冻结时长升级、刷新与 Boss 免疫。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const PROJECTILE_SCENE_PATH := "res://scenes/combat/projectiles/projectile_base.tscn"
 const ENEMY_SCENE_PATH := "res://scenes/actors/enemies/enemy_basic.tscn"
 const BOSS_PATH := "res://data/enemies/boss_default.tres"

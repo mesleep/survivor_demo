@@ -31,13 +31,13 @@ func _test_catalog_defaults(catalog: ContentCatalog) -> void:
 		return
 	_expect(catalog.validate().is_empty(), "默认目录自身校验应通过。")
 	_expect(catalog.get_character(&"player_default") != null, "目录缺少默认角色。")
-	for weapon_id: StringName in [&"starter_weapon", &"leaf", &"bone", &"bell"]:
+	for weapon_id: StringName in [&"bow", &"staff", &"sword"]:
 		_expect(catalog.get_weapon(weapon_id) != null, "目录缺少武器：%s。" % weapon_id)
 
 	var loadout: RunLoadout = RunLoadout.default_for(catalog)
 	_expect(loadout.is_valid(catalog), "默认快照应通过校验：%s。" % str(loadout.validate(catalog)))
 	_expect(loadout.character_id == &"player_default", "默认快照角色 ID 不正确。")
-	_expect(loadout.starting_weapon_ids.has(&"starter_weapon"), "默认快照缺少起始武器。")
+	_expect(loadout.starting_weapon_ids.has(&"staff"), "默认快照缺少起始武器。")
 	_expect(loadout.candidate_weapon_ids.size() == catalog.weapons.size(), "默认候选池应包含全部现有武器。")
 	_expect(loadout.candidate_weapon_ids.size() <= RunLoadout.MAX_CANDIDATE_WEAPONS, "默认候选池超过上限。")
 	for weapon_id: StringName in loadout.starting_weapon_ids:
@@ -45,30 +45,30 @@ func _test_catalog_defaults(catalog: ContentCatalog) -> void:
 
 
 func _test_validation_errors(catalog: ContentCatalog) -> void:
-	var unknown_character := RunLoadout.new(&"ghost_character", [&"leaf"], [&"leaf"])
+	var unknown_character := RunLoadout.new(&"ghost_character", [&"bow"], [&"bow"])
 	_expect(_contains(unknown_character.validate(catalog), "未知角色"), "未知角色未被识别。")
 
 	var unknown_weapon := RunLoadout.new(
-		&"player_default", [&"starter_weapon", &"ghost_weapon"], [&"starter_weapon"]
+		&"player_default", [&"staff", &"ghost_weapon"], [&"staff"]
 	)
 	_expect(_contains(unknown_weapon.validate(catalog), "不在目录"), "未知武器未被识别。")
 
-	var duplicate_candidate := RunLoadout.new(&"player_default", [&"leaf", &"leaf"], [&"leaf"])
+	var duplicate_candidate := RunLoadout.new(&"player_default", [&"bow", &"bow"], [&"bow"])
 	_expect(_contains(duplicate_candidate.validate(catalog), "重复"), "重复候选未被识别。")
 
-	var starting_outside_pool := RunLoadout.new(&"player_default", [&"leaf"], [&"starter_weapon"])
+	var starting_outside_pool := RunLoadout.new(&"player_default", [&"bow"], [&"staff"])
 	_expect(_contains(starting_outside_pool.validate(catalog), "不在候选池"), "起始武器越界未被识别。")
 
-	var empty_starting := RunLoadout.new(&"player_default", [&"leaf"], [])
+	var empty_starting := RunLoadout.new(&"player_default", [&"bow"], [])
 	_expect(_contains(empty_starting.validate(catalog), "至少需要一把起始武器"), "空起始武器未被识别。")
 
-	var many_ids: Array[StringName] = [&"starter_weapon", &"leaf", &"bone", &"bell"]
+	var many_ids: Array[StringName] = [&"staff", &"bow", &"sword"]
 	while many_ids.size() < RunLoadout.MAX_CANDIDATE_WEAPONS + 1:
 		many_ids.append(StringName("fake_%d" % many_ids.size()))
-	var over_limit := RunLoadout.new(&"player_default", many_ids, [&"starter_weapon"])
+	var over_limit := RunLoadout.new(&"player_default", many_ids, [&"staff"])
 	_expect(_contains(over_limit.validate(catalog), "最多"), "超过候选上限未被识别。")
 
-	var fewer_than_ten := RunLoadout.new(&"player_default", [&"starter_weapon"], [&"starter_weapon"])
+	var fewer_than_ten := RunLoadout.new(&"player_default", [&"staff"], [&"staff"])
 	_expect(fewer_than_ten.is_valid(catalog), "库存不足十个时应允许少选。")
 
 
@@ -96,7 +96,7 @@ func _test_game_session_paths(catalog: ContentCatalog) -> void:
 	session.auto_start = false
 	root.add_child(main_node)
 	await process_frame
-	var external := RunLoadout.new(&"player_default", [&"leaf", &"bone"], [&"leaf"])
+	var external := RunLoadout.new(&"player_default", [&"bow", &"staff"], [&"bow"])
 	session.set_run_loadout(external)
 	external.starting_weapon_ids.clear()
 	external.candidate_weapon_ids.clear()
@@ -104,8 +104,8 @@ func _test_game_session_paths(catalog: ContentCatalog) -> void:
 	await process_frame
 	_expect(session.player != null, "配置路径未创建玩家。")
 	if session.player != null:
-		_expect(session.player.has_weapon(&"leaf"), "配置路径未按快照装备起始武器。")
-		_expect(not session.player.has_weapon(&"starter_weapon"), "配置路径错误添加了非起始武器。")
+		_expect(session.player.has_weapon(&"bow"), "配置路径未按快照装备起始武器。")
+		_expect(not session.player.has_weapon(&"staff"), "配置路径错误添加了非起始武器。")
 	session.enemy_spawner.stop()
 	main_node.queue_free()
 	await process_frame
@@ -117,7 +117,7 @@ func _test_game_session_paths(catalog: ContentCatalog) -> void:
 	var legacy_session: GameSession = legacy_main.get_node("GameSession") as GameSession
 	_expect(legacy_session.player != null, "旧直启未创建玩家。")
 	if legacy_session.player != null:
-		_expect(legacy_session.player.has_weapon(&"starter_weapon"), "旧直启缺少起始武器。")
+		_expect(legacy_session.player.has_weapon(&"staff"), "直启缺少起始武器。")
 	legacy_session.enemy_spawner.stop()
 	legacy_main.queue_free()
 	await process_frame

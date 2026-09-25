@@ -1,7 +1,7 @@
 ## T12：基础弓箭数据、获取、攻击与重开专项回归。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 const ACQUIRE_BOW_PATH := "res://data/upgrades/acquire_bow.tres"
 const BOW_BASE_PATH := "res://data/upgrades/bow_base.tres"
@@ -76,7 +76,7 @@ func _test_bow_flow() -> void:
 		_expect(spawned != null and spawned.definition.id == &"arrow_projectile", "生成的弹体不是箭矢。")
 
 	# 与旧武器共存。
-	var leaf: WeaponDefinition = catalog.get_weapon(&"leaf")
+	var leaf: WeaponDefinition = load("res://data/weapons/leaf.tres") as WeaponDefinition
 	player.configure_equipment([&"starter_weapon", &"bow", &"leaf"])
 	_expect(player.try_acquire_weapon(leaf), "长弓应能与飞叶刃共存。")
 	_expect(_find_controller(player, &"leaf") != null, "缺少飞叶刃控制器。")

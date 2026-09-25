@@ -4,7 +4,7 @@
 ## 已释放目标与 Boss、爆炸分支与溅射升级，以及结算后的节点清理。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const PROJECTILE_SCENE_PATH := "res://scenes/combat/projectiles/projectile_base.tscn"
 const ENEMY_SCENE_PATH := "res://scenes/actors/enemies/enemy_basic.tscn"
 const EXPLOSION_ORB_PATH := "res://data/projectiles/staff_orb_explosion.tres"
@@ -131,7 +131,7 @@ func _test_released_target_and_boss() -> void:
 
 	var hit_count: int = _detonate(session, player, _load_definition(EXPLOSION_ORB_PATH), Vector2.ZERO, center, [])
 	_expect(hit_count == 2, "已释放目标应被跳过，命中直击目标与 Boss 共 2 个。")
-	_expect(boss != null and boss.health_component.current_health < 500.0, "Boss 应承受溅射伤害。")
+	_expect(boss != null and boss.health_component.current_health < boss_definition.max_health, "Boss 应承受溅射伤害。")
 	await _free_node(main_node)
 
 

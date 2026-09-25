@@ -4,7 +4,7 @@
 ## 来源离树、敌人死亡、火焰分支挂 DoT、火坑进出范围/重叠与结算清理。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const PROJECTILE_SCENE_PATH := "res://scenes/combat/projectiles/projectile_base.tscn"
 const ENEMY_SCENE_PATH := "res://scenes/actors/enemies/enemy_basic.tscn"
 const FLAME_BOLT_PATH := "res://data/projectiles/staff_flame_bolt.tres"

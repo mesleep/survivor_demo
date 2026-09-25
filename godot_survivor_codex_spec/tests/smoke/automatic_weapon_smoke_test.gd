@@ -3,7 +3,7 @@
 ## 验证默认武器自动请求最近敌人、射程和无目标过滤、约一秒冷却及多控制器组合。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 
 var _failed: bool = false
 var _fire_request_count: int = 0

@@ -3,7 +3,7 @@
 ## 覆盖分支切换、穿透逐一命中、减速生效与恢复、Boss 控制免疫、死亡清理与共享 Resource。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const PROJECTILE_SCENE_PATH := "res://scenes/combat/projectiles/projectile_base.tscn"
 const ENEMY_SCENE_PATH := "res://scenes/actors/enemies/enemy_basic.tscn"
 const BOSS_PATH := "res://data/enemies/boss_default.tres"

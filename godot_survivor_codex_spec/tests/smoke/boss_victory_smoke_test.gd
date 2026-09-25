@@ -18,7 +18,6 @@ func _run() -> void:
 	root.add_child(main_node)
 	await process_frame
 	var session: GameSession = main_node.get_node("GameSession") as GameSession
-	session.enemy_spawner.stop()
 	_clear_children(session.enemies)
 	await process_frame
 	session.boss_spawned.connect(_on_boss_spawned)
@@ -27,7 +26,7 @@ func _run() -> void:
 	session.advance_time(300.0)
 	_expect(session.boss_has_spawned and is_instance_valid(session.boss), "5 分钟未生成 Boss。")
 	_expect(_boss_signal_count == 1, "Boss 生成信号未恰好触发一次。")
-	_expect(session.enemy_spawner.spawn_timer.is_stopped(), "Boss 出现后普通生成未停止。")
+	_expect(not session.enemy_spawner.spawn_timer.is_stopped(), "Boss 出现后小怪应继续刷新。")
 	_expect(session.hud.time_label.text == "00:00", "Boss 出现时 HUD 未显示 00:00。")
 	var boss: EnemyActor = session.boss
 	_expect(boss.definition.is_boss and boss.definition.scene.resource_path.ends_with("boss.tscn"), "Boss 未使用独立场景和 Resource。")

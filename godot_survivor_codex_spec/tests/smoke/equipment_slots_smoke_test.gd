@@ -4,7 +4,7 @@
 ## 以及重开后装备清空重建。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const DAMAGE_UP_PATH := "res://data/upgrades/damage_up.tres"
 
 var _failed: bool = false

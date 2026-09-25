@@ -3,7 +3,7 @@
 ## 验证角色基础范围和武器射程分别形成上限，实际自动索敌使用两者较小值。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 
 var _failed: bool = false
 var _fire_count: int = 0

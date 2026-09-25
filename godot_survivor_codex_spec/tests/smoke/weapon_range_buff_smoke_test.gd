@@ -1,7 +1,7 @@
 ## T09：全武器索敌射程 Buff 的语义、边界与晚获取继承专项回归。
 extends SceneTree
 
-const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
+const MAIN_SCENE_PATH := "res://tests/fixtures/legacy_main.tscn"
 const CATALOG_PATH := "res://data/catalog/default_catalog.tres"
 const RANGE_UP_PATH := "res://data/upgrades/weapon_range_up.tres"
 const BASIC_PROJECTILE_PATH := "res://data/projectiles/basic_projectile.tres"
@@ -27,7 +27,7 @@ func _test_range_semantics() -> void:
 	session.enemy_spawner.stop()
 	var player: PlayerActor = session.player
 	var catalog: ContentCatalog = load(CATALOG_PATH) as ContentCatalog
-	var starter: WeaponDefinition = catalog.get_weapon(&"starter_weapon")
+	var starter: WeaponDefinition = load("res://data/weapons/starter_weapon.tres") as WeaponDefinition
 	var projectile: ProjectileDefinition = load(BASIC_PROJECTILE_PATH) as ProjectileDefinition
 	var reach_before: float = projectile.speed * projectile.lifetime_seconds
 	var target_range_before: float = starter.target_range
@@ -78,7 +78,7 @@ func _test_late_acquisition_and_restart() -> void:
 	var catalog: ContentCatalog = load(CATALOG_PATH) as ContentCatalog
 	var range_up: UpgradeDefinition = load(RANGE_UP_PATH) as UpgradeDefinition
 	_expect(player.apply_upgrade(range_up), "射程升级应成功。")
-	var leaf: WeaponDefinition = catalog.get_weapon(&"leaf")
+	var leaf: WeaponDefinition = load("res://data/weapons/leaf.tres") as WeaponDefinition
 	player.configure_equipment([&"starter_weapon", &"leaf"])
 	_expect(player.try_acquire_weapon(leaf), "应能晚获取飞叶刃。")
 	var leaf_controller: WeaponController = _find_controller(player, &"leaf")

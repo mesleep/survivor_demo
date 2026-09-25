@@ -97,6 +97,27 @@ func purchase_permanent_upgrade(
 	return _commit(snapshot)
 
 
+## 测试入口：一次解锁目录内全部角色/武器并升满永久强化，不消耗金币。
+## 成功时只写一次档；失败恢复快照，不会留下半解锁状态。
+func unlock_all_for_testing(
+		catalog: ContentCatalog, permanent_catalog: PermanentUpgradeCatalog
+) -> Result:
+	if profile == null or catalog == null or permanent_catalog == null:
+		return Result.INVALID_ID
+	var snapshot: Profile = profile.copy()
+	for character_id: StringName in catalog.get_character_ids():
+		if not profile.unlocked_character_ids.has(character_id):
+			profile.unlocked_character_ids.append(character_id)
+	for weapon_id: StringName in catalog.get_weapon_ids():
+		if not profile.unlocked_weapon_ids.has(weapon_id):
+			profile.unlocked_weapon_ids.append(weapon_id)
+	for definition: PermanentUpgradeDefinition in permanent_catalog.upgrades:
+		if definition != null:
+			profile.permanent_upgrades[definition.id] = definition.max_level
+	profile.refresh_bonus = maxi(profile.refresh_bonus, 5)
+	return _commit(snapshot)
+
+
 ## 写档失败时把内存档案恢复为交易前快照，保证与磁盘一致。
 func _commit(snapshot: Profile) -> Result:
 	if store == null:

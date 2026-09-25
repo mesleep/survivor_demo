@@ -3,7 +3,7 @@
 ## 验证默认武器 Resource、强类型起始武器列表和基础参数。
 extends SceneTree
 
-const PLAYER_DEFINITION_PATH := "res://data/characters/player_default.tres"
+const PLAYER_DEFINITION_PATH := "res://tests/fixtures/legacy_player.tres"
 const STARTER_WEAPON_PATH := "res://data/weapons/starter_weapon.tres"
 
 var _failed: bool = false

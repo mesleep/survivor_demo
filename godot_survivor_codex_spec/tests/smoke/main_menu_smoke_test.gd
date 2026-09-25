@@ -95,7 +95,7 @@ func _test_entry_routing() -> void:
 	var session: GameSession = entry.get_active_session()
 	_expect(session != null, "入口未创建单局。")
 	if session != null and session.player != null:
-		_expect(session.player.has_weapon(&"starter_weapon"), "入口单局缺少起始武器。")
+		_expect(session.player.has_weapon(&"staff"), "入口单局缺少设计稿起始法杖。")
 		session.enemy_spawner.stop()
 	entry.show_menu()
 	await process_frame
@@ -112,7 +112,7 @@ func _test_legacy_direct_start() -> void:
 	var session: GameSession = main_node.get_node("GameSession") as GameSession
 	_expect(session != null and session.player != null, "旧直启入口未创建玩家。")
 	if session != null and session.player != null:
-		_expect(session.player.has_weapon(&"starter_weapon"), "旧直启入口缺少起始武器。")
+		_expect(session.player.has_weapon(&"staff"), "旧直启入口缺少设计稿起始法杖。")
 		session.enemy_spawner.stop()
 	await _free_node(main_node)
 
