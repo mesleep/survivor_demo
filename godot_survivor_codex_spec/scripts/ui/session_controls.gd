@@ -50,10 +50,29 @@ func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
 	_loadout.add_theme_constant_override("shadow_offset_x", 2)
 	_loadout.add_theme_constant_override("shadow_offset_y", 2)
 	add_child(_loadout)
-	session.player.upgrade_state_changed.connect(_update_loadout)
-	session.player.weapon_added.connect(_on_weapon_added)
+	_connect_player()
+	if not session.run_started.is_connected(_on_run_started):
+		session.run_started.connect(_on_run_started)
 	_update_loadout()
 	_update_hint()
+
+
+## 在 start_run 之前创建时，玩家尚不存在；改由 run_started 信号延迟连接。
+func _on_run_started(_player: PlayerActor) -> void:
+	_connect_player()
+	_update_loadout()
+
+
+func _connect_player() -> void:
+	if not is_instance_valid(session):
+		return
+	var player: PlayerActor = session.player
+	if not is_instance_valid(player):
+		return
+	if not player.upgrade_state_changed.is_connected(_update_loadout):
+		player.upgrade_state_changed.connect(_update_loadout)
+	if not player.weapon_added.is_connected(_on_weapon_added):
+		player.weapon_added.connect(_on_weapon_added)
 
 
 func _process(_delta: float) -> void:
@@ -75,7 +94,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	var key: InputEventKey = event as InputEventKey
 	if key.physical_keycode == KEY_M:
 		audio.set_muted(not audio.muted)
-		session.player.damage_feedback_component.play_sound = not audio.muted
+		if is_instance_valid(session.player):
+			session.player.damage_feedback_component.play_sound = not audio.muted
 		_update_hint()
 		get_viewport().set_input_as_handled()
 	elif key.physical_keycode == KEY_ESCAPE:
@@ -98,6 +118,9 @@ func _on_weapon_added(_weapon: WeaponController) -> void:
 
 
 func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
+	if not is_instance_valid(session) or not is_instance_valid(session.player):
+		_loadout.text = ""
+		return
 	var names: PackedStringArray = []
 	for weapon: WeaponController in session.player.weapon_controllers:
 		names.append("%s ×%d" % [weapon.definition.display_name, weapon.get_effective_projectile_count()])

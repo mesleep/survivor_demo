@@ -7,13 +7,18 @@ extends Node2D
 signal time_changed(remaining_seconds: float, elapsed_seconds: float)
 signal run_ended(result: GameResult)
 signal boss_spawned(boss: EnemyActor)
+## 玩家创建并完成依赖注入后发出；供在 start_run 之前已存在的 UI 延迟连接。
+signal run_started(player: PlayerActor)
 
 @export var player_definition: CharacterDefinition
+@export var content_catalog: ContentCatalog
 @export var enemy_spawn_settings: EnemySpawnSettings
 @export var run_definition: RunDefinition
 @export var experience_gem_scene: PackedScene
 ## HUD 和升级面板的统一尺寸倍率，不影响游戏世界或摄像机。
 @export_range(0.75, 2.0, 0.05) var ui_scale: float = 1.3
+## 为 false 时等待外部先注入 RunLoadout 再调用 start_run()，供主菜单流程使用。
+@export var auto_start: bool = true
 
 var player: PlayerActor
 var elapsed_seconds: float = 0.0
@@ -23,6 +28,8 @@ var boss_has_spawned: bool = false
 var boss: EnemyActor
 var game_audio: GameAudio
 var session_controls: SessionControls
+## 单局开局配置快照；为空时沿用导出 player_definition 的旧直启行为。
+var run_loadout: RunLoadout
 
 @onready var arena: Arena = $Arena
 @onready var actors: Node2D = $Actors
@@ -41,10 +48,21 @@ var session_controls: SessionControls
 func _ready() -> void:
 	game_audio = GameAudio.new()
 	add_child(game_audio)
-	start_run()
+	if auto_start:
+		start_run()
 	session_controls = SessionControls.new()
 	add_child(session_controls)
 	session_controls.initialize(self, game_audio)
+
+
+## 注入单局配置快照；必须在 start_run() 前调用。
+##
+## 保存副本，菜单或调用方之后再改动原对象不会影响本局；已开始则拒绝替换。
+func set_run_loadout(loadout: RunLoadout) -> void:
+	if is_instance_valid(player):
+		push_error("GameSession 已开始，无法替换单局配置。")
+		return
+	run_loadout = loadout.copy() if loadout != null else null
 
 
 func _process(delta: float) -> void:
@@ -70,12 +88,14 @@ func advance_time(delta: float) -> void:
 func start_run() -> void:
 	if is_instance_valid(player):
 		return
-	if player_definition == null or player_definition.scene == null:
+	var effective_character: CharacterDefinition = _resolve_run_character()
+	if effective_character == null or effective_character.scene == null:
 		push_error("GameSession 启动失败：缺少玩家配置或玩家场景。")
 		return
 	if run_definition == null or run_definition.stages.is_empty():
 		push_error("GameSession 启动失败：缺少 RunDefinition 或难度阶段。")
 		return
+	var starting_weapons: Array[WeaponDefinition] = _resolve_run_starting_weapons(effective_character)
 	get_tree().paused = false
 	elapsed_seconds = 0.0
 	kill_count = 0
@@ -83,7 +103,7 @@ func start_run() -> void:
 	boss_has_spawned = false
 	boss = null
 
-	var player_node: Node = player_definition.scene.instantiate()
+	var player_node: Node = effective_character.scene.instantiate()
 	if player_node is not PlayerActor:
 		push_error("GameSession 启动失败：CharacterDefinition.scene 必须生成 PlayerActor。")
 		player_node.queue_free()
@@ -92,7 +112,7 @@ func start_run() -> void:
 	var new_player: PlayerActor = player_node as PlayerActor
 	actors.add_child(new_player)
 	new_player.global_position = Vector2.ZERO
-	new_player.initialize(player_definition)
+	new_player.initialize(effective_character)
 	new_player.configure_camera_bounds(arena.get_bounds())
 	player = new_player
 	if not enemy_spawner.enemy_spawned.is_connected(_on_enemy_spawned):
@@ -100,7 +120,7 @@ func start_run() -> void:
 	enemy_spawner.initialize(enemy_spawn_settings, player, enemies, arena.get_bounds())
 	difficulty_director.initialize(run_definition, enemy_spawner)
 	targeting_service.initialize(enemies)
-	new_player.configure_weapons(player_definition.starting_weapons, projectiles, targeting_service)
+	new_player.configure_weapons(starting_weapons, projectiles, targeting_service)
 	new_player.weapon_added.connect(_on_weapon_added)
 	for controller: WeaponController in new_player.weapon_controllers:
 		controller.weapon_fired.connect(_on_weapon_fired)
@@ -123,6 +143,36 @@ func start_run() -> void:
 	if not end_panel.restart_requested.is_connected(restart_run):
 		end_panel.restart_requested.connect(restart_run)
 	_publish_time()
+	run_started.emit(new_player)
+
+
+## 解析本局角色：优先使用单局配置快照，缺失或无效时回退到导出 player_definition。
+##
+## 配置无效只报错并回退，保证旧直启入口仍然可启动；不修改任何共享 Resource。
+func _resolve_run_character() -> CharacterDefinition:
+	if run_loadout == null:
+		return player_definition
+	if not is_instance_valid(content_catalog):
+		push_error("GameSession 单局配置缺少内容目录，回退默认角色。")
+		return player_definition
+	var errors: Array[String] = run_loadout.validate(content_catalog)
+	if not errors.is_empty():
+		push_error("GameSession 单局配置无效，回退默认角色：%s" % "; ".join(errors))
+		return player_definition
+	return run_loadout.resolve_character(content_catalog)
+
+
+## 解析起始武器：配置有效时用快照，否则用角色自身配置；结果复制，不共享数组。
+func _resolve_run_starting_weapons(character: CharacterDefinition) -> Array[WeaponDefinition]:
+	if run_loadout != null and is_instance_valid(content_catalog):
+		var errors: Array[String] = run_loadout.validate(content_catalog)
+		if errors.is_empty():
+			var resolved: Array[WeaponDefinition] = run_loadout.resolve_starting_weapons(content_catalog)
+			if not resolved.is_empty():
+				return resolved
+	if character == null:
+		return []
+	return character.starting_weapons.duplicate()
 
 
 ## 在指定世界位置创建一颗携带独立经验值的宝石。

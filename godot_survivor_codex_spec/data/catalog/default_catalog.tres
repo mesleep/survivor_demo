@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ContentCatalog" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://data/catalog/content_catalog.gd" id="1_catalog"]
+[ext_resource type="Script" path="res://data/characters/character_definition.gd" id="2_character_type"]
+[ext_resource type="Resource" path="res://data/characters/player_default.tres" id="3_character"]
+[ext_resource type="Script" path="res://data/weapons/weapon_definition.gd" id="4_weapon_type"]
+[ext_resource type="Resource" path="res://data/weapons/starter_weapon.tres" id="5_starter"]
+[ext_resource type="Resource" path="res://data/weapons/leaf.tres" id="6_leaf"]
+[ext_resource type="Resource" path="res://data/weapons/bone.tres" id="7_bone"]
+[ext_resource type="Resource" path="res://data/weapons/bell.tres" id="8_bell"]
+
+[resource]
+script = ExtResource("1_catalog")
+characters = Array[ExtResource("2_character_type")]([ExtResource("3_character")])
+weapons = Array[ExtResource("4_weapon_type")]([ExtResource("5_starter"), ExtResource("6_leaf"), ExtResource("7_bone"), ExtResource("8_bell")])

@@ -1,7 +1,8 @@
-[gd_scene load_steps=36 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
+[ext_resource type="Resource" path="res://data/catalog/default_catalog.tres" id="36_catalog"]
 [ext_resource type="PackedScene" path="res://scenes/gameplay/arena.tscn" id="3_arena"]
 [ext_resource type="Resource" path="res://data/waves/phase_one_spawn.tres" id="4_spawn_settings"]
 [ext_resource type="Script" path="res://scripts/systems/enemy_spawner.gd" id="5_enemy_spawner"]
@@ -40,6 +41,7 @@
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
 player_definition = ExtResource("2_player_definition")
+content_catalog = ExtResource("36_catalog")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
 run_definition = ExtResource("18_run")
 experience_gem_scene = ExtResource("7_experience_gem")

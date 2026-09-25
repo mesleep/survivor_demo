@@ -15,6 +15,14 @@
 - D01 候选池、D02 装备位、D03 局内获取、D07 伤害顺序依用户授权采用“建议”首版并改为“已确认”；D04/D05/D06/D10/D11/D12 保持“待确认”。
 - 基准证据：Godot 4.7.1 解析与主场景 300 帧退出码 0；27 项快速冒烟与 120 秒 soak 全部退出码 0；完整五分钟人工游玩未执行，标记未完成。本次未新增玩法代码。
 
+### T02 角色/武器目录与单局配置快照（2026-09-25）
+
+- 新增只读 `ContentCatalog`（`data/catalog/content_catalog.gd`）与默认目录 `default_catalog.tres`，按 ID 查询并校验重复/空引用/缺失场景。
+- 新增运行时 `RunLoadout`（`scripts/core/run_loadout.gd`），保存角色 ID、候选武器 ID、起始武器 ID，复制数组并提供校验与解析；候选池上限 10（D01）。
+- `GameSession` 新增 `content_catalog`、`auto_start`、`set_run_loadout()`、`run_started` 信号；`start_run()` 优先使用快照，缺失时回退旧 `player_definition`，不修改共享 `.tres`。
+- `SessionControls` 改为经 `run_started` 延迟连接玩家，兼容菜单先创建 UI 再开局的流程。
+- 新增 `run_loadout_smoke_test.gd`；解析、启动与 28 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。
