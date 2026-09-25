@@ -24,6 +24,7 @@ STATIC_ASSETS = {
     "staff_ice_split": ("projectiles/staff_ice_split.png", (("default", 1, 1.0, True),)),
     "enemy_bolt": ("projectiles/enemy_bolt.png", (("default", 1, 1.0, True),)),
     "sword": ("weapons/sword.png", (("idle", 1, 1.0, True), ("fire", 1, 14.0, False))),
+    "laser_beam": ("projectiles/laser_beam.png", (("default", 1, 1.0, True),)),
 }
 
 # name -> (asset stem without index, frame_count, speed, loop)
@@ -40,6 +41,8 @@ ANIMATED_ASSETS = {
     "slash_arc": ("fx/slash_arc", 4, 18.0, False),
     "jet_flight": ("fx/jet_flight", 4, 12.0, True),
     "missile_trail": ("fx/missile_trail", 4, 14.0, True),
+    "laser_hit": ("fx/laser_hit", 4, 18.0, False),
+    "laser_muzzle": ("fx/laser_muzzle", 4, 20.0, False),
 }
 
 

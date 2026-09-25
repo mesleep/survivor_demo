@@ -31,6 +31,14 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export_range(0.01, 5.0, 0.01) var trail_scale: float = 0.2
 ## 尾焰相对弹体中心的偏移（沿弹体反方向）。
 @export var trail_offset: float = -16.0
+## 命中特效序列帧（如激光命中光斑）；为空则无。
+@export var hit_effect_frames: SpriteFrames
+@export_range(1.0, 500.0, 1.0) var hit_effect_radius: float = 22.0
+@export_range(0.05, 2.0, 0.01) var hit_effect_duration: float = 0.22
+## 开火口特效序列帧（如激光口闪）；为空则无。
+@export var muzzle_frames: SpriteFrames
+@export_range(1.0, 500.0, 1.0) var muzzle_radius: float = 26.0
+@export_range(0.05, 2.0, 0.01) var muzzle_duration: float = 0.18
 ## 命中后的一次性范围爆炸配置；为空表示不爆炸（T16）。
 @export var explosion: ExplosionDefinition
 ## 命中后施加的持续伤害效果；为空表示无 DoT（T17）。

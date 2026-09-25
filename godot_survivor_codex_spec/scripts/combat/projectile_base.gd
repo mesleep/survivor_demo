@@ -63,6 +63,19 @@ func initialize(new_definition: ProjectileDefinition, new_context: ProjectileSpa
 		collision_shape.shape = runtime_shape
 
 
+## 生成一次性特效（命中/口闪）；无素材时不创建节点。
+func _spawn_effect(frames: SpriteFrames, radius: float, duration: float, position: Vector2) -> void:
+	if frames == null:
+		return
+	var parent: Node = get_parent()
+	if not is_instance_valid(parent):
+		return
+	var effect := ExplosionEffect.new()
+	parent.add_child(effect)
+	effect.global_position = position
+	effect.setup(radius, duration, Color.WHITE, frames, 1.0)
+
+
 ## 可选尾焰（E05 导弹）：作为弹体子节点朝反方向偏移，不参与碰撞。
 func _configure_trail() -> void:
 	if definition.trail_frames == null:
@@ -88,6 +101,7 @@ func launch(new_direction: Vector2) -> void:
 	monitoring = true
 	set_physics_process(true)
 	lifetime_timer.start(definition.lifetime_seconds)
+	_spawn_effect(definition.muzzle_frames, definition.muzzle_radius, definition.muzzle_duration, global_position)
 
 
 func _physics_process(delta: float) -> void:
@@ -165,6 +179,10 @@ func on_hit(target: Node) -> bool:
 			)
 	projectile_hit.emit(target_actor, event)
 	_apply_on_hit_effects(target_actor)
+	_spawn_effect(
+		definition.hit_effect_frames, definition.hit_effect_radius,
+		definition.hit_effect_duration, global_position
+	)
 	_spawn_split()
 
 	# 爆炸弹以首击为终点：引爆后立即停用，穿透属性不参与后续飞行。
