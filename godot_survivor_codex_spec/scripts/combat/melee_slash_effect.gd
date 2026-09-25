@@ -10,15 +10,31 @@ var _arc_degrees: float = 110.0
 var _duration: float = 0.18
 var _remaining: float = 0.18
 var _color: Color = Color(0.95, 0.95, 1.0, 0.55)
+var _frames: SpriteFrames
+var _sprite: AnimatedSprite2D
 
 
-## direction 决定弧光朝向；半径与角度来自武器配置。
-func setup(radius: float, arc_degrees: float, direction: Vector2, duration: float) -> void:
+## direction 决定弧光朝向；半径与角度来自武器配置；有 C05 素材时改用序列帧。
+func setup(
+		radius: float, arc_degrees: float, direction: Vector2, duration: float,
+		frames: SpriteFrames = null
+) -> void:
 	_radius = maxf(radius, 0.0)
 	_arc_degrees = clampf(arc_degrees, 1.0, 360.0)
 	_duration = maxf(duration, 0.05)
 	_remaining = _duration
+	_frames = frames
 	rotation = direction.angle()
+	if _frames != null:
+		_sprite = AnimatedSprite2D.new()
+		_sprite.sprite_frames = _frames
+		_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		var first: Texture2D = _frames.get_frame_texture(&"default", 0)
+		if first != null:
+			_sprite.scale = Vector2.ONE * (_radius * 2.0 / maxf(float(first.get_width()), 1.0))
+		add_child(_sprite)
+		if _frames.has_animation(&"default"):
+			_sprite.play(&"default")
 	queue_redraw()
 
 
@@ -30,6 +46,8 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
+	if _frames != null:
+		return
 	var progress: float = 1.0 - (_remaining / _duration) if _duration > 0.0 else 1.0
 	var faded: Color = _color
 	faded.a *= clampf(1.0 - progress, 0.0, 1.0)

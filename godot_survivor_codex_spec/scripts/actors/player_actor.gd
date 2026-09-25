@@ -53,6 +53,7 @@ var _tech_set_definition: TechSetDefinition
 var _tech_set_active: bool = false
 var _tech_set_move_multiplier: float = 1.0
 var _set_weapon_controller: WeaponController
+var _tech_flight_visual: AnimatedSprite2D
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
 ## 永久强化（T30）：开局从档案快照写入，运行中不再读取档案。
@@ -838,6 +839,7 @@ func _apply_tech_set() -> void:
 	_tech_set_active = true
 	_tech_set_move_multiplier = maxf(_tech_set_definition.move_speed_multiplier, 1.0)
 	_apply_float_visual(true)
+	_configure_flight_visual(true)
 	grant_set_weapon(_tech_set_definition.launcher_weapon)
 	tech_set_activated.emit()
 
@@ -846,8 +848,30 @@ func _remove_tech_set() -> void:
 	_tech_set_active = false
 	_tech_set_move_multiplier = 1.0
 	_apply_float_visual(false)
+	_configure_flight_visual(false)
 	remove_set_weapon()
 	tech_set_deactivated.emit()
+
+
+## 科技套装飞行表现（E05）：脚下推进序列帧，纯表现不绕过碰撞。
+func _configure_flight_visual(active: bool) -> void:
+	if not active:
+		if is_instance_valid(_tech_flight_visual):
+			_tech_flight_visual.queue_free()
+		_tech_flight_visual = null
+		return
+	if _tech_set_definition == null or _tech_set_definition.flight_frames == null:
+		return
+	if not is_instance_valid(_tech_flight_visual):
+		_tech_flight_visual = AnimatedSprite2D.new()
+		_tech_flight_visual.name = "FlightVisual"
+		_tech_flight_visual.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		add_child(_tech_flight_visual)
+	_tech_flight_visual.sprite_frames = _tech_set_definition.flight_frames
+	_tech_flight_visual.position = Vector2(0.0, 14.0)
+	_tech_flight_visual.z_index = -1
+	if _tech_set_definition.flight_frames.has_animation(&"default"):
+		_tech_flight_visual.play(&"default")
 
 
 ## 飞行仅改视觉高度，不绕过 World 碰撞（T25）。

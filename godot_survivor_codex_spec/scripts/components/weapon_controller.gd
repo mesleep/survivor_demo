@@ -47,6 +47,8 @@ var _size_multiplier: float = 1.0
 var _critical_chance: float = 0.0
 ## 质变切换后的弹体覆盖；为空时使用 WeaponDefinition 上的共享弹体（T16 爆炸分支）。
 var _projectile_definition_override: ProjectileDefinition
+## 交替攻击开关：true 时本次使用 alternate_projectile_definition（T25 激光）。
+var _alternate_toggle: bool = false
 var _explosion_radius_multiplier: float = 1.0
 var _explosion_damage_multiplier: float = 1.0
 var _ground_area_duration_multiplier: float = 1.0
@@ -155,12 +157,29 @@ func request_fire(target: Node2D) -> bool:
 	# 近战扇形：不生成弹体，直接做一次范围斩击（T32）。
 	if definition.attack_mode == WeaponDefinition.AttackMode.MELEE_FAN:
 		return _request_melee(base_direction, target)
-	var requested_count: int = get_effective_projectile_count()
-	if _random.randf() < _runtime_bonus_projectile_chance:
-		requested_count += 1
-	var spawned_count: int = _fire_volley(base_direction, requested_count, target, _runtime_damage_multiplier)
+	# 交替攻击（T25 激光）：主弹体与副弹体逐次交替，副弹体不叠弹数加成。
+	var use_alternate: bool = (
+		definition.alternate_projectile_definition != null and _alternate_toggle
+	)
+	var projectile_definition: ProjectileDefinition = (
+		definition.alternate_projectile_definition
+		if use_alternate
+		else get_effective_projectile_definition()
+	)
+	var requested_count: int
+	if use_alternate:
+		requested_count = maxi(definition.alternate_projectile_count, 1)
+	else:
+		requested_count = get_effective_projectile_count()
+		if _random.randf() < _runtime_bonus_projectile_chance:
+			requested_count += 1
+	var spawned_count: int = _fire_volley(
+		base_direction, requested_count, target, _runtime_damage_multiplier, projectile_definition
+	)
 	if spawned_count == 0:
 		return false
+	if definition.alternate_projectile_definition != null:
+		_alternate_toggle = not _alternate_toggle
 
 	var cooldown_seconds := get_effective_cooldown_seconds()
 	_cooldown_remaining = cooldown_seconds
@@ -237,14 +256,17 @@ func _spawn_slash_effect(direction: Vector2, radius: float) -> void:
 	var effect := MeleeSlashEffect.new()
 	add_child(effect)
 	effect.global_position = owner_actor.global_position
-	effect.setup(radius, definition.melee_arc_degrees, direction, 0.18)
+	effect.setup(radius, definition.melee_arc_degrees, direction, 0.18, definition.melee_visual_frames)
 
 
 ## 生成一轮弹幕（可能多颗），方向与扩散规则集中在此。
 func _fire_volley(
-		base_direction: Vector2, requested_count: int, target: Node2D, damage_multiplier: float
+		base_direction: Vector2, requested_count: int, target: Node2D, damage_multiplier: float,
+		override_definition: ProjectileDefinition = null
 ) -> int:
-	var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
+	var projectile_definition: ProjectileDefinition = (
+		override_definition if override_definition != null else get_effective_projectile_definition()
+	)
 	if projectile_definition == null:
 		return 0
 	var spawned_count: int = 0
@@ -461,6 +483,7 @@ func reset_runtime_state() -> void:
 	_size_multiplier = 1.0
 	_critical_chance = 0.0
 	_projectile_definition_override = null
+	_alternate_toggle = false
 	_explosion_radius_multiplier = 1.0
 	_explosion_damage_multiplier = 1.0
 	_ground_area_duration_multiplier = 1.0
@@ -503,6 +526,11 @@ func get_effective_volley_count() -> int:
 	if definition == null:
 		return 1
 	return maxi(1 + _runtime_volley_count_bonus, 1)
+
+
+## 立即清除冷却（供测试或特殊效果使用），不重置伤害/弹数/交替等修正。
+func clear_cooldown() -> void:
+	_cooldown_remaining = 0.0
 
 
 func get_runtime_damage_multiplier() -> float:

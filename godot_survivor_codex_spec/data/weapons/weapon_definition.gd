@@ -34,6 +34,9 @@ enum AttackMode { PROJECTILE, MELEE_FAN }
 @export_range(1.0, 20.0, 0.1) var charge_damage_multiplier: float = 1.0
 ## 索敌方式；RANDOM 时每一发各自从 TargetingService 候选中随机取目标。
 @export var target_mode: TargetMode = TargetMode.NEAREST
+## 交替攻击弹体（T25 激光）：每次开火在主弹体与该弹体之间交替；为空则只发主弹体。
+@export var alternate_projectile_definition: ProjectileDefinition
+@export_range(1, 100, 1) var alternate_projectile_count: int = 1
 ## 攻击形态；MELEE_FAN 时不发射弹体，改为扇形范围斩击。
 @export var attack_mode: AttackMode = AttackMode.PROJECTILE
 ## 近战扇形参数（MELEE_FAN 使用）。
@@ -42,3 +45,5 @@ enum AttackMode { PROJECTILE, MELEE_FAN }
 @export_range(10.0, 360.0, 1.0) var melee_arc_degrees: float = 110.0
 @export_range(0.0, 100000.0, 0.1) var melee_knockback_strength: float = 100.0
 @export_flags_2d_physics var melee_hit_mask: int = 4
+## 近战斩击表现序列帧（C05）；为空时用代码绘制占位弧光。
+@export var melee_visual_frames: SpriteFrames

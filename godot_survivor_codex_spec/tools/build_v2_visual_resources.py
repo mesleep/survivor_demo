@@ -23,6 +23,9 @@ ASSETS = {
     "bell": ("projectiles/orbit_bell.png", ("idle", 1, 1.0, True), ("walk", 4, 8.0, True), ("fire", 4, 12.0, False), ("default", 4, 12.0, True)),
     "gem": ("pickups/experience_gem.png", ("default", 4, 8.0, True)),
     "impact": ("fx/hit_spark.png", ("default", 4, 16.0, False)),
+    "enemy_shooter": ("enemies/enemy_shooter_单帧.png", ("idle", 1, 1.0, True), ("walk", 4, 8.0, True)),
+    "enemy_brute": ("enemies/enemy_brute_单帧.png", ("idle", 1, 1.0, True), ("walk", 4, 8.0, True)),
+    "ranger": ("actors/B02_远程射手_单帧.png", ("idle", 1, 1.0, True), ("walk", 4, 8.0, True)),
 }
 MOTION_STEMS = {
     "player": "actors/B01_月光小法师_walk",
@@ -33,8 +36,11 @@ MOTION_STEMS = {
     "boss": "enemies/B09_月夜领主_walk",
     "wand": "weapons/starlight_wand_fire",
     "bolt": "projectiles/starlight_bolt_pulse",
+    "enemy_shooter": "enemies/enemy_shooter_walk",
+    "enemy_brute": "enemies/enemy_brute_walk",
+    "ranger": "actors/B02_远程射手_walk",
 }
-MOTION_ANIMATIONS = {"player": "walk", "huniu": "walk", "heibao": "walk", "xiaosi": "walk", "xiaoqi": "walk", "boss": "walk", "wand": "fire", "bolt": "default"}
+MOTION_ANIMATIONS = {"player": "walk", "huniu": "walk", "heibao": "walk", "xiaosi": "walk", "xiaoqi": "walk", "boss": "walk", "wand": "fire", "bolt": "default", "enemy_shooter": "walk", "enemy_brute": "walk", "ranger": "walk"}
 
 
 def build(name: str, definition: tuple) -> None:

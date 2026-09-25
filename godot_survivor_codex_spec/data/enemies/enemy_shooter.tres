@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EnemyDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/enemies/enemy_definition.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/actors/enemies/enemy_basic.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/actors/enemies/enemy_shooter.tscn" id="2"]
 [ext_resource type="Resource" path="res://data/projectiles/enemy_bolt.tres" id="3"]
 
 [resource]

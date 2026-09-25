@@ -7,7 +7,9 @@ extends Control
 
 signal start_requested(loadout: RunLoadout)
 
-const BUTTON_STYLE: StyleBox = preload("res://data/visuals/v2_dark_comic/button_style.tres")
+const BUTTON_NORMAL: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_normal.tres")
+const BUTTON_HOVER: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_hover.tres")
+const BUTTON_PRESSED: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_pressed.tres")
 
 @export var catalog: ContentCatalog
 
@@ -40,8 +42,10 @@ func _ready() -> void:
 
 ## 统一按钮样式；动态生成的按钮都走这里（T34 界面收口）。
 func _style_button(button: Button) -> void:
-	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
-		button.add_theme_stylebox_override(state, BUTTON_STYLE)
+	button.add_theme_stylebox_override(&"normal", BUTTON_NORMAL)
+	button.add_theme_stylebox_override(&"hover", BUTTON_HOVER)
+	button.add_theme_stylebox_override(&"pressed", BUTTON_PRESSED)
+	button.add_theme_stylebox_override(&"disabled", BUTTON_NORMAL)
 
 
 ## 由入口在入树前或入树后注入目录；会重建选项。

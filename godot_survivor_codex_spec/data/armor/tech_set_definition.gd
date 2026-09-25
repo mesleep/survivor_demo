@@ -15,3 +15,7 @@ extends Resource
 @export_range(0.0, 64.0, 1.0) var float_visual_offset: float = 12.0
 ## 激活后额外授予的数据驱动武器（科技发射器）；为空则不授予。
 @export var launcher_weapon: WeaponDefinition
+## 飞行表现序列帧（E05）；为空则只做视觉高度偏移。
+@export var flight_frames: SpriteFrames
+## 套装徽记（C08）；供 UI 显示。
+@export var icon: Texture2D

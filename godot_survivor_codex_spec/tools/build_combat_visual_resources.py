@@ -22,6 +22,8 @@ STATIC_ASSETS = {
     "arrow_power": ("projectiles/arrow_power.png", (("default", 1, 1.0, True),)),
     "staff_ice_spear": ("projectiles/staff_ice_spear.png", (("default", 1, 1.0, True),)),
     "staff_ice_split": ("projectiles/staff_ice_split.png", (("default", 1, 1.0, True),)),
+    "enemy_bolt": ("projectiles/enemy_bolt.png", (("default", 1, 1.0, True),)),
+    "sword": ("weapons/sword.png", (("idle", 1, 1.0, True), ("fire", 1, 14.0, False))),
 }
 
 # name -> (asset stem without index, frame_count, speed, loop)
@@ -35,6 +37,9 @@ ANIMATED_ASSETS = {
     "fire_patch": ("fx/fire_patch", 4, 10.0, True),
     "ice_freeze": ("fx/ice_freeze", 4, 8.0, True),
     "thorn_aura": ("fx/thorn_aura", 4, 8.0, True),
+    "slash_arc": ("fx/slash_arc", 4, 18.0, False),
+    "jet_flight": ("fx/jet_flight", 4, 12.0, True),
+    "missile_trail": ("fx/missile_trail", 4, 14.0, True),
 }
 
 

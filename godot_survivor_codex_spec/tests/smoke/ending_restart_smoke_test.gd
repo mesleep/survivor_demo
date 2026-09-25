@@ -24,6 +24,11 @@ func _run() -> void:
 	if not choices.is_empty():
 		session.upgrade_system.apply_choice(choices[0])
 	await process_frame
+	# 随机首卡可能是闪避/免疫升级；关闭概率免伤以保证致命伤害确定性。
+	var rules := CombatRules.new()
+	rules.max_dodge_chance = 0.0
+	rules.max_immune_chance = 0.0
+	session.player.set_combat_rules(rules)
 	session.player.apply_damage(DamageEvent.new(session.player.health_component.maximum_health, null, Vector2.ZERO))
 	_expect(not session.is_run_active and paused, "玩家死亡未结束并暂停本局。")
 	_expect(session.end_panel.visible and session.end_panel.title.text == "休息一下，再来一局", "失败结算面板未显示。")

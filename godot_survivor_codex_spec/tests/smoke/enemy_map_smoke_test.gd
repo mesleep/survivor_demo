@@ -79,7 +79,7 @@ func _test_arena_configure() -> void:
 	session.arena.configure(map)
 	_expect(session.arena.get_definition() == map, "地图定义应已应用。")
 	_expect(session.arena.get_bounds() == Rect2(-1280.0, -720.0, 2560.0, 1440.0), "地图范围应为 2560×1440。")
-	_expect(map.background_texture == null, "新地图背景素材待交付，当前为配色占位。")
+	_expect(map.background_texture != null, "新地图应已接入 F02 背景素材。")
 	await _free_node(main_node)
 
 

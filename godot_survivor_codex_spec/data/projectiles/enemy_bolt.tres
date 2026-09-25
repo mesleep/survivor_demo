@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
-[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/enemy_bolt_frames.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
@@ -10,7 +10,6 @@ id = &"enemy_bolt"
 scene = ExtResource("2")
 visual_frames = ExtResource("3")
 visual_scale = 0.26
-visual_modulate = Color(1, 0.45, 0.45, 1)
 motion_type = 0
 damage = 6.0
 speed = 300.0

@@ -1,0 +1,44 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/actors/enemy_actor.gd" id="1_enemy_actor"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/enemy_brute_frames.tres" id="2_enemy_texture"]
+[ext_resource type="Script" path="res://scripts/visuals/actor_sprite.gd" id="art_script"]
+[ext_resource type="PackedScene" path="res://scenes/components/health_component.tscn" id="3_health"]
+[ext_resource type="PackedScene" path="res://scenes/components/hurtbox_component.tscn" id="4_hurtbox"]
+[ext_resource type="PackedScene" path="res://scenes/components/hitbox_component.tscn" id="5_hitbox"]
+[ext_resource type="PackedScene" path="res://scenes/components/damage_feedback_component.tscn" id="6_feedback"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 28.0
+
+[node name="EnemyBrute" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_enemy_actor")
+
+[node name="Visual" type="AnimatedSprite2D" parent="."]
+texture_filter = 2
+scale = Vector2(0.32, 0.32)
+sprite_frames = ExtResource("2_enemy_texture")
+animation = &"idle"
+script = ExtResource("art_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="HealthComponent" parent="." instance=ExtResource("3_health")]
+unique_name_in_owner = true
+
+[node name="HurtboxComponent" parent="." instance=ExtResource("4_hurtbox")]
+unique_name_in_owner = true
+collision_layer = 4
+
+[node name="ContactHitbox" parent="." instance=ExtResource("5_hitbox")]
+unique_name_in_owner = true
+collision_layer = 16
+collision_mask = 2
+
+[node name="DamageFeedbackComponent" parent="." instance=ExtResource("6_feedback")]
+unique_name_in_owner = true
+play_sound = false

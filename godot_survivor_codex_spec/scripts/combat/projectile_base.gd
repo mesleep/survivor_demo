@@ -54,12 +54,28 @@ func initialize(new_definition: ProjectileDefinition, new_context: ProjectileSpa
 		visual.play(&"default")
 	visual.scale = Vector2.ONE * definition.visual_scale * context.size_multiplier
 	visual.modulate = definition.visual_modulate
+	_configure_trail()
 
 	var source_shape: Shape2D = collision_shape.shape
 	if source_shape is CircleShape2D:
 		var runtime_shape: CircleShape2D = source_shape.duplicate() as CircleShape2D
 		runtime_shape.radius = definition.hit_radius * context.size_multiplier
 		collision_shape.shape = runtime_shape
+
+
+## 可选尾焰（E05 导弹）：作为弹体子节点朝反方向偏移，不参与碰撞。
+func _configure_trail() -> void:
+	if definition.trail_frames == null:
+		return
+	var trail := AnimatedSprite2D.new()
+	trail.name = "Trail"
+	trail.sprite_frames = definition.trail_frames
+	trail.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	trail.scale = Vector2.ONE * maxf(definition.trail_scale, 0.01)
+	trail.position = Vector2(definition.trail_offset, 0.0)
+	add_child(trail)
+	if definition.trail_frames.has_animation(&"default"):
+		trail.play(&"default")
 
 
 ## 启动直线运动和寿命计时；零方向不会激活子弹。

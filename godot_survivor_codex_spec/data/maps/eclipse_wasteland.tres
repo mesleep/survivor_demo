@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="ArenaDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ArenaDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/maps/arena_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/backgrounds/F02_eclipse_wasteland.png" id="2"]
 
 [resource]
 script = ExtResource("1")
+background_texture = ExtResource("2")
 id = &"eclipse_wasteland"
 display_name = "月蚀荒原"
 size = Vector2(2560, 1440)

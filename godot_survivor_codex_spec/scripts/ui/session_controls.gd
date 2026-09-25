@@ -12,6 +12,7 @@ var _boss_bar: ProgressBar
 var _loadout: Label
 var _coin_icon: TextureRect
 var _coin_label: Label
+var _tech_icon: TextureRect
 
 
 func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
@@ -77,6 +78,13 @@ func _build_coin_display() -> void:
 	_coin_label.add_theme_constant_override("shadow_offset_y", 2)
 	_coin_label.visible = false
 	add_child(_coin_label)
+	_tech_icon = TextureRect.new()
+	_tech_icon.texture = load("res://assets/v2_dark_comic/ui/icon_tech_set.png") as Texture2D
+	_tech_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_tech_icon.position = Vector2(838, 22)
+	_tech_icon.size = Vector2(26, 26)
+	_tech_icon.visible = false
+	add_child(_tech_icon)
 
 
 ## 在 start_run 之前创建时，玩家尚不存在；改由 run_started 信号延迟连接。
@@ -112,9 +120,15 @@ func _process(_delta: float) -> void:
 		_coin_icon.visible = _hint.visible
 		_coin_label.visible = _hint.visible
 		_coin_label.text = str(session.get_run_coins())
+	if is_instance_valid(_tech_icon):
+		_tech_icon.visible = _status.visible and is_instance_valid(session.player) \
+			and session.player.is_tech_set_active()
 	_status.visible = session.is_run_active and not session.level_up_panel.visible
 	_boss_bar.visible = _status.visible and is_instance_valid(session.boss)
-	_status.text = "月光庭院 · 四宠大作战\n击退 %d · 场上 %d\n%s" % [session.kill_count, session.enemies.get_child_count(), "击退月夜领主，守护庭院！" if session.boss_has_spawned else "坚持五分钟，迎接月夜领主"]
+	var map_name: String = "月光庭院"
+	if is_instance_valid(session.arena) and session.arena.get_definition() != null:
+		map_name = session.arena.get_definition().display_name
+	_status.text = "%s\n击退 %d · 场上 %d\n%s" % [map_name, session.kill_count, session.enemies.get_child_count(), "击退月夜领主，守护庭院！" if session.boss_has_spawned else "坚持五分钟，迎接月夜领主"]
 	if _boss_bar.visible:
 		_boss_bar.max_value = session.boss.health_component.maximum_health
 		_boss_bar.value = session.boss.health_component.current_health

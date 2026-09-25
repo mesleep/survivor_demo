@@ -29,6 +29,7 @@ func _run() -> void:
 	await _test_set_requires_all_three_and_is_idempotent()
 	await _test_branch_mismatch_blocks_set()
 	await _test_random_target_missiles()
+	await _test_alternating_laser()
 	await _test_fallback_when_no_random_target()
 	await _test_cleanup_on_clear()
 	if not _failed:
@@ -98,6 +99,38 @@ func _test_random_target_missiles() -> void:
 			_expect(missile.definition.explosion != null, "导弹应带爆炸档案。")
 			directions[snappedf(missile.direction.angle(), 0.001)] = true
 	_expect(directions.size() >= 2, "随机目标应使导弹方向不全相同。")
+	await _free_node(main_node)
+
+
+## 发射器在导弹与激光之间交替：一次 3 枚导弹、下一次 1 道激光（T25）。
+func _test_alternating_laser() -> void:
+	var main_node: Node = await _spawn_main()
+	var session: GameSession = main_node.get_node("GameSession") as GameSession
+	var player: PlayerActor = _prepare(session)
+	_activate_set(player)
+	_disable_all_weapons(player)
+	var enemy_a: EnemyActor = _spawn_dummy(session, Vector2(220.0, 0.0))
+	_spawn_dummy(session, Vector2(0.0, 220.0))
+	await create_timer(0.15).timeout
+
+	var launcher: WeaponController = _find_controller(player, &"tech_launcher")
+	_expect(launcher != null, "应找到科技发射器。")
+	launcher.reset_runtime_state()
+
+	_expect(launcher.request_fire(enemy_a), "第一次应能发射。")
+	_expect(_count_projectiles(session, &"tech_missile") == 3, "第一次应发射 3 枚导弹。")
+	_expect(_count_projectiles(session, &"tech_laser") == 0, "第一次不应有激光。")
+
+	_clear_container(session.projectiles)
+	launcher.clear_cooldown()
+	_expect(launcher.request_fire(enemy_a), "第二次应能发射。")
+	_expect(_count_projectiles(session, &"tech_laser") == 1, "第二次应发射 1 道激光。")
+	_expect(_count_projectiles(session, &"tech_missile") == 0, "第二次不应有导弹。")
+
+	_clear_container(session.projectiles)
+	launcher.clear_cooldown()
+	launcher.request_fire(enemy_a)
+	_expect(_count_projectiles(session, &"tech_missile") == 3, "第三次应回到导弹。")
 	await _free_node(main_node)
 
 
