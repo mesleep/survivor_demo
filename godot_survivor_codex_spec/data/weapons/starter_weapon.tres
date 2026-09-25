@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_definition")
 id = &"starter_weapon"
+tags = Array[StringName]([&"ranged"])
 display_name = "星光魔杖"
 visual_frames = ExtResource("3_visual")
 projectile_definition = ExtResource("2_projectile")

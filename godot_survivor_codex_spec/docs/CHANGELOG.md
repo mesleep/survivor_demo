@@ -229,6 +229,13 @@
 - 开局由 GameEntry 注入等级快照，`GameSession.start_run` 一次性写入玩家；进行中的一局不受后续购买影响。
 - 新增 `permanent_upgrade_smoke_test.gd`；解析、启动与 58 项快速冒烟、120 秒 soak 通过。
 
+### T31 远程射手角色（2026-09-25）
+
+- 新增角色 `player_ranger`（生命 90/移速 230/起始长弓/解锁 120），复用 PlayerActor 与公共组件（D28、D12）。
+- `CharacterDefinition` 新增被动伤害倍率与适用标签，`WeaponDefinition` 新增 `tags`；被动只对带标签武器生效且晚获取继承。
+- 默认解锁改为只含价格为 0 的角色/武器；射手需金币解锁。
+- 新增 `ranger_character_smoke_test.gd`；解析、启动与 59 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

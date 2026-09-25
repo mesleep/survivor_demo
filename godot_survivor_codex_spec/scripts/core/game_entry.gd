@@ -44,8 +44,29 @@ func _ensure_profile_store() -> void:
 	if is_instance_valid(catalog):
 		profile_store.known_character_ids = catalog.get_character_ids()
 		profile_store.known_weapon_ids = catalog.get_weapon_ids()
-		profile_store.default_character_ids = catalog.get_character_ids()
-		profile_store.default_weapon_ids = catalog.get_weapon_ids()
+		# 默认只解锁价格为 0 的内容（T29）；其余需购买。
+		profile_store.default_character_ids = _free_character_ids()
+		profile_store.default_weapon_ids = _free_weapon_ids()
+
+
+func _free_character_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	if not is_instance_valid(catalog):
+		return ids
+	for character: CharacterDefinition in catalog.characters:
+		if character != null and character.unlock_cost == 0:
+			ids.append(character.id)
+	return ids
+
+
+func _free_weapon_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	if not is_instance_valid(catalog):
+		return ids
+	for weapon: WeaponDefinition in catalog.weapons:
+		if weapon != null and weapon.unlock_cost == 0:
+			ids.append(weapon.id)
+	return ids
 
 
 func get_profile() -> Profile:

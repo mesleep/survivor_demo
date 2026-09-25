@@ -18,3 +18,7 @@ extends Resource
 @export var starting_weapons: Array[WeaponDefinition] = []
 ## 解锁所需金币；0 表示默认解锁（T29）。
 @export_range(0, 1000000, 1) var unlock_cost: int = 0
+## 角色被动：对带 passive_weapon_tag 标签的武器提供的伤害倍率增量（T31）。
+@export_range(0.0, 5.0, 0.01) var passive_damage_multiplier: float = 0.0
+## 角色被动适用的武器标签；为空表示无被动。
+@export var passive_weapon_tag: StringName

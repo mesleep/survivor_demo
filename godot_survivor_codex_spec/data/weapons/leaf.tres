@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1")
 id = &"leaf"
+tags = Array[StringName]([&"ranged"])
 display_name = "飞叶刃"
 unlock_cost = 40
 visual_frames = ExtResource("3")

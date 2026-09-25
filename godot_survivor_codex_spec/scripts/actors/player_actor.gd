@@ -60,6 +60,9 @@ var _permanent_move_multiplier: float = 1.0
 var _permanent_lifesteal_ratio: float = 0.0
 var _permanent_defense: float = 0.0
 var _permanent_regeneration: float = 0.0
+## 角色被动（T31）：对带标签武器的伤害倍率与适用标签。
+var _passive_damage_multiplier: float = 1.0
+var _passive_weapon_tag: StringName = StringName()
 var _weapon_modifier_history: Array[Dictionary] = []
 var _projectile_parent: Node
 var _targeting_service: TargetingService
@@ -138,6 +141,8 @@ func initialize(new_definition: Resource) -> void:
 	_permanent_lifesteal_ratio = 0.0
 	_permanent_defense = 0.0
 	_permanent_regeneration = 0.0
+	_passive_damage_multiplier = 1.0 + maxf(definition.passive_damage_multiplier, 0.0)
+	_passive_weapon_tag = definition.passive_weapon_tag
 	_weapon_modifier_history.clear()
 	_candidate_weapon_ids.clear()
 	_equipped_equipment_ids.clear()
@@ -197,6 +202,11 @@ func add_weapon(weapon_definition: WeaponDefinition, allow_duplicate: bool = fal
 	for record: Dictionary in _weapon_modifier_history:
 		if record.target == StringName() or record.target == weapon_definition.id:
 			controller.apply_runtime_modifier(record.modifier as WeaponRuntimeModifier)
+	# 角色被动：只对带指定标签的武器生效，晚获取同样继承（T31）。
+	if _passive_weapon_tag != StringName() and weapon_definition.tags.has(_passive_weapon_tag):
+		controller.apply_runtime_modifier(
+			WeaponRuntimeModifier.new(1.0, 0, _passive_damage_multiplier)
+		)
 	weapon_controllers.append(controller)
 	_register_equipment(weapon_definition.id, &"weapon")
 	weapon_added.emit(controller)
@@ -725,6 +735,14 @@ func get_attack_range() -> float:
 ## 全武器索敌射程倍率（D06）：已持有与晚获取的武器都读取同一局内值。
 func get_weapon_range_multiplier() -> float:
 	return _all_weapon_range_multiplier
+
+
+func get_passive_damage_multiplier() -> float:
+	return _passive_damage_multiplier
+
+
+func get_passive_weapon_tag() -> StringName:
+	return _passive_weapon_tag
 
 
 func _on_pickup_detected(pickup: Area2D) -> void:
