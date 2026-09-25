@@ -111,6 +111,12 @@
 - 长弓扩散角设为 25°（Resource 可改）；新增“万箭齐发”质变与“箭雨”专属（每轮弹数 +1），与多重射击分支互斥，只改变每轮弹数不改变轮数。
 - 新增 `bow_volley_smoke_test.gd`；解析、启动与 40 项快速冒烟通过。
 
+### T15 基础蓄力法杖（2026-09-25）
+
+- `WeaponDefinition` 新增可配 `charge_seconds`/`charge_damage_multiplier`；`WeaponController` 支持可取消蓄力（`begin_charge`/`is_charging`/`get_charge_remaining`），释放后从释放时起算冷却。
+- 新增蓄力法杖与法球、获取卡与基础强化并接入目录/升级池（外观占位）。
+- 新增 `staff_charge_smoke_test.gd`；解析、启动与 41 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

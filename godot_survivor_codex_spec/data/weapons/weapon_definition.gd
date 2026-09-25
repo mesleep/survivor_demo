@@ -17,3 +17,7 @@ extends Resource
 @export_range(1.0, 5000.0, 1.0) var target_range: float = 900.0
 ## 多重射击时，相邻两轮之间的间隔（秒），可在 Resource 调整。
 @export_range(0.02, 5.0, 0.01) var volley_interval_seconds: float = 0.18
+## 蓄力时长（秒）；0 表示不蓄力、冷却好即发射。
+@export_range(0.0, 10.0, 0.05) var charge_seconds: float = 0.0
+## 蓄力完成后的伤害倍率（1 = 不额外加成）。
+@export_range(1.0, 20.0, 0.1) var charge_damage_multiplier: float = 1.0

@@ -34,6 +34,8 @@ var _runtime_bonus_projectile_chance: float = 0.0
 var _runtime_projectile_lifesteal_ratio: float = 0.0
 var _runtime_repeat_shot_chance: float = 0.0
 var _runtime_volley_count_bonus: int = 0
+var _charge_remaining: float = -1.0
+var _charge_target_position: Vector2 = Vector2.ZERO
 var _repeat_shot_generation: int = 0
 var _random := RandomNumberGenerator.new()
 var weapon_visual: AnimatedSprite2D
@@ -52,16 +54,35 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_update_visual(delta)
 	_cooldown_remaining = maxf(_cooldown_remaining - delta, 0.0)
-	if not can_fire() or not is_instance_valid(targeting_service):
+	if not is_instance_valid(owner_actor) or owner_actor.health_component.is_dead():
 		return
 
+	# 蓄力中：即使目标中途消失也继续，按最后一次已知位置释放。
+	if _charge_remaining >= 0.0:
+		if is_instance_valid(targeting_service) and definition != null:
+			var charging_target: ActorBase = targeting_service.get_nearest_target(
+				owner_actor.get_aim_position(), get_effective_target_range(), &"enemy"
+			)
+			if charging_target != null:
+				_charge_target_position = charging_target.get_aim_position()
+		_charge_remaining -= delta
+		if _charge_remaining <= 0.0:
+			_release_charge()
+		return
+
+	if not can_fire() or not is_instance_valid(targeting_service):
+		return
 	var target: ActorBase = targeting_service.get_nearest_target(
 		owner_actor.get_aim_position(),
 		get_effective_target_range(),
 		&"enemy"
 	)
-	if target != null:
-		request_fire(target)
+	if target == null:
+		return
+	if definition != null and definition.charge_seconds > 0.0:
+		_begin_charge(target)
+		return
+	request_fire(target)
 
 
 ## 注入武器配置及运行时依赖，并完全重置单局状态。
@@ -122,7 +143,7 @@ func request_fire(target: Node2D) -> bool:
 	var requested_count: int = get_effective_projectile_count()
 	if _random.randf() < _runtime_bonus_projectile_chance:
 		requested_count += 1
-	var spawned_count: int = _fire_volley(base_direction, requested_count, target)
+	var spawned_count: int = _fire_volley(base_direction, requested_count, target, _runtime_damage_multiplier)
 	if spawned_count == 0:
 		return false
 
@@ -150,7 +171,9 @@ func request_fire(target: Node2D) -> bool:
 
 
 ## 生成一轮弹幕（可能多颗），方向与扩散规则集中在此。
-func _fire_volley(base_direction: Vector2, requested_count: int, target: Node2D) -> int:
+func _fire_volley(
+		base_direction: Vector2, requested_count: int, target: Node2D, damage_multiplier: float
+) -> int:
 	var spawned_count: int = 0
 	for index: int in range(requested_count):
 		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
@@ -162,13 +185,57 @@ func _fire_volley(base_direction: Vector2, requested_count: int, target: Node2D)
 			owner_actor.get_aim_position(),
 			direction
 		)
-		context.damage_multiplier = _runtime_damage_multiplier
+		context.damage_multiplier = damage_multiplier
 		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
 		context.target = target
 		context.weapon_id = definition.id
 		if spawn_projectile(definition.projectile_definition, context) != null:
 			spawned_count += 1
 	return spawned_count
+
+
+## 开始蓄力；重复调用不会刷新或叠加蓄力进度。
+func begin_charge(target: Node2D) -> bool:
+	if definition == null or definition.charge_seconds <= 0.0 or _charge_remaining >= 0.0:
+		return false
+	if not is_instance_valid(target):
+		return false
+	_charge_remaining = definition.charge_seconds
+	_charge_target_position = (target as ActorBase).get_aim_position() if target is ActorBase else target.global_position
+	return true
+
+
+func _begin_charge(target: Node2D) -> void:
+	begin_charge(target)
+
+
+func is_charging() -> bool:
+	return _charge_remaining >= 0.0
+
+
+func get_charge_remaining() -> float:
+	return _charge_remaining
+
+
+## 蓄力完成：按最后已知位置释放高伤法球，冷却从释放时开始计算。
+func _release_charge() -> void:
+	_charge_remaining = -1.0
+	if not can_fire():
+		return
+	var direction: Vector2 = owner_actor.get_aim_position().direction_to(_charge_target_position)
+	if direction.is_zero_approx():
+		direction = Vector2.RIGHT
+	var charge_multiplier: float = _runtime_damage_multiplier * maxf(definition.charge_damage_multiplier, 0.0)
+	var requested_count: int = get_effective_projectile_count()
+	var spawned_count: int = _fire_volley(direction, requested_count, null, charge_multiplier)
+	if spawned_count == 0:
+		return
+	var cooldown_seconds := get_effective_cooldown_seconds()
+	_cooldown_remaining = cooldown_seconds
+	fire_requested.emit(
+		definition, owner_actor, null, projectile_parent, spawned_count, charge_multiplier
+	)
+	weapon_fired.emit(definition.id)
 
 
 ## 在同一次攻击周期内追加射击轮次；冷却只计算一次，轮间使用约定方向。
@@ -188,7 +255,7 @@ func _fire_extra_volleys(target_position: Vector2, volleys: int, generation: int
 		var requested_count: int = get_effective_projectile_count()
 		if _random.randf() < _runtime_bonus_projectile_chance:
 			requested_count += 1
-		var spawned_count: int = _fire_volley(direction, requested_count, null)
+		var spawned_count: int = _fire_volley(direction, requested_count, null, _runtime_damage_multiplier)
 		if spawned_count > 0:
 			fire_requested.emit(
 				definition, owner_actor, null, projectile_parent, spawned_count, _runtime_damage_multiplier
@@ -306,6 +373,8 @@ func reset_runtime_state() -> void:
 	_runtime_projectile_lifesteal_ratio = 0.0
 	_runtime_repeat_shot_chance = 0.0
 	_runtime_volley_count_bonus = 0
+	_charge_remaining = -1.0
+	_charge_target_position = Vector2.ZERO
 
 
 func get_effective_cooldown_seconds() -> float:
