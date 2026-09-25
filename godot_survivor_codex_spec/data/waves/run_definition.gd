@@ -5,6 +5,6 @@
 class_name RunDefinition
 extends Resource
 
-@export_range(1.0, 3600.0, 1.0) var run_duration_seconds: float = 300.0
+@export_range(1.0, 3600.0, 1.0) var run_duration_seconds: float = 600.0
 @export var stages: Array[DifficultyStage] = []
 @export var boss_definition: EnemyDefinition

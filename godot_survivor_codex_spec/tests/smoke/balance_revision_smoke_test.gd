@@ -55,7 +55,7 @@ func _test_upgrades_and_boss() -> void:
 	_expect(ascension_count == 20, "满足条件的质变应每次三选一都出现。")
 
 	session.advance_time(session.run_definition.run_duration_seconds)
-	_expect(is_instance_valid(session.boss), "五分钟应生成 Boss。")
+	_expect(is_instance_valid(session.boss), "十分钟应生成 Boss。")
 	_expect(not session.enemy_spawner.spawn_timer.is_stopped(), "Boss 登场后小怪生成必须继续。")
 	_expect(session.boss.definition.attack_type == EnemyDefinition.AttackType.HYBRID, "Boss 应兼有远程和近战能力。")
 	_expect(session.boss.health_component.maximum_health >= 1500.0, "Boss 在末阶段应有足够生命。")

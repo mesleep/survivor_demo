@@ -128,7 +128,13 @@ func _process(_delta: float) -> void:
 	var map_name: String = "月光庭院"
 	if is_instance_valid(session.arena) and session.arena.get_definition() != null:
 		map_name = session.arena.get_definition().display_name
-	_status.text = "%s\n击退 %d · 场上 %d\n%s" % [map_name, session.kill_count, session.enemies.get_child_count(), "击退月夜领主，守护庭院！" if session.boss_has_spawned else "坚持五分钟，迎接月夜领主"]
+	var boss_goal: String = "击退月夜领主，守护庭院！"
+	if not session.boss_has_spawned and session.run_definition != null:
+		var arrival_seconds: int = roundi(session.run_definition.run_duration_seconds)
+		boss_goal = "坚持到 %d:%02d，迎接月夜领主" % [arrival_seconds / 60, arrival_seconds % 60]
+	_status.text = "%s\n击退 %d · 场上 %d\n%s" % [
+		map_name, session.kill_count, session.enemies.get_child_count(), boss_goal
+	]
 	if _boss_bar.visible:
 		_boss_bar.max_value = session.boss.health_component.maximum_health
 		_boss_bar.value = session.boss.health_component.current_health

@@ -1,5 +1,14 @@
 # 开发任务清单
 
+## 用户追加：十分钟终局与后期升级节奏（2026-09-25）
+
+- [x] 默认单局延长为 10 分钟，Boss 在 10:00 仅生成一次，普通敌人持续生成
+- [x] 5:00 起降低基础/通用 Buff 权重，基础强化保底率由 100% 降至 50%；可用质变保底且提高额外抽中概率
+- [x] HUD 与战斗目标提示反映新的终局时间，规范与自动测试同步更新
+- [ ] 真实窗口连续十分钟游玩、后期升级体感与性能验收
+
+验证：Godot 4.7.1 `--headless --path . --editor --quit` 解析通过，`--headless --path . --quit-after 120` 启动通过；`tests/smoke/*_smoke_test.gd` 共 64 项通过。专项见 `ten_minute_flow_smoke_test.gd`、`boss_victory_smoke_test.gd`、`difficulty_director_smoke_test.gd`。未执行真实窗口完整十分钟游玩。
+
 ## 用户追加：新增战斗素材接入（2026-09-25）
 
 - [x] 外部生成 84 个透明 PNG（武器/弹体/特效/金币/图标）并放入 `assets/v2_dark_comic/`

@@ -58,6 +58,6 @@ enemy_pool = Array[ExtResource("6_enemy_type")]([ExtResource("3_basic"), ExtReso
 
 [resource]
 script = ExtResource("1_run")
-run_duration_seconds = 300.0
+run_duration_seconds = 600.0
 stages = Array[ExtResource("2_stage")]([SubResource("Stage0"), SubResource("Stage1"), SubResource("Stage2"), SubResource("Stage3")])
 boss_definition = ExtResource("5_boss")

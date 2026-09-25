@@ -100,7 +100,7 @@ func _process(delta: float) -> void:
 
 ## 推进唯一权威单局时间；暂停、结束或无配置时不会推进。
 ##
-## 独立入口允许烟雾测试快速模拟五分钟流程，而不绕过正式状态转换。
+## 独立入口允许烟雾测试快速模拟十分钟流程，而不绕过正式状态转换。
 func advance_time(delta: float) -> void:
 	if not is_run_active or get_tree().paused or run_definition == null:
 		return
@@ -315,6 +315,7 @@ func _request_next_upgrade() -> void:
 		return
 	get_tree().paused = true
 	game_audio.play_cue(&"upgrade")
+	upgrade_system.set_run_progress_ratio(elapsed_seconds / run_definition.run_duration_seconds)
 	upgrade_system.request_choices(3)
 
 

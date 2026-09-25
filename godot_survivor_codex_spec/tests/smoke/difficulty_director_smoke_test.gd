@@ -17,9 +17,9 @@ func _run() -> void:
 	var session: GameSession = main_node.get_node("GameSession") as GameSession
 	session.enemy_spawner.stop()
 	var run: RunDefinition = session.run_definition
-	_expect(run != null and is_equal_approx(run.run_duration_seconds, 300.0), "单局时长不是 5 分钟。")
+	_expect(run != null and is_equal_approx(run.run_duration_seconds, 600.0), "单局时长不是 10 分钟。")
 	_expect(run.stages.size() == 4, "默认流程不是四个难度阶段。")
-	_expect(session.hud.time_label.text == "05:00", "HUD 初始时间不是 05:00。")
+	_expect(session.hud.time_label.text == "10:00", "HUD 初始时间不是 10:00。")
 
 	session.advance_time(59.0)
 	_expect(session.difficulty_director.current_stage_index == 0, "一分钟前未保持第一阶段。")

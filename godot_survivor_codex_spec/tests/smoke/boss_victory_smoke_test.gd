@@ -1,4 +1,4 @@
-## P4-04/P4-05 五分钟 Boss 单次生成与胜利结算烟雾检查。
+## P4-04/P4-05 十分钟 Boss 单次生成与胜利结算烟雾检查。
 extends SceneTree
 
 const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
@@ -23,8 +23,10 @@ func _run() -> void:
 	session.boss_spawned.connect(_on_boss_spawned)
 	session.run_ended.connect(_on_run_ended)
 
-	session.advance_time(300.0)
-	_expect(session.boss_has_spawned and is_instance_valid(session.boss), "5 分钟未生成 Boss。")
+	session.advance_time(599.0)
+	_expect(not session.boss_has_spawned, "十分钟前不应生成 Boss。")
+	session.advance_time(1.0)
+	_expect(session.boss_has_spawned and is_instance_valid(session.boss), "10 分钟未生成 Boss。")
 	_expect(_boss_signal_count == 1, "Boss 生成信号未恰好触发一次。")
 	_expect(not session.enemy_spawner.spawn_timer.is_stopped(), "Boss 出现后小怪应继续刷新。")
 	_expect(session.hud.time_label.text == "00:00", "Boss 出现时 HUD 未显示 00:00。")
@@ -41,7 +43,7 @@ func _run() -> void:
 
 	paused = false
 	if not _failed:
-		print("Boss victory smoke test passed: five-minute spawn, single boss, victory, and stats are valid.")
+		print("Boss victory smoke test passed: ten-minute spawn, single boss, victory, and stats are valid.")
 	quit(1 if _failed else 0)
 
 

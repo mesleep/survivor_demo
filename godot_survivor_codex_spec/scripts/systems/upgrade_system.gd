@@ -13,6 +13,12 @@ signal upgrade_applied(definition: UpgradeDefinition)
 @export var guarantee_progression_choice: bool = true
 @export_range(1.0, 30.0, 0.5) var ascension_weight_multiplier: float = 8.0
 @export_range(1.0, 10.0, 0.5) var base_upgrade_weight_multiplier: float = 3.0
+## 单局过半进入后期；降低普通卡权重，并提高质变占据第二、三卡位的机会。
+@export_range(0.0, 1.0, 0.05) var late_game_start_ratio: float = 0.5
+@export_range(0.0, 1.0, 0.05) var late_base_guarantee_chance: float = 0.5
+@export_range(0.0, 1.0, 0.05) var late_base_weight_multiplier: float = 0.25
+@export_range(0.0, 1.0, 0.05) var late_generic_weight_multiplier: float = 0.5
+@export_range(1.0, 10.0, 0.5) var late_ascension_weight_multiplier: float = 2.5
 
 var player: PlayerActor
 var _current_choices: Array[UpgradeDefinition] = []
@@ -20,6 +26,7 @@ var _awaiting_choice: bool = false
 var _random := RandomNumberGenerator.new()
 ## 本局剩余刷新次数（T28）；跨升级保留，重开由新场景归零。
 var _remaining_refreshes: int = 0
+var _run_progress_ratio: float = 0.0
 
 
 func _ready() -> void:
@@ -31,6 +38,11 @@ func initialize(new_player: PlayerActor) -> void:
 	player = new_player
 	if not is_instance_valid(player):
 		push_error("UpgradeSystem 初始化失败：缺少 PlayerActor。")
+
+
+## 注入当前单局进度；只影响抽卡，不修改玩家或共享升级 Resource。
+func set_run_progress_ratio(progress_ratio: float) -> void:
+	_run_progress_ratio = clampf(progress_ratio, 0.0, 1.0)
 
 
 ## 设置本局刷新次数（开局由 GameSession/Profile 注入，T28）。
@@ -83,7 +95,9 @@ func _draw_choices(exclude: Array[UpgradeDefinition], count: int) -> void:
 		for definition: UpgradeDefinition in available:
 			if definition.category == UpgradeDefinition.UpgradeCategory.ASCENSION:
 				progression.append(definition)
-		if progression.is_empty():
+		# 后期仍给未满级装备一条可达的质变路径，但不再每次强占卡位。
+		if progression.is_empty() and (not _is_late_game() \
+				or _random.randf() < late_base_guarantee_chance):
 			for definition: UpgradeDefinition in available:
 				if definition.category == UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
 					progression.append(definition)
@@ -175,6 +189,7 @@ func can_offer(definition: UpgradeDefinition) -> bool:
 func reset() -> void:
 	_current_choices.clear()
 	_awaiting_choice = false
+	_run_progress_ratio = 0.0
 	player = null
 
 
@@ -206,6 +221,17 @@ func _effective_weight(definition: UpgradeDefinition) -> float:
 	match definition.category:
 		UpgradeDefinition.UpgradeCategory.ASCENSION:
 			result *= ascension_weight_multiplier
+			if _is_late_game():
+				result *= late_ascension_weight_multiplier
 		UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
 			result *= base_upgrade_weight_multiplier
+			if _is_late_game():
+				result *= late_base_weight_multiplier
+		UpgradeDefinition.UpgradeCategory.GENERIC:
+			if _is_late_game():
+				result *= late_generic_weight_multiplier
 	return result
+
+
+func _is_late_game() -> bool:
+	return _run_progress_ratio >= late_game_start_ratio

@@ -1,7 +1,7 @@
 ## T35：完整一局（含新敌人与远程弹体）的端到端自动验收。
 ##
-## 覆盖：推进到五分钟生成 Boss、击杀 Boss 胜利、结算一次、敌方弹体清理、
-## 连续重开隔离。人工五分钟游玩不在此测试内，按验证协议另行标记。
+## 覆盖：推进到十分钟生成 Boss、击杀 Boss 胜利、结算一次、敌方弹体清理、
+## 连续重开隔离。人工十分钟游玩不在此测试内，按验证协议另行标记。
 extends SceneTree
 
 const MAIN_SCENE_PATH := "res://scenes/bootstrap/main.tscn"
@@ -23,7 +23,7 @@ func _run() -> void:
 	quit(1 if _failed else 0)
 
 
-## 五分钟推进生成 Boss；期间新敌人可行动并发射弹体；击杀 Boss 胜利并清理。
+## 十分钟推进生成 Boss；期间新敌人可行动并发射弹体；击杀 Boss 胜利并清理。
 func _test_full_run_victory_with_new_content() -> void:
 	var main_node: Node = await _spawn_main()
 	var session: GameSession = main_node.get_node("GameSession") as GameSession
@@ -38,9 +38,9 @@ func _test_full_run_victory_with_new_content() -> void:
 	await physics_frame
 	_expect(_count_projectiles(session, &"enemy_bolt") >= 1, "远程敌人应在真实单局内发射弹体。")
 
-	# 推进到五分钟，Boss 生成。
+	# 推进到十分钟，Boss 生成。
 	session.advance_time(session.run_definition.run_duration_seconds)
-	_expect(session.boss_has_spawned and is_instance_valid(session.boss), "五分钟应生成 Boss。")
+	_expect(session.boss_has_spawned and is_instance_valid(session.boss), "十分钟应生成 Boss。")
 
 	var results: Array[GameResult] = []
 	session.run_ended.connect(func(result: GameResult) -> void: results.append(result))
