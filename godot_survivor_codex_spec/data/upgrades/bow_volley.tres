@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bow_volley"
+display_name = "质变·万箭齐发"
+description = "长弓：每轮额外射出一支箭，扇形扩散。"
+type = 2
+category = 3
+value = 1.0
+required_weapon_id = &"bow"
+target_equipment_id = &"bow"
+branch_id = &"volley"
+max_stacks = 1
+weight = 1.0

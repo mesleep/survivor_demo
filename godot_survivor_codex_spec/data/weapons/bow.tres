@@ -12,5 +12,5 @@ visual_frames = ExtResource("3")
 projectile_definition = ExtResource("2")
 cooldown_seconds = 1.2
 projectile_count = 1
-spread_degrees = 0.0
+spread_degrees = 25.0
 target_range = 1000.0
