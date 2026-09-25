@@ -10,6 +10,7 @@ signal start_requested(loadout: RunLoadout)
 const BUTTON_NORMAL: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_normal.tres")
 const BUTTON_HOVER: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_hover.tres")
 const BUTTON_PRESSED: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_pressed.tres")
+const TAB_STYLE: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_tab_style.tres")
 
 @export var catalog: ContentCatalog
 
@@ -446,7 +447,10 @@ func _build_permanent_section() -> void:
 	_permanent_container.visible = true
 	var title := Label.new()
 	title.text = "永久强化（跨角色共享）"
+	title.custom_minimum_size = Vector2(0.0, 46.0)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_stylebox_override(&"normal", TAB_STYLE)
 	_permanent_container.add_child(title)
 	for definition: PermanentUpgradeDefinition in permanent_catalog.upgrades:
 		if definition == null:

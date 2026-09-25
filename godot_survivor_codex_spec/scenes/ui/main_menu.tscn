@@ -1,28 +1,16 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/menu_background.png" id="2_background"]
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/menu_title_ornament.png" id="3_ornament"]
+[ext_resource type="StyleBox" path="res://data/visuals/v2_dark_comic/menu_card_style.tres" id="4_card"]
+[ext_resource type="StyleBox" path="res://data/visuals/v2_dark_comic/menu_tab_style.tres" id="5_tab"]
 
 [sub_resource type="SystemFont" id="SystemFont_chinese"]
 font_names = PackedStringArray("PingFang SC", "Heiti SC", "Noto Sans CJK SC", "Microsoft YaHei")
 
 [sub_resource type="Theme" id="Theme_menu"]
 default_font = SubResource("SystemFont_chinese")
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_card"]
-bg_color = Color(0.018, 0.035, 0.075, 0.92)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.36, 0.57, 0.68, 0.78)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.48)
-shadow_size = 8
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -129,22 +117,25 @@ theme_override_constants/separation = 18
 custom_minimum_size = Vector2(270, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBox_card")
+theme_override_styles/panel = ExtResource("4_card")
 
 [node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/CharacterCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_bottom = 14
 
 [node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/CharacterCard/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="CharacterTitle" type="Label" parent="SafeArea/Page/Cards/CharacterCard/Margin/Column"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_styles/normal = ExtResource("5_tab")
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 text = "01  选择角色"
 
@@ -163,28 +154,31 @@ horizontal_scroll_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 9
+theme_override_constants/separation = 8
 
 [node name="WeaponCard" type="PanelContainer" parent="SafeArea/Page/Cards"]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBox_card")
+theme_override_styles/panel = ExtResource("4_card")
 
 [node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/WeaponCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_bottom = 14
 
 [node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/WeaponCard/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="WeaponTitle" type="Label" parent="SafeArea/Page/Cards/WeaponCard/Margin/Column"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_styles/normal = ExtResource("5_tab")
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 text = "02  本局武器"
 
@@ -203,28 +197,31 @@ horizontal_scroll_mode = 0
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 9
+theme_override_constants/separation = 8
 
 [node name="ProgressCard" type="PanelContainer" parent="SafeArea/Page/Cards"]
 custom_minimum_size = Vector2(355, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBox_card")
+theme_override_styles/panel = ExtResource("4_card")
 
 [node name="Margin" type="MarginContainer" parent="SafeArea/Page/Cards/ProgressCard"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 18
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_bottom = 14
 
 [node name="Column" type="VBoxContainer" parent="SafeArea/Page/Cards/ProgressCard/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="ProgressTitle" type="Label" parent="SafeArea/Page/Cards/ProgressCard/Margin/Column"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.92, 0.85, 0.61, 1)
+theme_override_styles/normal = ExtResource("5_tab")
+horizontal_alignment = 1
 theme_override_font_sizes/font_size = 22
 text = "03  永久成长"
 
@@ -250,16 +247,17 @@ custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="MapArea" type="VBoxContainer" parent="SafeArea/Page/Footer"]
+[node name="MapArea" type="HBoxContainer" parent="SafeArea/Page/Footer"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 10
 
 [node name="MapTitle" type="Label" parent="SafeArea/Page/Footer/MapArea"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.82, 0.89, 1)
 theme_override_font_sizes/font_size = 14
 text = "地图"
+vertical_alignment = 1
 
 [node name="MapContainer" type="HBoxContainer" parent="SafeArea/Page/Footer/MapArea"]
 unique_name_in_owner = true
