@@ -18,6 +18,8 @@ var profile_store: ProfileStore
 var profile: Profile
 ## 解锁交易入口（T29）。
 var unlock_service: UnlockService
+## 永久强化目录（T30）；为空时用默认路径加载。
+var permanent_catalog: PermanentUpgradeCatalog
 
 var _menu: MainMenu
 var _session: GameSession
@@ -26,6 +28,8 @@ var _status_text: String = ""
 
 func _ready() -> void:
 	_ensure_profile_store()
+	if permanent_catalog == null:
+		permanent_catalog = load("res://data/progression/permanent_catalog.tres") as PermanentUpgradeCatalog
 	profile = profile_store.load_profile()
 	unlock_service = UnlockService.new(profile, profile_store)
 	if not profile_store.last_error.is_empty():
@@ -67,7 +71,7 @@ func show_menu() -> void:
 		return
 	_menu = menu_node as MainMenu
 	_menu.catalog = catalog
-	_menu.configure_profile(profile, unlock_service)
+	_menu.configure_profile(profile, unlock_service, permanent_catalog)
 	_menu.start_requested.connect(_on_start_requested)
 	if _remembered_loadout != null:
 		_menu.preselect(_remembered_loadout)
@@ -133,6 +137,8 @@ func _start_session(loadout: RunLoadout) -> void:
 	# 开局刷新次数 = 基础 + 档案永久加成（T28；永久加成由 T30 购买）。
 	var bonus: int = profile.refresh_bonus if profile != null else 0
 	_session.set_initial_refresh_count(_session.base_refresh_count + bonus)
+	if profile != null:
+		_session.set_permanent_upgrades(profile.permanent_upgrades.duplicate())
 	if not _session.run_ended.is_connected(_on_run_ended):
 		_session.run_ended.connect(_on_run_ended)
 	_session.start_run()

@@ -55,6 +55,11 @@ var _tech_set_move_multiplier: float = 1.0
 var _set_weapon_controller: WeaponController
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
+## 永久强化（T30）：开局从档案快照写入，运行中不再读取档案。
+var _permanent_move_multiplier: float = 1.0
+var _permanent_lifesteal_ratio: float = 0.0
+var _permanent_defense: float = 0.0
+var _permanent_regeneration: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
 var _projectile_parent: Node
 var _targeting_service: TargetingService
@@ -129,6 +134,10 @@ func initialize(new_definition: Resource) -> void:
 	_berserk_drain_reduction = 0.0
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
+	_permanent_move_multiplier = 1.0
+	_permanent_lifesteal_ratio = 0.0
+	_permanent_defense = 0.0
+	_permanent_regeneration = 0.0
 	_weapon_modifier_history.clear()
 	_candidate_weapon_ids.clear()
 	_equipped_equipment_ids.clear()
@@ -308,7 +317,9 @@ func _refresh_armor_bonuses() -> void:
 
 
 func _refresh_defense() -> void:
-	set_defense(_upgrade_defense_bonus + _armor_defense_bonus + _knight_defense_bonus)
+	set_defense(
+		_upgrade_defense_bonus + _armor_defense_bonus + _knight_defense_bonus + _permanent_defense
+	)
 
 
 func get_armor_move_penalty_ratio() -> float:
@@ -672,6 +683,7 @@ func get_effective_move_speed() -> float:
 		* _move_speed_multiplier
 		* (1.0 - _armor_move_penalty_ratio)
 		* _tech_set_move_multiplier
+		* _permanent_move_multiplier
 	)
 
 
@@ -689,8 +701,9 @@ func _physics_process(_delta: float) -> void:
 	_regeneration_clock += _delta
 	if _regeneration_clock >= 1.0:
 		_regeneration_clock -= 1.0
-		if _regeneration > 0.0:
-			health_component.heal(_regeneration)
+		var regeneration_total: float = _regeneration + _permanent_regeneration
+		if regeneration_total > 0.0:
+			health_component.heal(regeneration_total)
 	var input_direction: Vector2 = Input.get_vector(
 		&"move_left",
 		&"move_right",
@@ -869,14 +882,57 @@ func get_berserk_drain() -> BerserkDrainComponent:
 
 ## 狂战盔甲提供的额外吸血：基础值，半血以下再加成（T23）。
 func get_bonus_lifesteal_ratio() -> float:
-	if _berserk_definition == null:
-		return 0.0
-	var bonus: float = _berserk_definition.base_lifesteal_ratio
-	var maximum_health: float = get_effective_maximum_health()
-	if maximum_health > 0.0 \
-			and health_component.current_health <= maximum_health * _berserk_definition.half_health_ratio:
-		bonus += _berserk_definition.half_health_lifesteal_bonus + _berserk_half_lifesteal_bonus
+	var bonus: float = _permanent_lifesteal_ratio
+	if _berserk_definition != null:
+		bonus += _berserk_definition.base_lifesteal_ratio
+		var maximum_health: float = get_effective_maximum_health()
+		if maximum_health > 0.0 \
+				and health_component.current_health <= maximum_health * _berserk_definition.half_health_ratio:
+			bonus += _berserk_definition.half_health_lifesteal_bonus + _berserk_half_lifesteal_bonus
 	return clampf(bonus, 0.0, 1.0)
+
+
+## 应用开局永久强化快照（T30）：一次性写入，运行中不再读取档案。
+func apply_permanent_upgrades(
+		levels: Dictionary, catalog: PermanentUpgradeCatalog
+) -> void:
+	if catalog == null or levels == null:
+		return
+	for definition: PermanentUpgradeDefinition in catalog.upgrades:
+		if definition == null:
+			continue
+		var level: int = int(levels.get(definition.id, 0))
+		if level <= 0:
+			continue
+		var value: float = definition.per_level_value * float(level)
+		match definition.attribute:
+			PermanentUpgradeDefinition.Attribute.MOVE_SPEED:
+				_permanent_move_multiplier *= maxf(1.0 + value, 0.0)
+			PermanentUpgradeDefinition.Attribute.DAMAGE:
+				_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + value), &"")
+			PermanentUpgradeDefinition.Attribute.REGENERATION:
+				_permanent_regeneration += value
+			PermanentUpgradeDefinition.Attribute.LIFESTEAL:
+				_permanent_lifesteal_ratio += value
+			PermanentUpgradeDefinition.Attribute.DEFENSE:
+				_permanent_defense += value
+	_refresh_defense()
+
+
+func get_permanent_move_multiplier() -> float:
+	return _permanent_move_multiplier
+
+
+func get_permanent_lifesteal_ratio() -> float:
+	return _permanent_lifesteal_ratio
+
+
+func get_permanent_defense() -> float:
+	return _permanent_defense
+
+
+func get_permanent_regeneration() -> float:
+	return _permanent_regeneration
 
 
 func _clear_thorn_aura() -> void:

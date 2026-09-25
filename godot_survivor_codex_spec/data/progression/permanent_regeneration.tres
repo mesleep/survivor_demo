@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PermanentUpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/progression/permanent_upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"permanent_regeneration"
+display_name = "永久恢复"
+attribute = 2
+per_level_value = 0.3
+max_level = 5
+base_price = 30
+price_growth = 1.5

@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3]
+[gd_scene load_steps=97 format=3]
 
 [ext_resource type="Script" path="res://scripts/core/game_session.gd" id="1_game_session"]
 [ext_resource type="Resource" path="res://data/characters/player_default.tres" id="2_player_definition"]
@@ -96,6 +96,7 @@
 [ext_resource type="Resource" path="res://data/armor/tech_set_default.tres" id="93_tech_set"]
 [ext_resource type="Resource" path="res://data/economy/default_economy_rules.tres" id="94_economy"]
 [ext_resource type="PackedScene" path="res://scenes/pickups/coin_pickup.tscn" id="95_coin"]
+[ext_resource type="Resource" path="res://data/progression/permanent_catalog.tres" id="96_permanent"]
 
 [node name="GameSession" type="Node2D"]
 script = ExtResource("1_game_session")
@@ -105,6 +106,7 @@ combat_rules = ExtResource("46_combat")
 tech_set_definition = ExtResource("93_tech_set")
 economy_rules = ExtResource("94_economy")
 coin_pickup_scene = ExtResource("95_coin")
+permanent_catalog = ExtResource("96_permanent")
 enemy_spawn_settings = ExtResource("4_spawn_settings")
 run_definition = ExtResource("18_run")
 experience_gem_scene = ExtResource("7_experience_gem")

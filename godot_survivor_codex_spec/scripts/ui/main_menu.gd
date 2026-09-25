@@ -12,6 +12,9 @@ signal start_requested(loadout: RunLoadout)
 ## 跨局档案与解锁服务（T29）；为空时视为全部可用，保持旧直启兼容。
 var profile: Profile
 var unlock_service: UnlockService
+## 永久强化目录（T30）。
+var permanent_catalog: PermanentUpgradeCatalog
+var _permanent_container: VBoxContainer
 
 @onready var character_container: VBoxContainer = %CharacterContainer
 @onready var weapon_container: VBoxContainer = %WeaponContainer
@@ -40,9 +43,14 @@ func initialize(new_catalog: ContentCatalog) -> void:
 
 
 ## 注入档案与解锁服务（T29）；会重建选项以显示锁定/可买/已解锁。
-func configure_profile(new_profile: Profile, new_unlock_service: UnlockService) -> void:
+func configure_profile(
+		new_profile: Profile,
+		new_unlock_service: UnlockService,
+		new_permanent_catalog: PermanentUpgradeCatalog = null
+) -> void:
 	profile = new_profile
 	unlock_service = new_unlock_service
+	permanent_catalog = new_permanent_catalog
 	if is_inside_tree():
 		_build()
 
@@ -292,7 +300,74 @@ func _build() -> void:
 		if not _selected_weapon_ids.has(weapon_id):
 			_selected_weapon_ids.append(weapon_id)
 	_sync_weapon_buttons()
+	_build_permanent_section()
 	_update_hint()
+
+
+## 永久强化区：跨角色共享，显示等级/价格，点击购买（T30）。
+func _build_permanent_section() -> void:
+	_ensure_permanent_container()
+	_clear_children(_permanent_container)
+	if permanent_catalog == null or profile == null:
+		_permanent_container.visible = false
+		return
+	_permanent_container.visible = true
+	var title := Label.new()
+	title.text = "永久强化（跨角色共享）"
+	title.add_theme_font_size_override("font_size", 18)
+	_permanent_container.add_child(title)
+	for definition: PermanentUpgradeDefinition in permanent_catalog.upgrades:
+		if definition == null:
+			continue
+		var level: int = profile.get_permanent_level(definition.id)
+		var button := Button.new()
+		if level >= definition.max_level:
+			button.text = "%s Lv %d/%d（已满）" % [definition.display_name, level, definition.max_level]
+			button.disabled = true
+		else:
+			button.text = "%s Lv %d/%d（%d 金）" % [
+				definition.display_name, level, definition.max_level, definition.get_price(level)
+			]
+		button.pressed.connect(_on_permanent_pressed.bind(definition.id))
+		_permanent_container.add_child(button)
+
+
+func _ensure_permanent_container() -> void:
+	if is_instance_valid(_permanent_container):
+		return
+	var parent: Node = hint_label.get_parent()
+	_permanent_container = VBoxContainer.new()
+	_permanent_container.name = "PermanentContainer"
+	_permanent_container.add_theme_constant_override("separation", 6)
+	parent.add_child(_permanent_container)
+	parent.move_child(_permanent_container, hint_label.get_index())
+
+
+func _on_permanent_pressed(upgrade_id: StringName) -> void:
+	if unlock_service == null or permanent_catalog == null:
+		return
+	var result: UnlockService.Result = unlock_service.purchase_permanent_upgrade(
+		permanent_catalog, upgrade_id
+	)
+	match result:
+		UnlockService.Result.SUCCESS:
+			_rebuild_preserving_selection(StringName(), false)
+			_status_text = "永久强化已提升。"
+		UnlockService.Result.INSUFFICIENT_COINS:
+			_status_text = "金币不足，无法强化。"
+		UnlockService.Result.MAX_LEVEL:
+			_status_text = "该项永久强化已达上限。"
+		UnlockService.Result.SAVE_FAILED:
+			_status_text = "存档失败，强化已回滚。"
+		_:
+			_status_text = "无效的永久强化项。"
+	_update_hint()
+
+
+func _clear_children(node: Node) -> void:
+	for child: Node in node.get_children():
+		node.remove_child(child)
+		child.queue_free()
 
 
 func _first_available_character_id() -> StringName:

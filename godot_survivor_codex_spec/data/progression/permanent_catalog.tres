@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PermanentUpgradeCatalog" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://data/progression/permanent_upgrade_catalog.gd" id="1"]
+[ext_resource type="Script" path="res://data/progression/permanent_upgrade_definition.gd" id="2_type"]
+[ext_resource type="Resource" path="res://data/progression/permanent_move_speed.tres" id="3"]
+[ext_resource type="Resource" path="res://data/progression/permanent_damage.tres" id="4"]
+[ext_resource type="Resource" path="res://data/progression/permanent_regeneration.tres" id="5"]
+[ext_resource type="Resource" path="res://data/progression/permanent_lifesteal.tres" id="6"]
+[ext_resource type="Resource" path="res://data/progression/permanent_defense.tres" id="7"]
+
+[resource]
+script = ExtResource("1")
+upgrades = Array[ExtResource("2_type")]([ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7")])

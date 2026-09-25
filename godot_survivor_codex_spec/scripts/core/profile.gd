@@ -88,6 +88,25 @@ func is_weapon_unlocked(weapon_id: StringName) -> bool:
 	return unlocked_weapon_ids.has(weapon_id)
 
 
+## 永久强化当前等级（T30）。
+func get_permanent_level(upgrade_id: StringName) -> int:
+	return permanent_upgrades.get(upgrade_id, 0)
+
+
+## 尝试扣除金币并提升一级永久强化；已满级或余额不足返回 false。
+func try_upgrade_permanent(upgrade_id: StringName, cost: int, max_level: int) -> bool:
+	if upgrade_id == StringName():
+		return false
+	var current: int = get_permanent_level(upgrade_id)
+	if current >= maxi(max_level, 0):
+		return false
+	if coins < maxi(cost, 0):
+		return false
+	coins -= maxi(cost, 0)
+	permanent_upgrades[upgrade_id] = current + 1
+	return true
+
+
 ## 尝试扣除金币并解锁角色；已解锁或余额不足返回 false（T29）。
 func try_unlock_character(character_id: StringName, cost: int) -> bool:
 	if character_id == StringName() or is_character_unlocked(character_id):

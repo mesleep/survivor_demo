@@ -12,6 +12,7 @@ enum Result {
 	ALREADY_UNLOCKED,
 	INSUFFICIENT_COINS,
 	SAVE_FAILED,
+	MAX_LEVEL,
 }
 
 var profile: Profile
@@ -67,6 +68,31 @@ func purchase_weapon(catalog: ContentCatalog, weapon_id: StringName) -> Result:
 		return Result.INSUFFICIENT_COINS
 	var snapshot: Profile = profile.copy()
 	if not profile.try_unlock_weapon(weapon_id, definition.unlock_cost):
+		return Result.INSUFFICIENT_COINS
+	return _commit(snapshot)
+
+
+func get_permanent_level(upgrade_id: StringName) -> int:
+	return profile.get_permanent_level(upgrade_id) if profile != null else 0
+
+
+## 购买一级永久强化（T30）：校验上限与余额，成功写档，失败回滚。
+func purchase_permanent_upgrade(
+		catalog: PermanentUpgradeCatalog, upgrade_id: StringName
+) -> Result:
+	var definition: PermanentUpgradeDefinition = (
+		catalog.get_upgrade(upgrade_id) if catalog != null else null
+	)
+	if definition == null:
+		return Result.INVALID_ID
+	var current: int = profile.get_permanent_level(upgrade_id)
+	if current >= definition.max_level:
+		return Result.MAX_LEVEL
+	var price: int = definition.get_price(current)
+	if profile.coins < price:
+		return Result.INSUFFICIENT_COINS
+	var snapshot: Profile = profile.copy()
+	if not profile.try_upgrade_permanent(upgrade_id, price, definition.max_level):
 		return Result.INSUFFICIENT_COINS
 	return _commit(snapshot)
 

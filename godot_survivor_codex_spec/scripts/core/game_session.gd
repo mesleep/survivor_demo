@@ -15,6 +15,8 @@ signal run_started(player: PlayerActor)
 @export var combat_rules: CombatRules
 ## 科技三件套配置（T25）；为空则不启用套装。
 @export var tech_set_definition: TechSetDefinition
+## 永久强化目录（T30）；为空则不开局快照。
+@export var permanent_catalog: PermanentUpgradeCatalog
 ## 单局经济规则（T26）；为空时按 0 奖励处理。
 @export var economy_rules: EconomyRules
 ## 金币拾取物场景（T26）。
@@ -42,6 +44,8 @@ var run_loadout: RunLoadout
 var _economy_random := RandomNumberGenerator.new()
 ## 入口注入的本局刷新次数；-1 表示使用导出默认值。
 var _initial_refresh_count: int = -1
+## 入口注入的永久强化等级快照（T30）；运行中不再读取档案。
+var _permanent_upgrades: Dictionary[StringName, int] = {}
 
 @onready var arena: Arena = $Arena
 @onready var actors: Node2D = $Actors
@@ -81,6 +85,11 @@ func set_run_loadout(loadout: RunLoadout) -> void:
 ## 注入本局升级刷新次数（T28）；入口按“基础 + 永久加成”计算后传入。
 func set_initial_refresh_count(count: int) -> void:
 	_initial_refresh_count = maxi(count, 0)
+
+
+## 注入永久强化等级快照（T30）；只复制，运行中不读取档案。
+func set_permanent_upgrades(levels: Dictionary[StringName, int]) -> void:
+	_permanent_upgrades = levels.duplicate()
 
 
 func _process(delta: float) -> void:
@@ -142,6 +151,7 @@ func start_run() -> void:
 	new_player.configure_equipment(_resolve_candidate_weapon_ids())
 	new_player.configure_weapons(starting_weapons, projectiles, targeting_service)
 	new_player.configure_tech_set(tech_set_definition)
+	new_player.apply_permanent_upgrades(_permanent_upgrades, permanent_catalog)
 	new_player.weapon_added.connect(_on_weapon_added)
 	for controller: WeaponController in new_player.weapon_controllers:
 		controller.weapon_fired.connect(_on_weapon_fired)
