@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bow_multishot_rounds"
+display_name = "多重射击·连轮"
+description = "多重射击专属：每级额外增加一轮射击。"
+type = 21
+category = 4
+value = 1.0
+required_weapon_id = &"bow"
+target_equipment_id = &"bow"
+branch_id = &"multishot"
+max_stacks = 2
+weight = 1.0

@@ -33,6 +33,7 @@ var _runtime_damage_multiplier: float = 1.0
 var _runtime_bonus_projectile_chance: float = 0.0
 var _runtime_projectile_lifesteal_ratio: float = 0.0
 var _runtime_repeat_shot_chance: float = 0.0
+var _runtime_volley_count_bonus: int = 0
 var _repeat_shot_generation: int = 0
 var _random := RandomNumberGenerator.new()
 var weapon_visual: AnimatedSprite2D
@@ -121,23 +122,7 @@ func request_fire(target: Node2D) -> bool:
 	var requested_count: int = get_effective_projectile_count()
 	if _random.randf() < _runtime_bonus_projectile_chance:
 		requested_count += 1
-	var spawned_count: int = 0
-	for index: int in range(requested_count):
-		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
-		if definition.projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
-			direction = Vector2.RIGHT.rotated(TAU * float(index) / requested_count)
-		var context := ProjectileSpawnContext.new(
-			owner_actor,
-			owner_actor.get_team_id(),
-			owner_actor.get_aim_position(),
-			direction
-		)
-		context.damage_multiplier = _runtime_damage_multiplier
-		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
-		context.target = target
-		context.weapon_id = definition.id
-		if spawn_projectile(definition.projectile_definition, context) != null:
-			spawned_count += 1
+	var spawned_count: int = _fire_volley(base_direction, requested_count, target)
 	if spawned_count == 0:
 		return false
 
@@ -158,7 +143,57 @@ func request_fire(target: Node2D) -> bool:
 			cooldown_seconds * REPEAT_SHOT_DELAY_RATIO,
 			_repeat_shot_generation
 		)
+	var volley_count: int = get_effective_volley_count()
+	if volley_count > 1:
+		_fire_extra_volleys(target_position, volley_count, _repeat_shot_generation)
 	return true
+
+
+## 生成一轮弹幕（可能多颗），方向与扩散规则集中在此。
+func _fire_volley(base_direction: Vector2, requested_count: int, target: Node2D) -> int:
+	var spawned_count: int = 0
+	for index: int in range(requested_count):
+		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
+		if definition.projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
+			direction = Vector2.RIGHT.rotated(TAU * float(index) / requested_count)
+		var context := ProjectileSpawnContext.new(
+			owner_actor,
+			owner_actor.get_team_id(),
+			owner_actor.get_aim_position(),
+			direction
+		)
+		context.damage_multiplier = _runtime_damage_multiplier
+		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
+		context.target = target
+		context.weapon_id = definition.id
+		if spawn_projectile(definition.projectile_definition, context) != null:
+			spawned_count += 1
+	return spawned_count
+
+
+## 在同一次攻击周期内追加射击轮次；冷却只计算一次，轮间使用约定方向。
+##
+## 目标可能在轮间死亡，因此使用首次记录的目标位置；generation 变化（重置/重开）会取消后续轮次。
+func _fire_extra_volleys(target_position: Vector2, volleys: int, generation: int) -> void:
+	for _index: int in range(1, volleys):
+		var interval: float = maxf(definition.volley_interval_seconds, 0.01)
+		await get_tree().create_timer(interval, false).timeout
+		if generation != _repeat_shot_generation or not is_instance_valid(owner_actor):
+			return
+		if not is_instance_valid(projectile_parent) or owner_actor.health_component.is_dead():
+			return
+		var direction: Vector2 = owner_actor.get_aim_position().direction_to(target_position)
+		if direction.is_zero_approx():
+			direction = Vector2.RIGHT
+		var requested_count: int = get_effective_projectile_count()
+		if _random.randf() < _runtime_bonus_projectile_chance:
+			requested_count += 1
+		var spawned_count: int = _fire_volley(direction, requested_count, null)
+		if spawned_count > 0:
+			fire_requested.emit(
+				definition, owner_actor, null, projectile_parent, spawned_count, _runtime_damage_multiplier
+			)
+			weapon_fired.emit(definition.id)
 
 
 ## 通过注入的容器实例化并启动一个 ProjectileBase。
@@ -254,6 +289,7 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 		0.0,
 		1.0
 	)
+	_runtime_volley_count_bonus += modifier.volley_count_bonus
 
 
 func reset_runtime_state() -> void:
@@ -269,6 +305,7 @@ func reset_runtime_state() -> void:
 	_runtime_bonus_projectile_chance = 0.0
 	_runtime_projectile_lifesteal_ratio = 0.0
 	_runtime_repeat_shot_chance = 0.0
+	_runtime_volley_count_bonus = 0
 
 
 func get_effective_cooldown_seconds() -> float:
@@ -281,6 +318,13 @@ func get_effective_projectile_count() -> int:
 	if definition == null:
 		return 0
 	return maxi(definition.projectile_count + _runtime_projectile_count_bonus, 1)
+
+
+## 同一次攻击周期内的射击轮数，默认 1；与弹数、穿透相互独立。
+func get_effective_volley_count() -> int:
+	if definition == null:
+		return 1
+	return maxi(1 + _runtime_volley_count_bonus, 1)
 
 
 func get_runtime_damage_multiplier() -> float:

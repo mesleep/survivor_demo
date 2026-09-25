@@ -16,6 +16,8 @@ var pierce_bonus: int = 0
 var speed_multiplier: float = 1.0
 var size_multiplier: float = 1.0
 var critical_chance: float = 0.0
+## 同一次攻击周期内的额外射击轮数（与“弹数+1”“穿透+1”独立）。
+var volley_count_bonus: int = 0
 
 
 func _init(

@@ -29,6 +29,8 @@ enum UpgradeType {
 	DEFENSE,
 	DODGE_CHANCE,
 	IMMUNE_CHANCE,
+	## 同一次攻击周期内额外射击轮数（T13，独立于弹数与穿透）。
+	VOLLEY_COUNT,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。

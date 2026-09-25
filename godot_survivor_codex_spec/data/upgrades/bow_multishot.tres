@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bow_multishot"
+display_name = "质变·多重射击"
+description = "长弓：每次攻击间隔内射出两轮箭。"
+type = 21
+category = 3
+value = 1.0
+required_weapon_id = &"bow"
+target_equipment_id = &"bow"
+branch_id = &"multishot"
+max_stacks = 1
+weight = 1.0

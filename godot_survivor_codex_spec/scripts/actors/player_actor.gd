@@ -463,7 +463,7 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			add_immune_chance(upgrade.value)
 		UpgradeDefinition.UpgradeType.REPEAT_SHOT_CHANCE:
 			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value), upgrade.required_weapon_id)
-		UpgradeDefinition.UpgradeType.PIERCE_COUNT, UpgradeDefinition.UpgradeType.PROJECTILE_SPEED, UpgradeDefinition.UpgradeType.PROJECTILE_SIZE, UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:
+		UpgradeDefinition.UpgradeType.PIERCE_COUNT, UpgradeDefinition.UpgradeType.PROJECTILE_SPEED, UpgradeDefinition.UpgradeType.PROJECTILE_SIZE, UpgradeDefinition.UpgradeType.CRITICAL_CHANCE, UpgradeDefinition.UpgradeType.VOLLEY_COUNT:
 			var modifier := WeaponRuntimeModifier.new()
 			match upgrade.type:
 				UpgradeDefinition.UpgradeType.PIERCE_COUNT:
@@ -474,6 +474,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 					modifier.size_multiplier = 1.0 + upgrade.value
 				UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:
 					modifier.critical_chance = upgrade.value
+				UpgradeDefinition.UpgradeType.VOLLEY_COUNT:
+					modifier.volley_count_bonus = roundi(upgrade.value)
 			_apply_weapon_modifier(modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.REGENERATION:
 			_regeneration += upgrade.value

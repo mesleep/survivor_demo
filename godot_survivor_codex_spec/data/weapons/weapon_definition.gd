@@ -15,3 +15,5 @@ extends Resource
 @export_range(1, 100, 1) var projectile_count: int = 1
 @export_range(0.0, 360.0, 0.1) var spread_degrees: float = 0.0
 @export_range(1.0, 5000.0, 1.0) var target_range: float = 900.0
+## 多重射击时，相邻两轮之间的间隔（秒），可在 Resource 调整。
+@export_range(0.02, 5.0, 0.01) var volley_interval_seconds: float = 0.18
