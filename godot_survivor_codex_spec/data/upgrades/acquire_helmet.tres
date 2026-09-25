@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 [ext_resource type="Resource" path="res://data/armor/armor_helmet.tres" id="2"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_helmet_basic.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"acquire_helmet"
 display_name = "获得基础头盔"
 description = "装备基础头盔：防御 +2，没有移动速度惩罚。"

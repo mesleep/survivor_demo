@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_upgrade_branch.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"bow_volley_count"
 display_name = "万箭齐发·箭雨"
 description = "万箭齐发专属：每级每轮再多射出一支箭。"

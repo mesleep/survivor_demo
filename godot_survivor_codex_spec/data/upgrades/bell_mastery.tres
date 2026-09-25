@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/projectiles/orbit_bell.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"bell_mastery"
 display_name = "环绕铃铛·共鸣"
 description = "仅铃铛：体积与环绕半径增加 30%。"

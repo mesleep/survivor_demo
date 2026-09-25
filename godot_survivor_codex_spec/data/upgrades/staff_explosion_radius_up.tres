@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_staff_explosion.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"staff_explosion_radius_up"
 display_name = "爆炸法术·裂爆"
 description = "爆炸法术专属：溅射范围提高 25%。"

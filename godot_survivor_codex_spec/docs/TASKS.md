@@ -12,6 +12,14 @@
 
 验证：Godot 4.7.1 `--headless --path . --editor --quit` 解析 0；`--quit-after 300` 启动 0；`tests/smoke` 68 项快速冒烟 0；120 秒 soak 0。专项见 `equipment_display_smoke_test.gd`、`settings_panel_smoke_test.gd`、`coin_fallback_smoke_test.gd`、`map_selection_smoke_test.gd`。实拍 `art_review/v2_equipment_bar_preview.png`、`v2_settings_preview.png`、`v2_main_menu_preview.png`。
 
+## 用户追加：升级卡图标与排版（2026-09-25）
+
+- [x] 修复升级卡带图标时的排版错乱（自绘卡面：图标 + 分类标题 + 描述）
+- [x] 为 46 个升级卡补图标（获取/基础/质变/专属/金币）
+- [x] 列出仍缺图标的通用升级并保留空位
+- [x] 解析、启动、68 项快速冒烟、120 秒 soak 通过；实拍 `art_review/v2_upgrade_panel_preview.png`
+- [ ] 待生成 11 个通用属性图标：fire_rate、projectile_count、projectile_size、projectile_speed、repeat_shot、bonus_projectile、max_health、heal、dodge、immune、pierce
+
 ## 用户追加：十分钟终局与后期升级节奏（2026-09-25）
 
 - [x] 默认单局延长为 10 分钟，Boss 在 10:00 仅生成一次，普通敌人持续生成

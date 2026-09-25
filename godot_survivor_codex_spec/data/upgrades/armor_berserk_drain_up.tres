@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_armor_berserk.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_berserk_drain_up"
 display_name = "狂战盔甲·忍痛"
 description = "狂战盔甲专属：每秒失血减少 1 点。"

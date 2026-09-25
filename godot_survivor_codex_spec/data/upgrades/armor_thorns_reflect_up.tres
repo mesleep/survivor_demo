@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
 
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_armor_thorns.png" id="icon"]
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_thorns_reflect_up"
 display_name = "反伤刺甲·锐刺"
 description = "反伤刺甲专属：受击返还比例提高 10%。"
