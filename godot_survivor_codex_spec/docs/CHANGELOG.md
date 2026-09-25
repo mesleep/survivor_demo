@@ -59,6 +59,19 @@
 - `LevelUpPanel` 卡面新增【获取】【基础】【质变】【专属】中文分类标记。
 - 新增 `weapon_ascension_smoke_test.gd`；解析、启动与 33 项快速冒烟通过。
 
+### T08 防具静态定义与运行时装配接口（2026-09-25）
+
+- 新增 `ArmorDefinition`（`data/armor/armor_definition.gd`，盔甲/头盔/手套类别、图标、预留基础/分支升级引用）。
+- 装备清单支持武器与防具共存并记录类别；防具不创建 `WeaponController`，共用六格、重复与满格规则；新增 `armor_acquired` 信号与 `try_acquire_armor()` 等接口。
+- `UpgradeDefinition` 新增 `ACQUIRE_ARMOR` 与 `armor_definition`；`ContentCatalog` 新增 `armors`；装备栏分列武器与防具。
+- 新增 `armor_equipment_smoke_test.gd`；解析、启动与 34 项快速冒烟通过。
+
+### T09 全武器射程 Buff 与射程语义（2026-09-25）
+
+- D06 定案：基础索敌范围取 `min(角色攻击范围, 武器 target_range)`，再乘角色级“全武器射程”倍率；弹体可达距离仍由弹速×寿命决定。
+- `ActorBase.get_weapon_range_multiplier()`（默认 1.0）与 `PlayerActor` 覆盖、`UpgradeType.ALL_WEAPON_RANGE`；新增“全武器射程 +10%”升级并加入池。
+- 新增 `weapon_range_buff_smoke_test.gd`；解析、启动与 35 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

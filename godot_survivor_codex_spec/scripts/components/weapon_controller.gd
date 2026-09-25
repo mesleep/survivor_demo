@@ -304,13 +304,18 @@ func set_random_seed(seed: int) -> void:
 	_random.seed = seed
 
 
-## 合并角色攻击范围上限与武器自身射程。
+## 合并角色攻击范围上限、武器自身射程与全武器射程倍率（D06）。
 ##
-## 两者均为独立的数据驱动约束；较短的一方决定本武器本次索敌的有效范围。
+## 索敌范围取“角色上限与武器射程的较小值”，再乘以角色级全武器射程倍率；
+## 弹体实际可达距离仍由弹速与寿命决定，两者互不替代。
 func get_effective_target_range() -> float:
 	if definition == null or not is_instance_valid(owner_actor):
 		return 0.0
-	return minf(maxf(owner_actor.get_attack_range(), 0.0), maxf(definition.target_range, 0.0))
+	var base_range: float = minf(
+		maxf(owner_actor.get_attack_range(), 0.0),
+		maxf(definition.target_range, 0.0)
+	)
+	return base_range * maxf(owner_actor.get_weapon_range_multiplier(), 0.0)
 
 
 func _get_spread_offset_radians(index: int, projectile_count: int) -> float:

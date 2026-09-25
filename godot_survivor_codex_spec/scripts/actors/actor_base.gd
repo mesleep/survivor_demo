@@ -72,6 +72,11 @@ func get_attack_range() -> float:
 	return 0.0
 
 
+## 返回全武器索敌射程倍率；默认 1.0，由可成长 Actor 覆盖（D06 最终索敌值语义）。
+func get_weapon_range_multiplier() -> float:
+	return 1.0
+
+
 func _get_base_max_health() -> float:
 	return 1.0
 

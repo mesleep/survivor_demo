@@ -75,6 +75,8 @@ func _connect_player() -> void:
 		player.weapon_added.connect(_on_weapon_added)
 	if not player.equipment_changed.is_connected(_on_equipment_changed):
 		player.equipment_changed.connect(_on_equipment_changed)
+	if not player.armor_acquired.is_connected(_on_armor_acquired):
+		player.armor_acquired.connect(_on_armor_acquired)
 
 
 func _process(_delta: float) -> void:
@@ -123,15 +125,31 @@ func _on_equipment_changed(_equipped_ids: Array[StringName]) -> void:
 	_update_loadout()
 
 
+func _on_armor_acquired(_definition: ArmorDefinition) -> void:
+	_update_loadout()
+
+
 func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 	if not is_instance_valid(session) or not is_instance_valid(session.player):
 		_loadout.text = ""
 		return
-	var names: PackedStringArray = []
+	var weapon_names: PackedStringArray = []
 	for weapon: WeaponController in session.player.weapon_controllers:
-		names.append("%s ×%d" % [weapon.definition.display_name, weapon.get_effective_projectile_count()])
-	_loadout.text = "装备 %d/%d ｜ 当前武器：%s" % [
-		session.player.get_equipped_count(), PlayerActor.MAX_EQUIPMENT_SLOTS, " · ".join(names)
+		weapon_names.append("%s ×%d" % [weapon.definition.display_name, weapon.get_effective_projectile_count()])
+	var armor_names: PackedStringArray = []
+	for armor_id: StringName in session.player.get_equipped_armor_ids():
+		var armor: ArmorDefinition = session.player.get_armor_definition(armor_id)
+		if armor != null:
+			armor_names.append("%s(%s)" % [armor.display_name, armor.get_category_name()])
+	var parts: PackedStringArray = []
+	if not weapon_names.is_empty():
+		parts.append("武器：" + " · ".join(weapon_names))
+	if not armor_names.is_empty():
+		parts.append("防具：" + " · ".join(armor_names))
+	_loadout.text = "装备 %d/%d ｜ %s" % [
+		session.player.get_equipped_count(),
+		PlayerActor.MAX_EQUIPMENT_SLOTS,
+		" ｜ ".join(parts)
 	]
 
 

@@ -22,6 +22,9 @@ enum UpgradeType {
 	CRITICAL_CHANCE,
 	REGENERATION,
 	ACQUIRE_WEAPON,
+	ACQUIRE_ARMOR,
+	## 全武器索敌射程倍率（角色级通用属性，D06 采用“最终索敌值”语义）。
+	ALL_WEAPON_RANGE,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -50,6 +53,8 @@ enum UpgradeCategory {
 @export var branch_id: StringName
 ## 获取武器类升级所授予的只读配置。
 @export var weapon_definition: WeaponDefinition
+## 获取防具类升级所授予的只读配置（与 weapon_definition 二选一）。
+@export var armor_definition: ArmorDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

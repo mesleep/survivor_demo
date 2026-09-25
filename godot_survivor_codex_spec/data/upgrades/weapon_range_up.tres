@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"weapon_range_up"
+display_name = "全武器射程 +10%"
+description = "所有武器的索敌射程提高 10%。"
+type = 17
+category = 0
+value = 0.1
+max_stacks = 5
+weight = 1.0

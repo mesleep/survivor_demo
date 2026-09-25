@@ -9,6 +9,7 @@ extends Resource
 
 @export var characters: Array[CharacterDefinition] = []
 @export var weapons: Array[WeaponDefinition] = []
+@export var armors: Array[ArmorDefinition] = []
 
 
 func get_character(id: StringName) -> CharacterDefinition:
@@ -39,6 +40,13 @@ func get_weapon_ids() -> Array[StringName]:
 		if weapon != null and weapon.id != StringName():
 			ids.append(weapon.id)
 	return ids
+
+
+func get_armor(id: StringName) -> ArmorDefinition:
+	for armor: ArmorDefinition in armors:
+		if armor != null and armor.id == id:
+			return armor
+	return null
 
 
 ## 返回目录自身的错误列表；空数组表示有效。
@@ -72,5 +80,17 @@ func validate() -> Array[String]:
 			errors.append("武器 ID 重复：%s。" % weapon.id)
 		else:
 			seen_weapons[weapon.id] = true
+
+	var seen_armors: Dictionary[StringName, bool] = {}
+	for armor: ArmorDefinition in armors:
+		if armor == null:
+			errors.append("防具目录包含空引用。")
+			continue
+		if armor.id == StringName():
+			errors.append("防具缺少 ID：%s。" % armor.display_name)
+		elif seen_armors.has(armor.id):
+			errors.append("防具 ID 重复：%s。" % armor.id)
+		else:
+			seen_armors[armor.id] = true
 
 	return errors

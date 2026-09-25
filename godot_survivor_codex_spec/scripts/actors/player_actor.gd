@@ -15,6 +15,8 @@ signal weapon_added(controller: WeaponController)
 signal equipment_changed(equipped_ids: Array[StringName])
 ## 单件装备成长状态变化；携带只读快照，UI 不直接修改运行时对象。
 signal equipment_progress_changed(equipment_id: StringName, snapshot: EquipmentProgress)
+## 获得防具；防具不创建 WeaponController，只登记清单与类别。
+signal armor_acquired(definition: ArmorDefinition)
 
 ## D02：武器与防具共用六格，同一 ID 不重复装备；升级不占新格。
 const MAX_EQUIPMENT_SLOTS := 6
@@ -31,6 +33,7 @@ var _upgrade_stacks: Dictionary[StringName, int] = {}
 var _move_speed_multiplier: float = 1.0
 var _maximum_health_bonus: float = 0.0
 var _pickup_range_multiplier: float = 1.0
+var _all_weapon_range_multiplier: float = 1.0
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
@@ -38,6 +41,8 @@ var _projectile_parent: Node
 var _targeting_service: TargetingService
 var _candidate_weapon_ids: Array[StringName] = []
 var _equipped_equipment_ids: Array[StringName] = []
+var _equipment_categories: Dictionary[StringName, StringName] = {}
+var _armor_definitions: Dictionary[StringName, ArmorDefinition] = {}
 var _equipment_progress: Dictionary[StringName, EquipmentProgress] = {}
 
 @onready var camera: Camera2D = %Camera2D
@@ -74,11 +79,14 @@ func initialize(new_definition: Resource) -> void:
 	_move_speed_multiplier = 1.0
 	_maximum_health_bonus = 0.0
 	_pickup_range_multiplier = 1.0
+	_all_weapon_range_multiplier = 1.0
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
 	_weapon_modifier_history.clear()
 	_candidate_weapon_ids.clear()
 	_equipped_equipment_ids.clear()
+	_equipment_categories.clear()
+	_armor_definitions.clear()
 	_equipment_progress.clear()
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
@@ -105,6 +113,8 @@ func configure_weapons(
 ) -> void:
 	clear_weapons()
 	_equipped_equipment_ids.clear()
+	_equipment_categories.clear()
+	_armor_definitions.clear()
 	_equipment_progress.clear()
 	_projectile_parent = projectile_parent
 	_targeting_service = targeting_service
@@ -132,7 +142,7 @@ func add_weapon(weapon_definition: WeaponDefinition, allow_duplicate: bool = fal
 		if record.target == StringName() or record.target == weapon_definition.id:
 			controller.apply_runtime_modifier(record.modifier as WeaponRuntimeModifier)
 	weapon_controllers.append(controller)
-	_register_equipment(weapon_definition.id)
+	_register_equipment(weapon_definition.id, &"weapon")
 	weapon_added.emit(controller)
 	return true
 
@@ -191,16 +201,66 @@ func try_acquire_weapon(weapon_definition: WeaponDefinition) -> bool:
 	return add_weapon(weapon_definition, false)
 
 
-func _register_equipment(equipment_id: StringName) -> void:
+func _register_equipment(equipment_id: StringName, category: StringName = &"weapon") -> void:
 	if equipment_id == StringName() or _equipped_equipment_ids.has(equipment_id):
 		return
 	if _equipped_equipment_ids.size() >= MAX_EQUIPMENT_SLOTS:
 		return
 	if not _equipment_progress.has(equipment_id):
 		_equipment_progress[equipment_id] = EquipmentProgress.new(equipment_id)
+	_equipment_categories[equipment_id] = category
 	_equipped_equipment_ids.append(equipment_id)
 	equipment_changed.emit(_equipped_equipment_ids.duplicate())
 	_emit_equipment_progress(equipment_id)
+
+
+## 防具获取：与武器共用格数/重复/满格规则，但不创建武器控制器。
+func can_acquire_armor(armor_definition: ArmorDefinition) -> bool:
+	if armor_definition == null or armor_definition.id == StringName():
+		return false
+	if has_equipment(armor_definition.id):
+		return false
+	if is_equipment_full():
+		return false
+	return true
+
+
+func try_acquire_armor(armor_definition: ArmorDefinition) -> bool:
+	if not can_acquire_armor(armor_definition):
+		return false
+	_armor_definitions[armor_definition.id] = armor_definition
+	_register_equipment(armor_definition.id, &"armor")
+	armor_acquired.emit(armor_definition)
+	return true
+
+
+func has_armor(armor_id: StringName) -> bool:
+	return _armor_definitions.has(armor_id)
+
+
+func get_armor_definition(armor_id: StringName) -> ArmorDefinition:
+	return _armor_definitions.get(armor_id)
+
+
+## 返回装备类别：&"weapon" / &"armor"；未持有时返回空 StringName。
+func get_equipped_category(equipment_id: StringName) -> StringName:
+	return _equipment_categories.get(equipment_id, StringName())
+
+
+func get_equipped_weapon_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for equipment_id: StringName in _equipped_equipment_ids:
+		if _equipment_categories.get(equipment_id, &"") == &"weapon":
+			ids.append(equipment_id)
+	return ids
+
+
+func get_equipped_armor_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for equipment_id: StringName in _equipped_equipment_ids:
+		if _equipment_categories.get(equipment_id, &"") == &"armor":
+			ids.append(equipment_id)
+	return ids
 
 
 ## 返回单件装备成长的只读快照；未持有时返回 null。
@@ -353,6 +413,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		UpgradeDefinition.UpgradeType.PICKUP_RANGE_MULTIPLIER:
 			_pickup_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 			pickup_component.initialize(get_effective_pickup_radius())
+		UpgradeDefinition.UpgradeType.ALL_WEAPON_RANGE:
+			_all_weapon_range_multiplier *= maxf(1.0 + upgrade.value, 0.0)
 		UpgradeDefinition.UpgradeType.REPEAT_SHOT_CHANCE:
 			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0, 0.0, 0.0, upgrade.value), upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.PIERCE_COUNT, UpgradeDefinition.UpgradeType.PROJECTILE_SPEED, UpgradeDefinition.UpgradeType.PROJECTILE_SIZE, UpgradeDefinition.UpgradeType.CRITICAL_CHANCE:
@@ -371,6 +433,9 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			_regeneration += upgrade.value
 		UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
 			if not try_acquire_weapon(upgrade.weapon_definition):
+				return false
+		UpgradeDefinition.UpgradeType.ACQUIRE_ARMOR:
+			if not try_acquire_armor(upgrade.armor_definition):
 				return false
 		_:
 			return false
@@ -425,6 +490,11 @@ func get_team_id() -> StringName:
 
 func get_attack_range() -> float:
 	return _base_attack_range
+
+
+## 全武器索敌射程倍率（D06）：已持有与晚获取的武器都读取同一局内值。
+func get_weapon_range_multiplier() -> float:
+	return _all_weapon_range_multiplier
 
 
 func _on_pickup_detected(pickup: Area2D) -> void:

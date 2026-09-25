@@ -75,6 +75,8 @@ func can_offer(definition: UpgradeDefinition) -> bool:
 
 	match category:
 		UpgradeDefinition.UpgradeCategory.ACQUIRE_EQUIPMENT:
+			if definition.armor_definition != null:
+				return player.can_acquire_armor(definition.armor_definition)
 			return definition.weapon_definition != null and player.can_acquire(definition.weapon_definition)
 		UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
 			var base_progress: EquipmentProgress = player.get_progress(definition.get_target_equipment_id())
