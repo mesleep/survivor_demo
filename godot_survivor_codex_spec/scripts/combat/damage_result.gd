@@ -12,5 +12,7 @@ var blocked_amount: float = 0.0
 var is_dodged: bool = false
 var is_immune: bool = false
 var killed: bool = false
+## 本次结算是否消耗了“一次免死”（T23）。
+var death_immunity_triggered: bool = false
 var source: Node
 var tags: Array[StringName] = []

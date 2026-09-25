@@ -50,6 +50,10 @@ var _armor_definitions: Dictionary[StringName, ArmorDefinition] = {}
 var _equipment_progress: Dictionary[StringName, EquipmentProgress] = {}
 var _thorn_aura: ThornAuraComponent
 var _thorn_aura_radius_multiplier: float = 1.0
+var _berserk_definition: BerserkArmorDefinition
+var _berserk_drain: BerserkDrainComponent
+var _berserk_half_lifesteal_bonus: float = 0.0
+var _berserk_drain_reduction: float = 0.0
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -93,8 +97,13 @@ func initialize(new_definition: Resource) -> void:
 	set_defense(0.0)
 	set_immune_chance(0.0)
 	set_damage_reflect_ratio(0.0)
+	set_death_immunity_available(false)
 	_clear_thorn_aura()
 	_thorn_aura_radius_multiplier = 1.0
+	_clear_berserk_drain()
+	_berserk_definition = null
+	_berserk_half_lifesteal_bonus = 0.0
+	_berserk_drain_reduction = 0.0
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
 	_weapon_modifier_history.clear()
@@ -523,6 +532,16 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			_refresh_defense()
 		UpgradeDefinition.UpgradeType.KNIGHT_IMMUNE:
 			add_immune_chance(upgrade.value)
+		UpgradeDefinition.UpgradeType.BERSERK_ARMOR:
+			_enable_berserk_armor(upgrade.berserk_armor)
+		UpgradeDefinition.UpgradeType.BERSERK_DRAIN:
+			_berserk_drain_reduction += upgrade.value
+			if is_instance_valid(_berserk_drain):
+				_berserk_drain.set_drain_reduction(_berserk_drain_reduction)
+		UpgradeDefinition.UpgradeType.BERSERK_LIFESTEAL:
+			_berserk_half_lifesteal_bonus += upgrade.value
+		UpgradeDefinition.UpgradeType.BERSERK_IMMUNITY:
+			set_death_immunity_available(true)
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
@@ -630,6 +649,41 @@ func _enable_knight_armor(definition: KnightArmorDefinition) -> void:
 	_knight_defense_bonus = definition.bonus_defense
 	_refresh_defense()
 	add_immune_chance(definition.immune_chance)
+
+
+## 启用狂战盔甲：挂载持续失血组件并记录档案（T23）。
+func _enable_berserk_armor(definition: BerserkArmorDefinition) -> void:
+	if definition == null:
+		return
+	_clear_berserk_drain()
+	_berserk_definition = definition
+	_berserk_drain = BerserkDrainComponent.new()
+	_berserk_drain.name = "BerserkDrain"
+	add_child(_berserk_drain)
+	_berserk_drain.initialize(self, definition)
+	_berserk_drain.set_drain_reduction(_berserk_drain_reduction)
+
+
+func _clear_berserk_drain() -> void:
+	if is_instance_valid(_berserk_drain):
+		_berserk_drain.queue_free()
+	_berserk_drain = null
+
+
+func get_berserk_drain() -> BerserkDrainComponent:
+	return _berserk_drain
+
+
+## 狂战盔甲提供的额外吸血：基础值，半血以下再加成（T23）。
+func get_bonus_lifesteal_ratio() -> float:
+	if _berserk_definition == null:
+		return 0.0
+	var bonus: float = _berserk_definition.base_lifesteal_ratio
+	var maximum_health: float = get_effective_maximum_health()
+	if maximum_health > 0.0 \
+			and health_component.current_health <= maximum_health * _berserk_definition.half_health_ratio:
+		bonus += _berserk_definition.half_health_lifesteal_bonus + _berserk_half_lifesteal_bonus
+	return clampf(bonus, 0.0, 1.0)
 
 
 func _clear_thorn_aura() -> void:

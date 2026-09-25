@@ -65,6 +65,14 @@ enum UpgradeType {
 	KNIGHT_DEFENSE,
 	## 骑士盔甲完全免伤概率增量（T22 专属升级，value 为每级增量）。
 	KNIGHT_IMMUNE,
+	## 狂战盔甲：启用持续失血与基础吸血（T23）。
+	BERSERK_ARMOR,
+	## 狂战盔甲降低失血量（T23 专属升级，value 为每级减免值）。
+	BERSERK_DRAIN,
+	## 狂战盔甲半血增吸血（T23 专属升级，value 为每级增量）。
+	BERSERK_LIFESTEAL,
+	## 狂战盔甲一次免死（T23 专属升级，max_stacks=1）。
+	BERSERK_IMMUNITY,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -107,6 +115,8 @@ enum UpgradeCategory {
 @export var thorn_armor: ThornArmorDefinition
 ## KNIGHT_ARMOR 质变引用的骑士盔甲数值档案（T22）。
 @export var knight_armor: KnightArmorDefinition
+## BERSERK_ARMOR 质变引用的狂战盔甲数值档案（T23）。
+@export var berserk_armor: BerserkArmorDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

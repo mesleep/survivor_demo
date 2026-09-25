@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"armor_berserk_immunity"
+display_name = "狂战盔甲·不屈"
+description = "狂战盔甲专属：获得一次免疫死亡的机会（每局一次）。"
+type = 42
+category = 4
+value = 0.0
+target_equipment_id = &"armor_basic"
+branch_id = &"berserk"
+max_stacks = 1
+weight = 1.0

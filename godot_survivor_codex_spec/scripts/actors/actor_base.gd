@@ -23,6 +23,8 @@ const DEFAULT_MAX_REFLECT_RATIO := 1.0
 
 var definition_resource: Resource
 var _death_forwarded: bool = false
+## 一次免死标记（T23 狂战盔甲）；触发后本局不再生效。
+var _death_immunity_available: bool = false
 var _defense: float = 0.0
 var _dodge_chance: float = 0.0
 var _immune_chance: float = 0.0
@@ -62,6 +64,7 @@ func initialize(new_definition: Resource) -> void:
 		return
 	definition_resource = new_definition
 	_death_forwarded = false
+	_death_immunity_available = false
 	health_component.initialize(_get_base_max_health())
 	hurtbox_component.initialize(self)
 	if status_effect_component != null:
@@ -96,6 +99,13 @@ func apply_damage(event: DamageEvent) -> DamageResult:
 	result.blocked_amount = result.raw_amount - reduced
 	if reduced <= 0.0:
 		return result
+	# 一次免死（T23）：致命伤害被压到只剩 1 点生命，并消耗标记。
+	if _death_immunity_available and reduced >= health_component.current_health:
+		reduced = maxf(health_component.current_health - 1.0, 0.0)
+		_death_immunity_available = false
+		result.death_immunity_triggered = true
+		if reduced <= 0.0:
+			return result
 
 	var reduced_event := DamageEvent.new(reduced, event.source, event.source_position)
 	reduced_event.tags = event.tags.duplicate()
@@ -219,6 +229,20 @@ func set_damage_reflect_ratio(value: float) -> void:
 
 func add_damage_reflect_ratio(value: float) -> void:
 	_damage_reflect_ratio = clampf(_damage_reflect_ratio + value, 0.0, get_max_damage_reflect_ratio())
+
+
+## 设置“一次免死”标记（T23）；每局最多触发一次。
+func set_death_immunity_available(value: bool) -> void:
+	_death_immunity_available = value
+
+
+func has_death_immunity() -> bool:
+	return _death_immunity_available
+
+
+## 由角色状态提供的额外吸血比例（T23 狂战盔甲半血增吸血）；默认 0。
+func get_bonus_lifesteal_ratio() -> float:
+	return 0.0
 
 
 ## 固定随机种子，供测试确定闪避/免疫结果。

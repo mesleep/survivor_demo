@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BerserkArmorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/armor/berserk_armor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+drain_enabled = true
+drain_interval_seconds = 1.0
+drain_per_tick = 3.0
+drain_non_lethal = true
+base_lifesteal_ratio = 0.15
+half_health_lifesteal_bonus = 0.25
+half_health_ratio = 0.5

@@ -198,7 +198,7 @@ func _fire_volley(
 			direction
 		)
 		context.damage_multiplier = damage_multiplier
-		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
+		context.lifesteal_ratio = clampf(_runtime_projectile_lifesteal_ratio + owner_actor.get_bonus_lifesteal_ratio(), 0.0, 1.0)
 		context.target = target
 		context.weapon_id = definition.id
 		context.explosion_radius_multiplier = _explosion_radius_multiplier
@@ -533,7 +533,7 @@ func _fire_repeat_shot_after_delay(
 		direction
 	)
 	context.damage_multiplier = _runtime_damage_multiplier
-	context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
+	context.lifesteal_ratio = clampf(_runtime_projectile_lifesteal_ratio + owner_actor.get_bonus_lifesteal_ratio(), 0.0, 1.0)
 	context.weapon_id = definition.id
 	context.explosion_radius_multiplier = _explosion_radius_multiplier
 	context.explosion_damage_multiplier = _explosion_damage_multiplier
