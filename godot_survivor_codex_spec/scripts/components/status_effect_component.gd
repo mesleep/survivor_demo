@@ -36,6 +36,7 @@ var _owner_actor: ActorBase
 var _dots: Dictionary[StringName, DotState] = {}
 var _slows: Dictionary[StringName, SlowState] = {}
 var _freezes: Dictionary[StringName, FreezeState] = {}
+var _freeze_visual: AnimatedSprite2D
 
 
 func initialize(owner_actor: ActorBase) -> void:
@@ -98,6 +99,7 @@ func apply_freeze(effect: FreezeEffect, duration_multiplier: float = 1.0) -> boo
 	state.effect = effect
 	state.duration = maxf(effect.duration_seconds * maxf(duration_multiplier, 0.0), 0.0)
 	state.elapsed = 0.0
+	_ensure_freeze_visual(effect)
 	freeze_applied.emit(effect.id)
 	return true
 
@@ -189,6 +191,29 @@ func clear() -> void:
 	_dots.clear()
 	_slows.clear()
 	_freezes.clear()
+	_clear_freeze_visual()
+
+
+## 冻结期间叠加透明特效；无素材时不创建节点（T19/E03 接入）。
+func _ensure_freeze_visual(effect: FreezeEffect) -> void:
+	if effect.visual_frames == null or not is_instance_valid(_owner_actor):
+		return
+	if not is_instance_valid(_freeze_visual):
+		_freeze_visual = AnimatedSprite2D.new()
+		_freeze_visual.name = "FreezeVisual"
+		_freeze_visual.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		_owner_actor.add_child(_freeze_visual)
+	_freeze_visual.sprite_frames = effect.visual_frames
+	_freeze_visual.scale = Vector2.ONE * maxf(effect.visual_scale, 0.01)
+	_freeze_visual.position = Vector2.ZERO
+	if effect.visual_frames.has_animation(&"default"):
+		_freeze_visual.play(&"default")
+
+
+func _clear_freeze_visual() -> void:
+	if is_instance_valid(_freeze_visual):
+		_freeze_visual.queue_free()
+	_freeze_visual = null
 
 
 func _advance_slows(delta: float) -> void:
@@ -211,6 +236,8 @@ func _advance_freezes(delta: float) -> void:
 			expired.append(effect_id)
 	for effect_id: StringName in expired:
 		_freezes.erase(effect_id)
+	if _freezes.is_empty():
+		_clear_freeze_visual()
 
 
 func _process(delta: float) -> void:

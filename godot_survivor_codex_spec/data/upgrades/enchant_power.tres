@@ -1,10 +1,12 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_enchant_power.png" id="icon"]
 [ext_resource type="Resource" path="res://data/projectiles/arrow_power.tres" id="2"]
 [ext_resource type="Resource" path="res://data/combat/arrow_power_modifier.tres" id="3"]
 
 [resource]
+icon = ExtResource("icon")
 script = ExtResource("1")
 id = &"enchant_power"
 display_name = "质变：附魔箭·威能"

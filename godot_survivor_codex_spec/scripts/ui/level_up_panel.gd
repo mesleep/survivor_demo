@@ -49,6 +49,10 @@ func show_choices(choices: Array[UpgradeDefinition]) -> void:
 		button.text = "%s%s\n%s" % [
 			_category_tag(definition.category), definition.display_name, definition.description
 		]
+		if definition.icon != null:
+			button.icon = definition.icon
+			button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			button.add_theme_constant_override("icon_max_width", maxi(roundi(40.0 * _ui_scale), 1))
 		button.pressed.connect(_on_choice_pressed.bind(definition))
 		choices_container.add_child(button)
 	if choices_container.get_child_count() > 0:

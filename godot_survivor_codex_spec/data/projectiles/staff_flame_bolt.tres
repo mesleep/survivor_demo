@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
-[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/staff_flame_bolt_frames.tres" id="3"]
 [ext_resource type="Resource" path="res://data/combat/flame_dot.tres" id="4"]
 [ext_resource type="Resource" path="res://data/combat/fire_patch.tres" id="5"]
 
@@ -11,7 +11,7 @@ script = ExtResource("1")
 id = &"staff_flame_bolt"
 scene = ExtResource("2")
 visual_frames = ExtResource("3")
-visual_scale = 0.22
+visual_scale = 0.34
 motion_type = 0
 damage = 5.0
 speed = 620.0

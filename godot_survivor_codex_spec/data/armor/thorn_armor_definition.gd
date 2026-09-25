@@ -14,5 +14,9 @@ extends Resource
 @export_range(1, 256, 1) var max_targets: int = 64
 ## 受击后按“实际伤害”返还给攻击者的比例。
 @export_range(0.0, 2.0, 0.05) var hit_reflect_ratio: float = 0.3
-## 占位刺圈颜色（E04 正式素材待生成）。
+## 占位刺圈颜色（无 visual_frames 时使用）。
 @export var visual_color: Color = Color(0.85, 0.25, 0.35, 0.22)
+## 刺圈特效（E04）；提供后按下圆直径自动缩放，替代占位圆。
+@export var visual_frames: SpriteFrames
+## 特效视觉缩放附加系数。
+@export_range(0.1, 5.0, 0.05) var visual_scale: float = 1.0

@@ -13,6 +13,7 @@ var _definition: ThornArmorDefinition
 var _radius_multiplier: float = 1.0
 var _elapsed: float = 0.0
 var _tick_count: int = 0
+var _visual: AnimatedSprite2D
 
 
 func initialize(owner_actor: ActorBase, definition: ThornArmorDefinition) -> void:
@@ -20,13 +21,41 @@ func initialize(owner_actor: ActorBase, definition: ThornArmorDefinition) -> voi
 	_definition = definition
 	_elapsed = 0.0
 	_tick_count = 0
+	_configure_visual()
 	queue_redraw()
 
 
 ## 调整刺圈半径倍率（专属升级）；只改运行时，不回写资源。
 func set_radius_multiplier(multiplier: float) -> void:
 	_radius_multiplier = maxf(multiplier, 0.0)
+	_update_visual_scale()
 	queue_redraw()
+
+
+## 有 E04 素材时用序列帧，否则保留代码绘制的占位圆环。
+func _configure_visual() -> void:
+	if _definition == null or _definition.visual_frames == null or not is_instance_valid(_owner_actor):
+		return
+	if not is_instance_valid(_visual):
+		_visual = AnimatedSprite2D.new()
+		_visual.name = "ThornAuraVisual"
+		_visual.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		_owner_actor.add_child(_visual)
+	_visual.sprite_frames = _definition.visual_frames
+	if _definition.visual_frames.has_animation(&"default"):
+		_visual.play(&"default")
+	_update_visual_scale()
+
+
+func _update_visual_scale() -> void:
+	if not is_instance_valid(_visual) or _definition == null or _definition.visual_frames == null:
+		return
+	var texture: Texture2D = _definition.visual_frames.get_frame_texture(&"default", 0)
+	if texture == null:
+		return
+	var texture_width: float = maxf(float(texture.get_width()), 1.0)
+	var desired_width: float = get_effective_radius() * 2.0
+	_visual.scale = Vector2.ONE * (desired_width / texture_width) * maxf(_definition.visual_scale, 0.01)
 
 
 func get_effective_radius() -> float:
@@ -76,6 +105,8 @@ func _apply_tick() -> void:
 
 func _draw() -> void:
 	if _definition == null or not is_instance_valid(_owner_actor):
+		return
+	if is_instance_valid(_visual) and _definition.visual_frames != null:
 		return
 	var radius: float = get_effective_radius()
 	var color: Color = _definition.visual_color

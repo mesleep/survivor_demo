@@ -1,8 +1,10 @@
-[gd_resource type="Resource" script_class="ArmorDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ArmorDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/armor/armor_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_armor_basic.png" id="icon"]
 
 [resource]
+icon = ExtResource("icon")
 script = ExtResource("1")
 id = &"armor_basic"
 display_name = "基础盔甲"

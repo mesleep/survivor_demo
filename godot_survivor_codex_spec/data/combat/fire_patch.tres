@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="GroundDamageAreaDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GroundDamageAreaDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/combat/ground_damage_area_definition.gd" id="1"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/fire_patch_frames.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
+visual_frames = ExtResource("2")
 id = &"fire_patch"
 radius = 70.0
 duration_seconds = 3.0

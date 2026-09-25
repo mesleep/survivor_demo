@@ -8,3 +8,6 @@ extends Resource
 
 @export var id: StringName
 @export_range(0.05, 30.0, 0.05) var duration_seconds: float = 0.8
+## 冻结期间叠加在敌人身上的透明特效（E03）；为空则不显示。
+@export var visual_frames: SpriteFrames
+@export_range(0.01, 10.0, 0.01) var visual_scale: float = 1.0

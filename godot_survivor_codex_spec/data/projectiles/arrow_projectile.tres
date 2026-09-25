@@ -2,14 +2,14 @@
 
 [ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
-[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/arrow_frames.tres" id="3"]
 
 [resource]
 script = ExtResource("1")
 id = &"arrow_projectile"
 scene = ExtResource("2")
 visual_frames = ExtResource("3")
-visual_scale = 0.18
+visual_scale = 0.34
 motion_type = 0
 damage = 12.0
 speed = 850.0

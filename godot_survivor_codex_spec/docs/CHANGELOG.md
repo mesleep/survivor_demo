@@ -202,6 +202,13 @@
 - `GameEntry` 启动加载档案、结算累加金币并写档，写入失败时主菜单显示状态。
 - 新增 `profile_store_smoke_test.gd`；修复 T26 掉金导致的 `experience_flow` 拾取计数抖动（仅测试）；解析、启动与 55 项快速冒烟、120 秒 soak 通过。
 
+### 新增战斗美术素材接入（2026-09-25，跨 T16–T26）
+
+- 接入外部生成的 84 个透明 PNG：长弓/法杖/科技发射器、箭与四款附魔箭、法球/爆炸法球/火焰弹/冰枪/小冰枪/导弹、爆炸/火坑/冻结/刺圈特效、金币，以及法杖/盔甲/头盔/手套/附魔箭/属性/成长图标。
+- 新增生成脚本 `tools/build_combat_visual_resources.py`（19 个 SpriteFrames）与 `tools/wire_combat_visuals.py`（批量接入弹体帧与图标）；`ExplosionDefinition`/`GroundDamageAreaDefinition`/`FreezeEffect`/`ThornArmorDefinition` 的序列帧与升级卡图标生效，无素材时仍回退占位。
+- `WeaponDefinition` 新增可配置 `visual_scale`（迁移原控制器硬编码的手持缩放）；按实拍结果调整弹体显示比例。
+- 图形模式实拍证据：`art_review/v2_new_combat_art_preview.png`、`v2_asset_sheet_preview.png`；解析、启动与 55 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

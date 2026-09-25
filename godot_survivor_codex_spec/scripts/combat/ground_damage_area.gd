@@ -15,6 +15,7 @@ var _damage_multiplier: float = 1.0
 var _duration: float = 0.0
 var _elapsed: float = 0.0
 var _ticks_done: int = 0
+var _visual: AnimatedSprite2D
 
 
 ## 配置区域；来源离树后区域继续存在到时长结束，但不再持有来源引用。
@@ -33,6 +34,7 @@ func setup(
 		if definition != null else 0.1
 	if is_instance_valid(_source):
 		_source.tree_exiting.connect(_on_source_tree_exiting)
+	_configure_visual()
 	queue_redraw()
 
 
@@ -93,8 +95,28 @@ func _on_source_tree_exiting() -> void:
 	_source = null
 
 
+## 有 E02 火坑素材时用序列帧，否则保留代码绘制的地面圆环。
+func _configure_visual() -> void:
+	if _definition == null or _definition.visual_frames == null:
+		return
+	if not is_instance_valid(_visual):
+		_visual = AnimatedSprite2D.new()
+		_visual.name = "GroundAreaVisual"
+		_visual.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+		add_child(_visual)
+	_visual.sprite_frames = _definition.visual_frames
+	if _definition.visual_frames.has_animation(&"default"):
+		_visual.play(&"default")
+	var texture: Texture2D = _definition.visual_frames.get_frame_texture(&"default", 0)
+	if texture != null:
+		var texture_width: float = maxf(float(texture.get_width()), 1.0)
+		_visual.scale = Vector2.ONE * (_definition.radius * 2.0 / texture_width) * maxf(_definition.visual_scale, 0.01)
+
+
 func _draw() -> void:
 	if _definition == null:
+		return
+	if is_instance_valid(_visual) and _definition.visual_frames != null:
 		return
 	var progress: float = clampf(_elapsed / _duration, 0.0, 1.0) if _duration > 0.0 else 1.0
 	var faded: Color = _definition.visual_color

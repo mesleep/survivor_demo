@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://data/projectiles/projectile_definition.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/combat/projectiles/projectile_base.tscn" id="2"]
-[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/bolt_frames.tres" id="3"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/staff_ice_spear_frames.tres" id="3"]
 [ext_resource type="Resource" path="res://data/combat/ice_slow.tres" id="4"]
 [ext_resource type="Resource" path="res://data/combat/ice_freeze.tres" id="5"]
 [ext_resource type="Resource" path="res://data/projectiles/staff_ice_split.tres" id="6"]
@@ -12,7 +12,7 @@ script = ExtResource("1")
 id = &"staff_ice_spear"
 scene = ExtResource("2")
 visual_frames = ExtResource("3")
-visual_scale = 0.2
+visual_scale = 0.3
 motion_type = 0
 damage = 7.0
 speed = 760.0
