@@ -29,6 +29,23 @@ func _run() -> void:
 			for path: String in paths:
 				unique_paths[path] = true
 			check(unique_paths.size() == 4, "%s 四帧未接入独立图像" % name)
+	var upgrade_dir := DirAccess.open("res://data/upgrades")
+	check(upgrade_dir != null, "升级目录无法打开")
+	if upgrade_dir != null:
+		var upgrade_count := 0
+		for file_name: String in upgrade_dir.get_files():
+			if not file_name.ends_with(".tres"):
+				continue
+			var definition: UpgradeDefinition = load("res://data/upgrades/%s" % file_name) as UpgradeDefinition
+			check(definition != null, "升级定义加载失败：%s" % file_name)
+			if definition == null:
+				continue
+			upgrade_count += 1
+			check(
+				definition.icon != null and definition.icon.resource_path.contains("res://assets/v2_dark_comic/"),
+				"升级缺少新版图标：%s" % file_name
+			)
+		check(upgrade_count > 0, "未找到任何升级定义")
 	var main: Node = (load("res://scenes/bootstrap/main.tscn") as PackedScene).instantiate()
 	root.add_child(main)
 	await process_frame

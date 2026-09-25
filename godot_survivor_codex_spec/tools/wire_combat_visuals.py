@@ -4,6 +4,7 @@
 """
 
 from pathlib import Path
+import re
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,17 @@ ICON_ASSIGN = {
     "data/upgrades/defense_up.tres": "icon_attr_defense.png",
     "data/upgrades/weapon_range_up.tres": "icon_attr_range.png",
     "data/upgrades/regeneration.tres": "icon_attr_regeneration.png",
+    "data/upgrades/fire_rate_up.tres": "icon_attr_fire_rate.png",
+    "data/upgrades/projectile_count_up.tres": "icon_attr_projectile_count.png",
+    "data/upgrades/projectile_size_up.tres": "icon_attr_projectile_size.png",
+    "data/upgrades/projectile_speed_up.tres": "icon_attr_projectile_speed.png",
+    "data/upgrades/repeat_shot_chance_up.tres": "icon_attr_repeat_shot.png",
+    "data/upgrades/bonus_projectile_chance_up.tres": "icon_attr_bonus_projectile.png",
+    "data/upgrades/max_health_up.tres": "icon_attr_max_health.png",
+    "data/upgrades/heal.tres": "icon_attr_heal.png",
+    "data/upgrades/dodge_up.tres": "icon_attr_dodge.png",
+    "data/upgrades/immune_up.tres": "icon_attr_immune.png",
+    "data/upgrades/pierce_up.tres": "icon_attr_pierce.png",
 }
 
 
@@ -98,7 +110,14 @@ def assign_icons() -> None:
         text = "\n".join(lines) + "\n"
         if "[resource]" not in text:
             raise AssertionError(relative)
-        text = text.replace("[resource]\n", f'[resource]\nicon = ExtResource("{icon_id}")\n', 1)
+        # icon 必须写在 script 之后，否则脚本属性在加载时会被忽略（历史坑）。
+        text = re.sub(
+            r'(script = ExtResource\("[^"]+"\)\n)',
+            rf'\g<1>icon = ExtResource("{icon_id}")\n',
+            text,
+            count=1,
+        )
+        assert text.index("script = ExtResource") < text.index(f'icon = ExtResource("{icon_id}")'), relative
         # 更新 load_steps（仅在该文件确有该字段时）
         if "load_steps=" in text:
             head_end = text.index("]\n")

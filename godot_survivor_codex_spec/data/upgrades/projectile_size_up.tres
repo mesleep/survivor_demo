@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_projectile_size.png" id="icon"]
 
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"projectile_size_up"
 display_name = "巨大魔法 +20%"
 description = "弹体与命中范围增加 20%；铃铛环绕半径同步增大。"

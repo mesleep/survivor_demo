@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_max_health.png" id="icon"]
 
 [resource]
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"max_health_up"
 display_name = "强健体魄 +20"
 description = "生命上限增加 20，并恢复等量生命。"
