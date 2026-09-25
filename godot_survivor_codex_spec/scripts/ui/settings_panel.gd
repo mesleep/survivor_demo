@@ -9,6 +9,7 @@ extends Control
 signal closed
 signal return_to_menu_requested
 signal mute_toggled(muted: bool)
+signal quit_requested
 
 const BUTTON_NORMAL: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_normal.tres")
 const BUTTON_HOVER: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_hover.tres")
@@ -17,13 +18,14 @@ const BUTTON_PRESSED: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_
 @onready var _mute_button: Button = %MuteButton
 @onready var _return_button: Button = %ReturnButton
 @onready var _close_button: Button = %CloseButton
+@onready var _quit_button: Button = %QuitButton
 
 var _muted: bool = false
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for button: Button in [_mute_button, _return_button, _close_button]:
+	for button: Button in [_mute_button, _return_button, _close_button, _quit_button]:
 		button.add_theme_stylebox_override(&"normal", BUTTON_NORMAL)
 		button.add_theme_stylebox_override(&"hover", BUTTON_HOVER)
 		button.add_theme_stylebox_override(&"pressed", BUTTON_PRESSED)
@@ -31,6 +33,7 @@ func _ready() -> void:
 	_mute_button.pressed.connect(_on_mute_pressed)
 	_return_button.pressed.connect(_on_return_pressed)
 	_close_button.pressed.connect(_on_close_pressed)
+	_quit_button.pressed.connect(_on_quit_pressed)
 	visible = false
 
 
@@ -77,3 +80,7 @@ func _on_return_pressed() -> void:
 
 func _on_close_pressed() -> void:
 	close()
+
+
+func _on_quit_pressed() -> void:
+	quit_requested.emit()

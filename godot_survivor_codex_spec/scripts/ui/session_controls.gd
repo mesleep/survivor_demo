@@ -70,6 +70,11 @@ func _build_settings_panel() -> void:
 	_settings_panel.closed.connect(_on_settings_closed)
 	_settings_panel.return_to_menu_requested.connect(_on_settings_return_to_menu)
 	_settings_panel.mute_toggled.connect(_on_settings_mute_toggled)
+	_settings_panel.quit_requested.connect(_on_settings_quit)
+
+
+func _on_settings_quit() -> void:
+	get_tree().quit()
 
 
 ## 金币图标 + 数字，使用新增 D03 图标（T34）。

@@ -302,6 +302,12 @@
 - 仍有 11 个通用属性升级暂无对应素材（fire_rate/projectile_count/projectile_size/projectile_speed/repeat_shot/bonus_projectile/max_health/heal/dodge/immune/pierce），保留空图标并列入待生成清单。
 - 修正 `.tres` 中 `[ext_resource]` 误置于 `[resource]` 之后的解析错误；解析、启动与 68 项快速冒烟、120 秒 soak 通过。
 
+### 退出游戏选项（2026-09-25）
+
+- 暂停菜单（设置面板）与主菜单底部各新增「退出游戏」按钮，点击调用 `get_tree().quit()`。
+- 收窄按钮样式的内容边距，修复新增按钮后主菜单底部溢出。
+- 解析、启动与 68 项快速冒烟、120 秒 soak 通过；实拍 `art_review/v2_settings_preview.png`、`v2_main_menu_preview.png`。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

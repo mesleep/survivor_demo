@@ -27,6 +27,7 @@ var permanent_catalog: PermanentUpgradeCatalog
 @onready var start_button: Button = %StartButton
 @onready var unlock_all_button: Button = %UnlockAllButton
 @onready var settings_button: Button = %SettingsButton
+@onready var quit_button: Button = %QuitButton
 
 var _character_id: StringName = &""
 var _selected_weapon_ids: Array[StringName] = []
@@ -45,10 +46,16 @@ func _ready() -> void:
 	start_button.pressed.connect(request_start)
 	unlock_all_button.pressed.connect(_on_unlock_all_pressed)
 	settings_button.pressed.connect(_on_settings_pressed)
+	quit_button.pressed.connect(_on_quit_pressed)
 	_style_button(start_button)
 	_style_button(unlock_all_button)
 	_style_button(settings_button)
+	_style_button(quit_button)
 	_build()
+
+
+func _on_quit_pressed() -> void:
+	get_tree().quit()
 
 
 ## 主菜单设置：声音开关（进入单局时应用）。
@@ -58,6 +65,7 @@ func _on_settings_pressed() -> void:
 		add_child(_settings_panel)
 		_settings_panel.initialize(_menu_muted, false)
 		_settings_panel.mute_toggled.connect(_on_menu_mute_toggled)
+		_settings_panel.quit_requested.connect(_on_quit_pressed)
 	_settings_panel.open()
 
 

@@ -12,6 +12,13 @@
 
 验证：Godot 4.7.1 `--headless --path . --editor --quit` 解析 0；`--quit-after 300` 启动 0；`tests/smoke` 68 项快速冒烟 0；120 秒 soak 0。专项见 `equipment_display_smoke_test.gd`、`settings_panel_smoke_test.gd`、`coin_fallback_smoke_test.gd`、`map_selection_smoke_test.gd`。实拍 `art_review/v2_equipment_bar_preview.png`、`v2_settings_preview.png`、`v2_main_menu_preview.png`。
 
+## 用户追加：退出游戏选项（2026-09-25）
+
+- [x] 暂停菜单（设置面板）新增「退出游戏」
+- [x] 主菜单底部新增「退出游戏」
+- [x] 收窄按钮样式内容边距修复主菜单溢出
+- [x] 解析、启动、68 项快速冒烟、120 秒 soak 通过；实拍设置面板与主菜单
+
 ## 用户追加：升级卡图标与排版（2026-09-25）
 
 - [x] 修复升级卡带图标时的排版错乱（自绘卡面：图标 + 分类标题 + 描述）

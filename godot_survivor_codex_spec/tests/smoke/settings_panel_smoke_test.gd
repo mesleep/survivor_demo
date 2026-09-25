@@ -44,6 +44,10 @@ func _test_ingame_settings_and_return() -> void:
 	_expect(controls != null, "单局应有 SessionControls。")
 	controls.toggle_pause()
 	_expect(paused and controls._settings_panel.is_open(), "Esc 应暂停并打开设置。")
+	_expect(
+		controls._settings_panel._quit_button != null and controls._settings_panel._quit_button.visible,
+		"暂停菜单应显示退出游戏按钮。"
+	)
 	controls.toggle_pause()
 	_expect(not paused and not controls._settings_panel.is_open(), "再次 Esc 应恢复并关闭设置。")
 
@@ -63,6 +67,7 @@ func _test_menu_settings() -> void:
 	root.add_child(menu)
 	await process_frame
 	_expect(not menu.get_preferred_muted(), "主菜单默认不静音。")
+	_expect(menu.quit_button != null and menu.quit_button.visible, "主菜单应显示退出游戏按钮。")
 	menu._on_settings_pressed()
 	_expect(menu._settings_panel.is_open(), "主菜单设置应能打开。")
 	menu._on_menu_mute_toggled(true)
