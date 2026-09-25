@@ -8,6 +8,8 @@ extends Resource
 
 ## 索敌方式：最近目标；或每一发从范围内候选中随机取目标（T25 科技导弹）。
 enum TargetMode { NEAREST, RANDOM }
+## 攻击形态：发射弹体；或在目标方向做一次近战扇形斩击（T32）。
+enum AttackMode { PROJECTILE, MELEE_FAN }
 
 @export var id: StringName
 @export var display_name: String
@@ -32,3 +34,11 @@ enum TargetMode { NEAREST, RANDOM }
 @export_range(1.0, 20.0, 0.1) var charge_damage_multiplier: float = 1.0
 ## 索敌方式；RANDOM 时每一发各自从 TargetingService 候选中随机取目标。
 @export var target_mode: TargetMode = TargetMode.NEAREST
+## 攻击形态；MELEE_FAN 时不发射弹体，改为扇形范围斩击。
+@export var attack_mode: AttackMode = AttackMode.PROJECTILE
+## 近战扇形参数（MELEE_FAN 使用）。
+@export_range(0.0, 100000.0, 0.5) var melee_damage: float = 12.0
+@export_range(1.0, 1000.0, 1.0) var melee_radius: float = 120.0
+@export_range(10.0, 360.0, 1.0) var melee_arc_degrees: float = 110.0
+@export_range(0.0, 100000.0, 0.1) var melee_knockback_strength: float = 100.0
+@export_flags_2d_physics var melee_hit_mask: int = 4

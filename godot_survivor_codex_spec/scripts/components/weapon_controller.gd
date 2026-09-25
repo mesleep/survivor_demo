@@ -126,11 +126,14 @@ func set_targeting_service(new_targeting_service: TargetingService) -> void:
 
 
 func can_fire() -> bool:
-	var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
+	if definition == null:
+		return false
+	var ready: bool = true
+	if definition.attack_mode == WeaponDefinition.AttackMode.PROJECTILE:
+		var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
+		ready = projectile_definition != null and projectile_definition.scene != null
 	return (
-		definition != null
-		and projectile_definition != null
-		and projectile_definition.scene != null
+		ready
 		and is_instance_valid(owner_actor)
 		and is_instance_valid(projectile_parent)
 		and not owner_actor.health_component.is_dead()
@@ -149,6 +152,9 @@ func request_fire(target: Node2D) -> bool:
 	var base_direction: Vector2 = owner_actor.get_aim_position().direction_to(target_position)
 	if base_direction.is_zero_approx():
 		base_direction = Vector2.RIGHT
+	# 近战扇形：不生成弹体，直接做一次范围斩击（T32）。
+	if definition.attack_mode == WeaponDefinition.AttackMode.MELEE_FAN:
+		return _request_melee(base_direction, target)
 	var requested_count: int = get_effective_projectile_count()
 	if _random.randf() < _runtime_bonus_projectile_chance:
 		requested_count += 1
@@ -177,6 +183,61 @@ func request_fire(target: Node2D) -> bool:
 	if volley_count > 1:
 		_fire_extra_volleys(target_position, volley_count, _repeat_shot_generation)
 	return true
+
+
+## 近战扇形：按目标方向做一次范围斩击，冷却只计算一次（T32）。
+func _request_melee(base_direction: Vector2, target: Node2D) -> bool:
+	var hit_count: int = _perform_melee(base_direction)
+	var cooldown_seconds: float = get_effective_cooldown_seconds()
+	_cooldown_remaining = cooldown_seconds
+	fire_requested.emit(
+		definition, owner_actor, target, projectile_parent, hit_count, _runtime_damage_multiplier
+	)
+	weapon_fired.emit(definition.id)
+	return true
+
+
+## 在朝向扇形内对唯一目标各结算一次伤害；同一敌人不会被重复命中。
+func _perform_melee(base_direction: Vector2) -> int:
+	var origin: Vector2 = owner_actor.get_aim_position()
+	var radius: float = maxf(definition.melee_radius * _size_multiplier, 0.0)
+	var targets: Array[ActorBase] = AreaHitResolver.collect_actors(
+		get_world_2d(),
+		origin,
+		radius,
+		definition.melee_hit_mask,
+		owner_actor.get_team_id(),
+		64
+	)
+	var half_arc: float = deg_to_rad(definition.melee_arc_degrees * 0.5)
+	var base_angle: float = base_direction.angle()
+	var hit_count: int = 0
+	for actor: ActorBase in targets:
+		var to_actor: Vector2 = origin.direction_to(actor.get_aim_position())
+		if to_actor.is_zero_approx():
+			to_actor = base_direction
+		if absf(angle_difference(base_angle, to_actor.angle())) > half_arc:
+			continue
+		var event := DamageEvent.new(
+			definition.melee_damage * maxf(_runtime_damage_multiplier, 0.0), owner_actor, origin
+		)
+		if _random.randf() < _critical_chance:
+			event.amount *= 2.0
+		event.tags = [&"melee", definition.id]
+		event.knockback_strength = definition.melee_knockback_strength
+		actor.apply_damage(event)
+		hit_count += 1
+	_spawn_slash_effect(base_direction, radius)
+	return hit_count
+
+
+func _spawn_slash_effect(direction: Vector2, radius: float) -> void:
+	if not is_instance_valid(owner_actor):
+		return
+	var effect := MeleeSlashEffect.new()
+	add_child(effect)
+	effect.global_position = owner_actor.global_position
+	effect.setup(radius, definition.melee_arc_degrees, direction, 0.18)
 
 
 ## 生成一轮弹幕（可能多颗），方向与扩散规则集中在此。

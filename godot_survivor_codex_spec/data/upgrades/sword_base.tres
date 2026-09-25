@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sword_base"
+display_name = "铁剑·开锋"
+description = "铁剑：伤害提高 12%。"
+type = 0
+category = 2
+value = 0.12
+required_weapon_id = &"sword"
+target_equipment_id = &"sword"
+max_stacks = 4
+weight = 1.0

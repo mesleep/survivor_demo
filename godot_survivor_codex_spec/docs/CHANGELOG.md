@@ -236,6 +236,12 @@
 - 默认解锁改为只含价格为 0 的角色/武器；射手需金币解锁。
 - 新增 `ranger_character_smoke_test.gd`；解析、启动与 59 项快速冒烟、120 秒 soak 通过。
 
+### T32 基础剑与近战扇形（2026-09-25）
+
+- `WeaponDefinition` 新增 `AttackMode.MELEE_FAN` 与近战参数；`WeaponController` 支持扇形范围斩击（每敌一次、超距/扇外不计），不发射弹体（D29、D12）。
+- 新增铁剑 Resource、获取卡与 +12% 基础强化，接入目录与升级池；`MeleeSlashEffect` 提供占位弧光。
+- 新增 `sword_melee_smoke_test.gd`；解析、启动与 60 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

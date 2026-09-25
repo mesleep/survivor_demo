@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/weapons/weapon_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"sword"
+display_name = "铁剑"
+unlock_cost = 50
+tags = Array[StringName]([&"melee"])
+cooldown_seconds = 0.9
+projectile_count = 1
+spread_degrees = 0.0
+target_range = 130.0
+volley_interval_seconds = 0.18
+charge_seconds = 0.0
+charge_damage_multiplier = 1.0
+target_mode = 0
+attack_mode = 1
+melee_damage = 14.0
+melee_radius = 130.0
+melee_arc_degrees = 110.0
+melee_knockback_strength = 120.0
+melee_hit_mask = 4
