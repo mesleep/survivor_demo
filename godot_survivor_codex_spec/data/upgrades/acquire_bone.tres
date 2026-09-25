@@ -9,6 +9,7 @@ id = &"acquire_bone"
 display_name = "获得回旋骨棒"
 description = "加入一把能飞出并返回的贯穿骨棒。"
 type = 15
+category = 1
 value = 0
 max_stacks = 1
 required_weapon_id = &""

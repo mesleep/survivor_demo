@@ -61,20 +61,36 @@ func apply_choice(definition: UpgradeDefinition) -> bool:
 func can_offer(definition: UpgradeDefinition) -> bool:
 	if definition == null or not is_instance_valid(player):
 		return false
+	if definition.id == StringName() or definition.max_stacks <= 0:
+		return false
+	if player.get_upgrade_stack(definition.id) >= definition.max_stacks:
+		return false
 	if definition.required_weapon_id != StringName() and not player.has_weapon(definition.required_weapon_id):
 		return false
-	if definition.type == UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
-		if definition.weapon_definition == null:
-			return false
-		if not player.can_acquire(definition.weapon_definition):
-			return false
-	return (
-		definition != null
-		and definition.id != StringName()
-		and definition.max_stacks > 0
-		and is_instance_valid(player)
-		and player.get_upgrade_stack(definition.id) < definition.max_stacks
-	)
+
+	var category: UpgradeDefinition.UpgradeCategory = definition.category
+	if category == UpgradeDefinition.UpgradeCategory.GENERIC \
+			and definition.type == UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
+		category = UpgradeDefinition.UpgradeCategory.ACQUIRE_EQUIPMENT
+
+	match category:
+		UpgradeDefinition.UpgradeCategory.ACQUIRE_EQUIPMENT:
+			return definition.weapon_definition != null and player.can_acquire(definition.weapon_definition)
+		UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
+			var base_progress: EquipmentProgress = player.get_progress(definition.get_target_equipment_id())
+			return base_progress != null and base_progress.can_add_base_level()
+		UpgradeDefinition.UpgradeCategory.ASCENSION:
+			var ascension_progress: EquipmentProgress = player.get_progress(definition.get_target_equipment_id())
+			return ascension_progress != null and ascension_progress.can_choose_branch()
+		UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE:
+			var branch_progress: EquipmentProgress = player.get_progress(definition.get_target_equipment_id())
+			if branch_progress == null or not branch_progress.has_branch():
+				return false
+			if definition.branch_id != StringName() and branch_progress.branch_id != definition.branch_id:
+				return false
+			return branch_progress.can_add_branch_upgrade(definition.id)
+		_:
+			return true
 
 
 func reset() -> void:

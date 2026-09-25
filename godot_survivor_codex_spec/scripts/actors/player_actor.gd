@@ -323,6 +323,18 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		return false
 	if upgrade.required_weapon_id != StringName() and not has_weapon(upgrade.required_weapon_id):
 		return false
+	if upgrade.category == UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
+		if not add_equipment_base_level(upgrade.get_target_equipment_id()):
+			return false
+		return _finalize_upgrade(upgrade)
+	if upgrade.category == UpgradeDefinition.UpgradeCategory.ASCENSION:
+		if not choose_equipment_branch(upgrade.get_target_equipment_id(), upgrade.branch_id):
+			return false
+		return _finalize_upgrade(upgrade)
+	if upgrade.category == UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE:
+		if not add_equipment_branch_upgrade(upgrade.get_target_equipment_id(), upgrade.id):
+			return false
+		return _finalize_upgrade(upgrade)
 	match upgrade.type:
 		UpgradeDefinition.UpgradeType.DAMAGE_MULTIPLIER:
 			_apply_weapon_modifier(WeaponRuntimeModifier.new(1.0, 0, 1.0 + upgrade.value), upgrade.required_weapon_id)
@@ -366,6 +378,14 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 		_:
 			return false
 
+	var new_stack_count: int = get_upgrade_stack(upgrade.id) + 1
+	_upgrade_stacks[upgrade.id] = new_stack_count
+	upgrade_state_changed.emit(upgrade.id, new_stack_count)
+	return true
+
+
+## 统一记录升级层数并发布信号，供各分类的 apply 分支复用。
+func _finalize_upgrade(upgrade: UpgradeDefinition) -> bool:
 	var new_stack_count: int = get_upgrade_stack(upgrade.id) + 1
 	_upgrade_stacks[upgrade.id] = new_stack_count
 	upgrade_state_changed.emit(upgrade.id, new_stack_count)

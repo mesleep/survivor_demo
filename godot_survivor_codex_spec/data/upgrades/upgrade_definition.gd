@@ -24,15 +24,36 @@ enum UpgradeType {
 	ACQUIRE_WEAPON,
 }
 
+## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
+## GENERIC 通用属性；ACQUIRE_EQUIPMENT 获取装备；BASE_UPGRADE 装备基础升级；
+## ASCENSION 一次性互斥质变；BRANCH_UPGRADE 质变专属升级。
+enum UpgradeCategory {
+	GENERIC,
+	ACQUIRE_EQUIPMENT,
+	BASE_UPGRADE,
+	ASCENSION,
+	BRANCH_UPGRADE,
+}
+
 @export var id: StringName
 @export var display_name: String
 @export_multiline var description: String
 @export var icon: Texture2D
 @export var type: UpgradeType
+@export var category: UpgradeCategory = UpgradeCategory.GENERIC
 @export var value: float
 ## 非空时只对指定武器生效，未持有时不会进入候选池。
 @export var required_weapon_id: StringName
+## 目标装备 ID；为空时回退 required_weapon_id，避免重复维护两份 ID。
+@export var target_equipment_id: StringName
+## 质变卡：本卡授予的分支 ID；分支专属卡：要求已选中的分支 ID。
+@export var branch_id: StringName
 ## 获取武器类升级所授予的只读配置。
 @export var weapon_definition: WeaponDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
+
+
+## 统一解析目标装备：优先 target_equipment_id，兼容旧的 required_weapon_id。
+func get_target_equipment_id() -> StringName:
+	return target_equipment_id if target_equipment_id != StringName() else required_weapon_id

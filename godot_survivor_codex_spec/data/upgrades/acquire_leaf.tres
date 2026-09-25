@@ -9,6 +9,7 @@ id = &"acquire_leaf"
 display_name = "获得飞叶刃"
 description = "加入一把快速直射的飞叶刃，可与魔杖同时攻击。"
 type = 15
+category = 1
 value = 0
 max_stacks = 1
 required_weapon_id = &""

@@ -9,6 +9,7 @@ id = &"acquire_bell"
 display_name = "获得环绕铃铛"
 description = "加入环绕自身的双铃铛，保护近身范围。"
 type = 15
+category = 1
 value = 0
 max_stacks = 1
 required_weapon_id = &""

@@ -45,6 +45,13 @@
 - `PlayerActor` 新增每装备进度字典与 `equipment_progress_changed` 信号，提供 `get_progress()` 及基础升级/质变选择/专属升级的唯一修改入口。
 - 新增 `equipment_progress_smoke_test.gd`；解析、启动与 31 项快速冒烟通过。
 
+### T06 升级候选的分类、前置与上限（2026-09-25）
+
+- `UpgradeDefinition` 新增 `UpgradeCategory`（通用/获取/基础/质变/分支专属）与 `target_equipment_id`、`branch_id`，`get_target_equipment_id()` 统一解析目标装备。
+- `UpgradeSystem.can_offer()` 集中执行前置、互斥与上限过滤：获取看候选/空格，基础看基础等级，质变需基础满级且未选分支，分支专属需匹配分支与上限；D05 首版保留均匀无放回抽取。
+- `PlayerActor.apply_upgrade()` 支持基础升级、质变与分支专属三类进度应用。
+- 三个获取升级资源标注 `category=1`；新增 `upgrade_category_smoke_test.gd`；解析、启动与 32 项快速冒烟通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。
