@@ -30,8 +30,10 @@ func collect(collector: PlayerActor) -> bool:
 
 	_is_collected = true
 	set_deferred("monitorable", false)
-	collector.add_experience(_experience_value)
-	collected.emit(self, _experience_value)
+	# 宝石经验统一经玩家倍率入口（T24 科技单件）；单颗宝石只结算一次。
+	var gained: int = roundi(_experience_value * maxf(collector.get_experience_gain_multiplier(), 0.0))
+	collector.add_experience(gained)
+	collected.emit(self, gained)
 	queue_free()
 	return true
 

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/armor/armor_gloves.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"acquire_gloves"
+display_name = "获得基础手套"
+description = "装备基础手套：防御 +1，攻击间隔 -10%，射程 +10%。"
+type = 16
+category = 1
+value = 0.0
+max_stacks = 1
+weight = 1.0
+armor_definition = ExtResource("2")

@@ -73,6 +73,8 @@ enum UpgradeType {
 	BERSERK_LIFESTEAL,
 	## 狂战盔甲一次免死（T23 专属升级，max_stacks=1）。
 	BERSERK_IMMUNITY,
+	## 科技单件质变：授予每秒经验与宝石经验倍率（T24）。
+	TECH_ASCENSION,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -117,6 +119,8 @@ enum UpgradeCategory {
 @export var knight_armor: KnightArmorDefinition
 ## BERSERK_ARMOR 质变引用的狂战盔甲数值档案（T23）。
 @export var berserk_armor: BerserkArmorDefinition
+## TECH_ASCENSION 质变引用的科技单件数值档案（T24）。
+@export var tech_armor: TechArmorDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

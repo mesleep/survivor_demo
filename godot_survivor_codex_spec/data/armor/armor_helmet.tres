@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ArmorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/armor/armor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"armor_helmet"
+display_name = "基础头盔"
+description = "增加少量防御，没有移动速度惩罚。"
+category = 1
+defense_base = 2.0
+defense_per_level = 1.0
+move_penalty_ratio = 0.0
+move_penalty_reduction_per_level = 0.0
+cooldown_reduction = 0.0
+cooldown_reduction_per_level = 0.0
+attack_range_bonus = 0.0
+attack_range_bonus_per_level = 0.0

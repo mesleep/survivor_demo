@@ -410,7 +410,13 @@ func reset_runtime_state() -> void:
 func get_effective_cooldown_seconds() -> float:
 	if definition == null:
 		return MINIMUM_COOLDOWN_SECONDS
-	return maxf(definition.cooldown_seconds * _runtime_cooldown_multiplier, MINIMUM_COOLDOWN_SECONDS)
+	var owner_multiplier: float = 1.0
+	if is_instance_valid(owner_actor):
+		owner_multiplier = maxf(owner_actor.get_bonus_cooldown_multiplier(), 0.0)
+	return maxf(
+		definition.cooldown_seconds * _runtime_cooldown_multiplier * owner_multiplier,
+		MINIMUM_COOLDOWN_SECONDS
+	)
 
 
 func get_effective_projectile_count() -> int:
@@ -499,6 +505,7 @@ func get_effective_target_range() -> float:
 		base_range
 		* maxf(owner_actor.get_weapon_range_multiplier(), 0.0)
 		* maxf(_range_multiplier, 0.0)
+		* maxf(owner_actor.get_bonus_range_multiplier(), 0.0)
 	)
 
 

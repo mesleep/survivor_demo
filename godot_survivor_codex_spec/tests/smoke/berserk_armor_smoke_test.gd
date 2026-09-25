@@ -78,7 +78,9 @@ func _test_half_health_lifesteal() -> void:
 	)
 
 	var controller: WeaponController = _find_controller(player, &"starter_weapon")
-	controller.request_fire(enemy)
+	# 首帧可能已自动发射而进入冷却；重置运行时状态以确定生成弹体。
+	controller.reset_runtime_state()
+	_expect(controller.request_fire(enemy), "起始武器应能发射。")
 	var projectile: ProjectileBase = _first_projectile(session)
 	_expect(
 		projectile != null and is_equal_approx(projectile.context.lifesteal_ratio, 0.7),

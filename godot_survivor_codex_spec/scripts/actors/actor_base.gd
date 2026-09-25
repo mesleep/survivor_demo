@@ -245,6 +245,16 @@ func get_bonus_lifesteal_ratio() -> float:
 	return 0.0
 
 
+## 由角色装备提供的全武器冷却倍率（T24 手套）；默认 1.0。
+func get_bonus_cooldown_multiplier() -> float:
+	return 1.0
+
+
+## 由角色装备提供的全武器射程倍率（T24 手套）；默认 1.0。
+func get_bonus_range_multiplier() -> float:
+	return 1.0
+
+
 ## 固定随机种子，供测试确定闪避/免疫结果。
 func set_damage_random_seed(seed_value: int) -> void:
 	_damage_random.seed = seed_value

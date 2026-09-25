@@ -21,6 +21,14 @@ enum ArmorCategory { ARMOR, HELMET, GLOVES }
 @export_range(0.0, 1.0, 0.01) var move_penalty_ratio: float = 0.0
 ## 每提升 1 级基础等级减轻的移动惩罚比例，最低减到 0。
 @export_range(0.0, 1.0, 0.01) var move_penalty_reduction_per_level: float = 0.0
+## 手套等：1 级时的冷却缩短比例（0.1 = 攻速 +约 11%）。
+@export_range(0.0, 0.9, 0.01) var cooldown_reduction: float = 0.0
+## 每提升 1 级额外增加的冷却缩短比例。
+@export_range(0.0, 0.9, 0.01) var cooldown_reduction_per_level: float = 0.0
+## 手套等：1 级时的全武器索敌射程加成比例。
+@export_range(0.0, 2.0, 0.05) var attack_range_bonus: float = 0.0
+## 每提升 1 级额外增加的射程加成比例。
+@export_range(0.0, 2.0, 0.05) var attack_range_bonus_per_level: float = 0.0
 ## 预留：基础升级与质变卡；T11 起填充，当前只保存引用，不在此脚本套用效果。
 @export var base_upgrades: Array[UpgradeDefinition] = []
 @export var branch_upgrades: Array[UpgradeDefinition] = []
@@ -35,6 +43,18 @@ func get_defense_for_level(base_level: int) -> float:
 func get_move_penalty_for_level(base_level: int) -> float:
 	var reduction: float = move_penalty_reduction_per_level * float(maxi(base_level, 1) - 1)
 	return clampf(move_penalty_ratio - reduction, 0.0, 1.0)
+
+
+## 按基础等级计算该防具的冷却倍率（<1 表示更快）。
+func get_cooldown_multiplier_for_level(base_level: int) -> float:
+	var reduction: float = cooldown_reduction + cooldown_reduction_per_level * float(maxi(base_level, 1) - 1)
+	return clampf(1.0 - reduction, 0.05, 1.0)
+
+
+## 按基础等级计算该防具提供的全武器射程倍率（>=1）。
+func get_range_multiplier_for_level(base_level: int) -> float:
+	var bonus: float = attack_range_bonus + attack_range_bonus_per_level * float(maxi(base_level, 1) - 1)
+	return maxf(1.0 + bonus, 0.0)
 
 
 func get_category_name() -> String:

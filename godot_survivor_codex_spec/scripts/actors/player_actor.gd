@@ -38,6 +38,10 @@ var _upgrade_defense_bonus: float = 0.0
 var _armor_defense_bonus: float = 0.0
 var _knight_defense_bonus: float = 0.0
 var _armor_move_penalty_ratio: float = 0.0
+var _glove_cooldown_multiplier: float = 1.0
+var _glove_range_multiplier: float = 1.0
+var _tech_pieces: Dictionary[StringName, TechArmorDefinition] = {}
+var _tech_experience_clock: float = 0.0
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
 var _weapon_modifier_history: Array[Dictionary] = []
@@ -94,6 +98,10 @@ func initialize(new_definition: Resource) -> void:
 	_armor_defense_bonus = 0.0
 	_knight_defense_bonus = 0.0
 	_armor_move_penalty_ratio = 0.0
+	_glove_cooldown_multiplier = 1.0
+	_glove_range_multiplier = 1.0
+	_tech_pieces.clear()
+	_tech_experience_clock = 0.0
 	set_defense(0.0)
 	set_immune_chance(0.0)
 	set_damage_reflect_ratio(0.0)
@@ -263,6 +271,8 @@ func try_acquire_armor(armor_definition: ArmorDefinition) -> bool:
 func _refresh_armor_bonuses() -> void:
 	var defense_total: float = 0.0
 	var move_multiplier: float = 1.0
+	var cooldown_multiplier: float = 1.0
+	var range_multiplier: float = 1.0
 	for armor_id: StringName in _armor_definitions.keys():
 		var armor: ArmorDefinition = _armor_definitions[armor_id]
 		if armor == null:
@@ -273,8 +283,12 @@ func _refresh_armor_bonuses() -> void:
 			level = progress.base_level
 		defense_total += armor.get_defense_for_level(level)
 		move_multiplier *= 1.0 - armor.get_move_penalty_for_level(level)
+		cooldown_multiplier *= armor.get_cooldown_multiplier_for_level(level)
+		range_multiplier *= armor.get_range_multiplier_for_level(level)
 	_armor_defense_bonus = defense_total
 	_armor_move_penalty_ratio = clampf(1.0 - move_multiplier, 0.0, 1.0)
+	_glove_cooldown_multiplier = clampf(cooldown_multiplier, 0.05, 1.0)
+	_glove_range_multiplier = maxf(range_multiplier, 0.0)
 	_refresh_defense()
 
 
@@ -284,6 +298,51 @@ func _refresh_defense() -> void:
 
 func get_armor_move_penalty_ratio() -> float:
 	return _armor_move_penalty_ratio
+
+
+## 手套等装备提供的全武器冷却倍率（T24）。
+func get_bonus_cooldown_multiplier() -> float:
+	return _glove_cooldown_multiplier
+
+
+## 手套等装备提供的全武器射程倍率（T24）。
+func get_bonus_range_multiplier() -> float:
+	return _glove_range_multiplier
+
+
+## 已选科技质变的单件汇总每秒经验（T24）。
+func get_tech_experience_per_second() -> float:
+	var total: float = 0.0
+	for definition: TechArmorDefinition in _tech_pieces.values():
+		if definition != null:
+			total += definition.experience_per_second
+	return total
+
+
+## 宝石经验倍率：各科技单件相乘（T24）。
+func get_experience_gain_multiplier() -> float:
+	var multiplier: float = 1.0
+	for definition: TechArmorDefinition in _tech_pieces.values():
+		if definition != null:
+			multiplier *= maxf(definition.gem_experience_multiplier, 0.0)
+	return multiplier
+
+
+## 推进科技经验计时；暂停时不由 _process 调用，因此暂停不计时（T24）。
+func advance_tech_time(delta: float) -> void:
+	if _tech_pieces.is_empty() or delta <= 0.0:
+		return
+	_tech_experience_clock += delta
+	var xp_per_second: float = get_tech_experience_per_second()
+	if xp_per_second <= 0.0:
+		return
+	while _tech_experience_clock >= 1.0:
+		_tech_experience_clock -= 1.0
+		add_experience(roundi(xp_per_second))
+
+
+func _process(delta: float) -> void:
+	advance_tech_time(delta)
 
 
 func has_armor(armor_id: StringName) -> bool:
@@ -542,6 +601,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			_berserk_half_lifesteal_bonus += upgrade.value
 		UpgradeDefinition.UpgradeType.BERSERK_IMMUNITY:
 			set_death_immunity_available(true)
+		UpgradeDefinition.UpgradeType.TECH_ASCENSION:
+			_enable_tech_armor(upgrade.get_target_equipment_id(), upgrade.tech_armor)
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
@@ -662,6 +723,13 @@ func _enable_berserk_armor(definition: BerserkArmorDefinition) -> void:
 	add_child(_berserk_drain)
 	_berserk_drain.initialize(self, definition)
 	_berserk_drain.set_drain_reduction(_berserk_drain_reduction)
+
+
+## 记录某件装备已选择科技质变；单件即可获得自身每秒经验与宝石倍率（T24）。
+func _enable_tech_armor(equipment_id: StringName, definition: TechArmorDefinition) -> void:
+	if equipment_id == StringName() or definition == null:
+		return
+	_tech_pieces[equipment_id] = definition
 
 
 func _clear_berserk_drain() -> void:
