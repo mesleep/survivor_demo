@@ -10,6 +10,8 @@ var _pause_label: Label
 var _status: Label
 var _boss_bar: ProgressBar
 var _loadout: Label
+var _coin_icon: TextureRect
+var _coin_label: Label
 
 
 func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
@@ -50,11 +52,31 @@ func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
 	_loadout.add_theme_constant_override("shadow_offset_x", 2)
 	_loadout.add_theme_constant_override("shadow_offset_y", 2)
 	add_child(_loadout)
+	_build_coin_display()
 	_connect_player()
 	if not session.run_started.is_connected(_on_run_started):
 		session.run_started.connect(_on_run_started)
 	_update_loadout()
 	_update_hint()
+
+
+## 金币图标 + 数字，使用新增 D03 图标（T34）。
+func _build_coin_display() -> void:
+	_coin_icon = TextureRect.new()
+	_coin_icon.texture = load("res://assets/v2_dark_comic/ui/icon_coin.png") as Texture2D
+	_coin_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_coin_icon.position = Vector2(20, 592)
+	_coin_icon.size = Vector2(24, 24)
+	_coin_icon.visible = false
+	add_child(_coin_icon)
+	_coin_label = Label.new()
+	_coin_label.position = Vector2(48, 592)
+	_coin_label.add_theme_font_size_override("font_size", 18)
+	_coin_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	_coin_label.add_theme_constant_override("shadow_offset_x", 2)
+	_coin_label.add_theme_constant_override("shadow_offset_y", 2)
+	_coin_label.visible = false
+	add_child(_coin_label)
 
 
 ## 在 start_run 之前创建时，玩家尚不存在；改由 run_started 信号延迟连接。
@@ -86,6 +108,10 @@ func _process(_delta: float) -> void:
 		return
 	_hint.visible = session.is_run_active and not session.level_up_panel.visible
 	_loadout.visible = _hint.visible
+	if is_instance_valid(_coin_icon):
+		_coin_icon.visible = _hint.visible
+		_coin_label.visible = _hint.visible
+		_coin_label.text = str(session.get_run_coins())
 	_status.visible = session.is_run_active and not session.level_up_panel.visible
 	_boss_bar.visible = _status.visible and is_instance_valid(session.boss)
 	_status.text = "月光庭院 · 四宠大作战\n击退 %d · 场上 %d\n%s" % [session.kill_count, session.enemies.get_child_count(), "击退月夜领主，守护庭院！" if session.boss_has_spawned else "坚持五分钟，迎接月夜领主"]
@@ -131,7 +157,9 @@ func _on_armor_acquired(_definition: ArmorDefinition) -> void:
 	_update_loadout()
 
 
-func _on_coins_changed(_current_coins: int) -> void:
+func _on_coins_changed(current_coins: int) -> void:
+	if is_instance_valid(_coin_label):
+		_coin_label.text = str(current_coins)
 	_update_loadout()
 
 

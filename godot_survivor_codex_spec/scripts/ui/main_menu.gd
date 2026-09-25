@@ -7,6 +7,8 @@ extends Control
 
 signal start_requested(loadout: RunLoadout)
 
+const BUTTON_STYLE: StyleBox = preload("res://data/visuals/v2_dark_comic/button_style.tres")
+
 @export var catalog: ContentCatalog
 
 ## 跨局档案与解锁服务（T29）；为空时视为全部可用，保持旧直启兼容。
@@ -32,7 +34,14 @@ var _status_text: String = ""
 
 func _ready() -> void:
 	start_button.pressed.connect(request_start)
+	_style_button(start_button)
 	_build()
+
+
+## 统一按钮样式；动态生成的按钮都走这里（T34 界面收口）。
+func _style_button(button: Button) -> void:
+	for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
+		button.add_theme_stylebox_override(state, BUTTON_STYLE)
 
 
 ## 由入口在入树前或入树后注入目录；会重建选项。
@@ -265,6 +274,7 @@ func _build() -> void:
 	var group := ButtonGroup.new()
 	for character: CharacterDefinition in catalog.characters:
 		var button := Button.new()
+		_style_button(button)
 		if _is_character_available(character.id):
 			button.text = character.display_name
 		else:
@@ -277,6 +287,7 @@ func _build() -> void:
 
 	for weapon: WeaponDefinition in catalog.weapons:
 		var button := Button.new()
+		_style_button(button)
 		if _is_weapon_available(weapon.id):
 			button.text = weapon.display_name
 		else:
@@ -321,6 +332,7 @@ func _build_permanent_section() -> void:
 			continue
 		var level: int = profile.get_permanent_level(definition.id)
 		var button := Button.new()
+		_style_button(button)
 		if level >= definition.max_level:
 			button.text = "%s Lv %d/%d（已满）" % [definition.display_name, level, definition.max_level]
 			button.disabled = true
