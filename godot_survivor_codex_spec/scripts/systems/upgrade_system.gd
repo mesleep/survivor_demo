@@ -67,6 +67,13 @@ func can_offer(definition: UpgradeDefinition) -> bool:
 		return false
 	if definition.required_weapon_id != StringName() and not player.has_weapon(definition.required_weapon_id):
 		return false
+	if definition.required_equipment_id != StringName():
+		var required_progress: EquipmentProgress = player.get_progress(definition.required_equipment_id)
+		if required_progress == null:
+			return false
+		if definition.required_equipment_branch_id != StringName() \
+				and required_progress.branch_id != definition.required_equipment_branch_id:
+			return false
 
 	var category: UpgradeDefinition.UpgradeCategory = definition.category
 	if category == UpgradeDefinition.UpgradeCategory.GENERIC \

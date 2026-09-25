@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/arrow_ice.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"enchant_ice"
+display_name = "质变：附魔箭·寒冰"
+description = "长弓：需要已质变为寒冰法术的法杖。箭矢命中减速并短暂冻结敌人。"
+type = 32
+category = 3
+value = 0.0
+required_weapon_id = &"bow"
+target_equipment_id = &"bow"
+branch_id = &"enchant"
+max_stacks = 1
+weight = 1.0
+projectile_definition = ExtResource("2")
+required_equipment_id = &"staff"
+required_equipment_branch_id = &"ice"

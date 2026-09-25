@@ -147,6 +147,13 @@
 - 冰枪（穿透 3、冰缓、冻结）命中时左右对称分裂小冰枪，小冰枪不再分裂（上下文与资源双层防递归）；新增“寒冰法术”质变与穿刺/冰封/裂冰专属升级并接入升级池。
 - 新增 `ice_slow_smoke_test.gd`、`ice_freeze_smoke_test.gd`、`ice_split_smoke_test.gd`；解析、启动与 47 项快速冒烟、120 秒 soak 通过。
 
+### T20 附魔箭与法杖分支联动（2026-09-25）
+
+- 新增 `ENCHANT_ARROW` 与 `required_equipment_id`/`required_equipment_branch_id`，`UpgradeSystem.can_offer` 支持按前置装备分支过滤（D17）。
+- 四张附魔箭质变卡共享 `branch_id=enchant`，需持弓、弓基础满级且法杖已质变到对应分支；效果映射为爆炸/DoT+火坑/减速+冻结/威能捆绑，数值独立。
+- 新增四种附魔箭 Resource 与威能箭独立捆绑修正；D08 快照继承（当前规则与实时等价）。
+- 修复 `staff_charge_smoke_test` 首帧弹体计数抖动（仅测试）；新增 `enchant_arrow_smoke_test.gd`；解析、启动与 48 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

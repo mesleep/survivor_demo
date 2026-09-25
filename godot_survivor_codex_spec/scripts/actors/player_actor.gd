@@ -498,6 +498,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			var split_modifier := WeaponRuntimeModifier.new()
 			split_modifier.split_count_bonus = roundi(upgrade.value)
 			_apply_weapon_modifier(split_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.ENCHANT_ARROW:
+			_apply_projectile_override(upgrade.projectile_definition, upgrade.get_target_equipment_id())
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:

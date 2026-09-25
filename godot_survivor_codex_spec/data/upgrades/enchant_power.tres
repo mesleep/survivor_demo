@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/arrow_power.tres" id="2"]
+[ext_resource type="Resource" path="res://data/combat/arrow_power_modifier.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"enchant_power"
+display_name = "质变：附魔箭·威能"
+description = "长弓：需要已质变为威能法术的法杖。改用威能箭并提高伤害、攻速与射程。"
+type = 32
+category = 3
+value = 0.0
+required_weapon_id = &"bow"
+target_equipment_id = &"bow"
+branch_id = &"enchant"
+max_stacks = 1
+weight = 1.0
+projectile_definition = ExtResource("2")
+weapon_modifier = ExtResource("3")
+required_equipment_id = &"staff"
+required_equipment_branch_id = &"power"

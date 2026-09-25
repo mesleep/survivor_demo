@@ -51,6 +51,8 @@ enum UpgradeType {
 	FREEZE_DURATION,
 	## 分裂弹体数量加成（T19 寒冰分支专属升级，value 为每级增量）。
 	SPLIT_COUNT,
+	## 附魔箭：把弓的弹体切换为对应法杖质变的附魔箭（T20，D08 快照继承）。
+	ENCHANT_ARROW,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -85,6 +87,10 @@ enum UpgradeCategory {
 @export var projectile_definition: ProjectileDefinition
 ## 捆绑武器修正（T18 威能质变等）；非空时在升级应用时合并到目标武器。
 @export var weapon_modifier: WeaponRuntimeModifier
+## 前置装备要求（T20 附魔箭需要已质变法杖），与 required_weapon_id 独立。
+@export var required_equipment_id: StringName
+## 前置装备必须已选择的分支 ID；为空只要求持有该装备。
+@export var required_equipment_branch_id: StringName
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

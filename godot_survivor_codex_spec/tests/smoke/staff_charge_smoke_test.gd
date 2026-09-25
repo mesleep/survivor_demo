@@ -31,7 +31,7 @@ func _test_charge_and_release() -> void:
 	var staff: WeaponDefinition = _make_charge_weapon()
 	_expect(player.add_weapon(staff), "应能装备蓄力法杖。")
 	var controller: WeaponController = _find_controller(player, &"test_staff")
-	_only_enable(player, &"test_staff")
+	_only_enable(session, player, &"test_staff")
 	var enemy: EnemyActor = _spawn_dummy(session, player.global_position + Vector2(200.0, 0.0))
 
 	await create_timer(0.3).timeout
@@ -57,7 +57,7 @@ func _test_reset_cancels() -> void:
 	var player: PlayerActor = session.player
 	player.add_weapon(_make_charge_weapon())
 	var controller: WeaponController = _find_controller(player, &"test_staff")
-	_only_enable(player, &"test_staff")
+	_only_enable(session, player, &"test_staff")
 	_spawn_dummy(session, player.global_position + Vector2(200.0, 0.0))
 	await create_timer(0.3).timeout
 	_expect(controller.is_charging(), "应已进入蓄力。")
@@ -75,7 +75,7 @@ func _test_target_disappears() -> void:
 	var player: PlayerActor = session.player
 	player.add_weapon(_make_charge_weapon())
 	var controller: WeaponController = _find_controller(player, &"test_staff")
-	_only_enable(player, &"test_staff")
+	_only_enable(session, player, &"test_staff")
 	var enemy: EnemyActor = _spawn_dummy(session, player.global_position + Vector2(200.0, 0.0))
 	await create_timer(0.3).timeout
 	_expect(controller.is_charging(), "应已进入蓄力。")
@@ -98,10 +98,14 @@ func _make_charge_weapon() -> WeaponDefinition:
 	return weapon
 
 
-func _only_enable(player: PlayerActor, weapon_id: StringName) -> void:
+## 只启用目标武器，并移除首帧可能已自动发射的起始武器弹体，避免弹体计数抖动。
+func _only_enable(session: GameSession, player: PlayerActor, weapon_id: StringName) -> void:
 	for controller: WeaponController in player.weapon_controllers:
 		if is_instance_valid(controller):
 			controller.set_process(controller.definition.id == weapon_id)
+	for child: Node in session.projectiles.get_children():
+		session.projectiles.remove_child(child)
+		child.queue_free()
 
 
 func _spawn_main() -> Node:
