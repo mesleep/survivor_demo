@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"star_wand_focus"
+display_name = "质变·星辉聚焦"
+description = "星光魔杖：伤害 +25%，凝聚星光。"
+type = 0
+category = 3
+value = 0.25
+required_weapon_id = &"starter_weapon"
+target_equipment_id = &"starter_weapon"
+branch_id = &"focus"
+max_stacks = 1
+weight = 1.0

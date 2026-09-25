@@ -46,7 +46,9 @@ func show_choices(choices: Array[UpgradeDefinition]) -> void:
 		button.add_theme_font_size_override("font_size", maxi(roundi(BASE_BUTTON_FONT_SIZE * _ui_scale), 1))
 		for state: StringName in [&"normal", &"hover", &"pressed", &"disabled"]:
 			button.add_theme_stylebox_override(state, BUTTON_STYLE)
-		button.text = "%s\n%s" % [definition.display_name, definition.description]
+		button.text = "%s%s\n%s" % [
+			_category_tag(definition.category), definition.display_name, definition.description
+		]
 		button.pressed.connect(_on_choice_pressed.bind(definition))
 		choices_container.add_child(button)
 	if choices_container.get_child_count() > 0:
@@ -79,6 +81,21 @@ func _clear_buttons() -> void:
 	for child: Node in choices_container.get_children():
 		choices_container.remove_child(child)
 		child.queue_free()
+
+
+## 卡面前缀：让玩家区分通用、获取、基础、质变与质变专属。
+func _category_tag(category: UpgradeDefinition.UpgradeCategory) -> String:
+	match category:
+		UpgradeDefinition.UpgradeCategory.ACQUIRE_EQUIPMENT:
+			return "【获取】"
+		UpgradeDefinition.UpgradeCategory.BASE_UPGRADE:
+			return "【基础】"
+		UpgradeDefinition.UpgradeCategory.ASCENSION:
+			return "【质变】"
+		UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE:
+			return "【专属】"
+		_:
+			return ""
 
 
 func _disconnect_system() -> void:
