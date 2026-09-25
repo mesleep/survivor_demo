@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/staff_ice_spear.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"staff_ice"
 display_name = "质变：寒冰法术"
 description = "蓄力法杖：发射可穿透的冰枪，沿途造成伤害并减速敌人。"

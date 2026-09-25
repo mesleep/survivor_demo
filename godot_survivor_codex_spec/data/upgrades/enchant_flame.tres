@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/arrow_flame.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"enchant_flame"
 display_name = "质变：附魔箭·火焰"
 description = "长弓：需要已质变为火焰法术的法杖。箭矢命中造成持续伤害并留下火坑。"

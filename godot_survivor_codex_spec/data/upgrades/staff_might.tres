@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/combat/staff_might_modifier.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"staff_might"
 display_name = "质变：威能法术"
 description = "蓄力法杖：大幅提高伤害，缩短攻击间隔并扩大射程。"

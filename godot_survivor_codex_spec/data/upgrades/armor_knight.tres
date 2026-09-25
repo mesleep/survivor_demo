@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/armor/armor_knight.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_knight"
 display_name = "质变：骑士盔甲"
 description = "基础盔甲：大幅减少受到的伤害，并获得一定概率完全免伤。"

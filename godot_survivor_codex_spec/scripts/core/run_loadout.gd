@@ -13,16 +13,20 @@ const MAX_CANDIDATE_WEAPONS := 10
 var character_id: StringName = &""
 var candidate_weapon_ids: Array[StringName] = []
 var starting_weapon_ids: Array[StringName] = []
+## 本局地图 ID（T33 地图选择）；为空表示使用单局场景默认地图。
+var map_id: StringName = &""
 
 
 func _init(
 		new_character_id: StringName = &"",
 		new_candidate_weapon_ids: Array[StringName] = [],
-		new_starting_weapon_ids: Array[StringName] = []
+		new_starting_weapon_ids: Array[StringName] = [],
+		new_map_id: StringName = &""
 ) -> void:
 	character_id = new_character_id
 	candidate_weapon_ids = new_candidate_weapon_ids.duplicate()
 	starting_weapon_ids = new_starting_weapon_ids.duplicate()
+	map_id = new_map_id
 
 
 ## 由目录中的可玩内容生成默认快照，供旧直启入口使用。
@@ -57,12 +61,14 @@ static func default_for(catalog: ContentCatalog, character_id: StringName = &"")
 		if not candidates.has(weapon.id):
 			candidates.append(weapon.id)
 	loadout.candidate_weapon_ids = candidates
+	if not catalog.maps.is_empty() and catalog.maps[0] != null:
+		loadout.map_id = catalog.maps[0].id
 	return loadout
 
 
 ## 返回副本；调用方修改副本不会影响本对象，反之亦然。
 func copy() -> RunLoadout:
-	return RunLoadout.new(character_id, candidate_weapon_ids, starting_weapon_ids)
+	return RunLoadout.new(character_id, candidate_weapon_ids, starting_weapon_ids, map_id)
 
 
 ## 按目录校验本快照；返回中文错误列表，空数组表示可用。
@@ -78,6 +84,9 @@ func validate(catalog: ContentCatalog) -> Array[String]:
 		errors.append("单局配置缺少角色 ID。")
 	elif catalog.get_character(character_id) == null:
 		errors.append("单局配置引用了未知角色：%s。" % character_id)
+
+	if map_id != StringName() and catalog.get_map(map_id) == null:
+		errors.append("单局配置引用了未知地图：%s。" % map_id)
 
 	if candidate_weapon_ids.size() > MAX_CANDIDATE_WEAPONS:
 		errors.append("候选武器最多 %d 个，当前 %d 个。" % [
@@ -123,6 +132,13 @@ func resolve_character(catalog: ContentCatalog) -> CharacterDefinition:
 	if catalog == null:
 		return null
 	return catalog.get_character(character_id)
+
+
+## 解析本局地图；未指定或目录缺失时返回 null（回退单局场景默认地图）。
+func resolve_map(catalog: ContentCatalog) -> ArenaDefinition:
+	if catalog == null or map_id == StringName():
+		return null
+	return catalog.get_map(map_id)
 
 
 ## 解析起始武器；按快照顺序返回，跳过目录中不存在的 ID。

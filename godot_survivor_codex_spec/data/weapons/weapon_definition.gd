@@ -13,6 +13,8 @@ enum AttackMode { PROJECTILE, MELEE_FAN }
 
 @export var id: StringName
 @export var display_name: String
+## 装备栏图标；为空时回退到武器动画首帧（T33）。
+@export var icon: Texture2D
 ## 解锁所需金币；0 表示默认解锁（T29）。
 @export_range(0, 1000000, 1) var unlock_cost: int = 0
 ## 武器标签（如 ranged）；角色被动按标签生效（T31）。

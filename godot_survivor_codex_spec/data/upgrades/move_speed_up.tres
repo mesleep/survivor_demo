@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_move_speed.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"move_speed_up"
 display_name = "轻盈步伐 +10%"
 description = "移动速度增加 10%。"

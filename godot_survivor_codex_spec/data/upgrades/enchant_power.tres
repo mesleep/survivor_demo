@@ -6,8 +6,8 @@
 [ext_resource type="Resource" path="res://data/combat/arrow_power_modifier.tres" id="3"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"enchant_power"
 display_name = "质变：附魔箭·威能"
 description = "长弓：需要已质变为威能法术的法杖。改用威能箭并提高伤害、攻速与射程。"

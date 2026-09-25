@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_pickup_range.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"pickup_range_up"
 display_name = "宝石磁铁 +25%"
 description = "经验宝石拾取半径增加 25%。"

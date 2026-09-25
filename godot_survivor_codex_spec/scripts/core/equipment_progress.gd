@@ -14,6 +14,9 @@ var equipment_id: StringName = &""
 var base_level: int = 1
 var branch_id: StringName = &""
 var branch_upgrade_levels: Dictionary[StringName, int] = {}
+## 质变后的显示名与图标（T33 装备栏用）；未质变时为空。
+var branch_display_name: String = ""
+var branch_icon: Texture2D
 
 
 func _init(new_equipment_id: StringName = &"") -> void:
@@ -26,6 +29,8 @@ func copy() -> EquipmentProgress:
 	clone.base_level = base_level
 	clone.branch_id = branch_id
 	clone.branch_upgrade_levels = branch_upgrade_levels.duplicate()
+	clone.branch_display_name = branch_display_name
+	clone.branch_icon = branch_icon
 	return clone
 
 

@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/staff_flame_bolt.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"staff_flame"
 display_name = "质变：火焰法术"
 description = "蓄力法杖：改为喷吐火焰，命中造成持续伤害并在地面留下燃烧火坑。"

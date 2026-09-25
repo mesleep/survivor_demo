@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_damage.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"damage_up"
 display_name = "魔力增强 +20%"
 description = "魔弹伤害增加 20%。"

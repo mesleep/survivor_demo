@@ -78,6 +78,8 @@ func _test_empty_pool_no_deadlock() -> void:
 	var upgrade_system: UpgradeSystem = session.upgrade_system
 	upgrade_system.set_refresh_count(2)
 	upgrade_system.upgrade_pool = []
+	# 本用例验证空池；关闭金币兜底以隔离该行为。
+	upgrade_system.fallback_upgrades = []
 	upgrade_system.request_choices(3)
 	_expect(upgrade_system.get_current_choices().is_empty(), "空池应给出空列表。")
 	_expect(not upgrade_system.can_refresh(), "空池不应可刷新。")

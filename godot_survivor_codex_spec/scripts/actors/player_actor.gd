@@ -465,6 +465,72 @@ func _emit_equipment_progress(equipment_id: StringName) -> void:
 	equipment_progress_changed.emit(equipment_id, _equipment_progress[equipment_id].copy())
 
 
+## 记录质变后的显示名（去掉“质变：”前缀）与图标，供装备栏显示（T33）。
+func _set_equipment_branch_details(
+		equipment_id: StringName, display_name: String, icon: Texture2D
+) -> void:
+	if not _equipment_progress.has(equipment_id):
+		return
+	var progress: EquipmentProgress = _equipment_progress[equipment_id]
+	progress.branch_display_name = display_name.replace("质变：", "").replace("质变:", "").strip_edges()
+	progress.branch_icon = icon
+	_emit_equipment_progress(equipment_id)
+
+
+## 装备显示名：质变后为“基础名·分支名”。
+func get_equipment_display_name(equipment_id: StringName) -> String:
+	var base_name: String = _equipment_base_name(equipment_id)
+	var progress: EquipmentProgress = _equipment_progress.get(equipment_id)
+	if progress != null and not progress.branch_display_name.is_empty():
+		return "%s·%s" % [base_name, progress.branch_display_name]
+	return base_name
+
+
+## 装备图标：优先质变图标，其次防具图标，最后武器动画首帧（T33）。
+func get_equipment_icon(equipment_id: StringName) -> Texture2D:
+	var progress: EquipmentProgress = _equipment_progress.get(equipment_id)
+	if progress != null and progress.branch_icon != null:
+		return progress.branch_icon
+	if _armor_definitions.has(equipment_id):
+		var armor: ArmorDefinition = _armor_definitions[equipment_id]
+		if armor != null and armor.icon != null:
+			return armor.icon
+	var weapon: WeaponDefinition = _find_weapon_definition(equipment_id)
+	if weapon != null:
+		if weapon.icon != null:
+			return weapon.icon
+		return _weapon_frame_texture(weapon)
+	return null
+
+
+func _equipment_base_name(equipment_id: StringName) -> String:
+	if _armor_definitions.has(equipment_id):
+		var armor: ArmorDefinition = _armor_definitions[equipment_id]
+		if armor != null:
+			return armor.display_name
+	var weapon: WeaponDefinition = _find_weapon_definition(equipment_id)
+	if weapon != null:
+		return weapon.display_name
+	return String(equipment_id)
+
+
+func _find_weapon_definition(equipment_id: StringName) -> WeaponDefinition:
+	for controller: WeaponController in weapon_controllers:
+		if is_instance_valid(controller) and controller.definition != null \
+				and controller.definition.id == equipment_id:
+			return controller.definition
+	return null
+
+
+func _weapon_frame_texture(weapon: WeaponDefinition) -> Texture2D:
+	if weapon == null or weapon.visual_frames == null:
+		return null
+	for animation: StringName in [&"idle", &"default", &"walk"]:
+		if weapon.visual_frames.has_animation(animation):
+			return weapon.visual_frames.get_frame_texture(animation, 0)
+	return null
+
+
 func clear_weapons() -> void:
 	for controller: WeaponController in weapon_controllers:
 		if not is_instance_valid(controller):
@@ -554,6 +620,9 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 	elif upgrade.category == UpgradeDefinition.UpgradeCategory.ASCENSION:
 		if not choose_equipment_branch(upgrade.get_target_equipment_id(), upgrade.branch_id):
 			return false
+		_set_equipment_branch_details(
+			upgrade.get_target_equipment_id(), upgrade.display_name, upgrade.icon
+		)
 	elif upgrade.category == UpgradeDefinition.UpgradeCategory.BRANCH_UPGRADE:
 		if not add_equipment_branch_upgrade(upgrade.get_target_equipment_id(), upgrade.id):
 			return false
@@ -665,6 +734,8 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			_apply_weapon_modifier(explosion_damage_modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.REGENERATION:
 			_regeneration += upgrade.value
+		UpgradeDefinition.UpgradeType.COIN_REWARD:
+			add_coins(roundi(upgrade.value))
 		UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
 			if not try_acquire_weapon(upgrade.weapon_definition):
 				return false

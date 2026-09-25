@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/arrow_explosion.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"enchant_explosion"
 display_name = "质变：附魔箭·爆炸"
 description = "长弓：需要已质变为爆炸法术的法杖。箭矢命中后爆炸，造成溅射伤害。"

@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/armor/armor_berserk.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_berserk"
 display_name = "质变：狂战盔甲"
 description = "基础盔甲：每秒失去少量生命（不致死），换取大幅提高的吸血能力。"

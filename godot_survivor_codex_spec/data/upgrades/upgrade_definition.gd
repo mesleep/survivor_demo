@@ -75,6 +75,8 @@ enum UpgradeType {
 	BERSERK_IMMUNITY,
 	## 科技单件质变：授予每秒经验与宝石经验倍率（T24）。
 	TECH_ASCENSION,
+	## 金币奖励：满级后的兜底选项，value 为获得金币数。
+	COIN_REWARD,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。

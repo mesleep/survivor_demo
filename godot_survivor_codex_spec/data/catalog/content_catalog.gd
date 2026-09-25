@@ -10,6 +10,8 @@ extends Resource
 @export var characters: Array[CharacterDefinition] = []
 @export var weapons: Array[WeaponDefinition] = []
 @export var armors: Array[ArmorDefinition] = []
+## 可选地图（T33 地图选择）。
+@export var maps: Array[ArenaDefinition] = []
 
 
 func get_character(id: StringName) -> CharacterDefinition:
@@ -47,6 +49,21 @@ func get_armor(id: StringName) -> ArmorDefinition:
 		if armor != null and armor.id == id:
 			return armor
 	return null
+
+
+func get_map(id: StringName) -> ArenaDefinition:
+	for map: ArenaDefinition in maps:
+		if map != null and map.id == id:
+			return map
+	return null
+
+
+func get_map_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for map: ArenaDefinition in maps:
+		if map != null and map.id != StringName():
+			ids.append(map.id)
+	return ids
 
 
 ## 返回目录自身的错误列表；空数组表示有效。
@@ -92,5 +109,17 @@ func validate() -> Array[String]:
 			errors.append("防具 ID 重复：%s。" % armor.id)
 		else:
 			seen_armors[armor.id] = true
+
+	var seen_maps: Dictionary[StringName, bool] = {}
+	for map: ArenaDefinition in maps:
+		if map == null:
+			errors.append("地图目录包含空引用。")
+			continue
+		if map.id == StringName():
+			errors.append("地图缺少 ID：%s。" % map.display_name)
+		elif seen_maps.has(map.id):
+			errors.append("地图 ID 重复：%s。" % map.id)
+		else:
+			seen_maps[map.id] = true
 
 	return errors

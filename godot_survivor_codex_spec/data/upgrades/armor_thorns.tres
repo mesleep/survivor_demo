@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/armor/armor_thorns.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_thorns"
 display_name = "质变：反伤刺甲"
 description = "基础盔甲：身边形成反伤刺圈，受击后按实际伤害返还一部分给攻击者。"

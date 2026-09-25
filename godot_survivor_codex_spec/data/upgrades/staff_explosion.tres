@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/staff_orb_explosion.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"staff_explosion"
 display_name = "质变：爆炸法术"
 description = "蓄力法杖：法球命中首个敌人后爆炸，对周围敌人造成较低的溅射伤害。"

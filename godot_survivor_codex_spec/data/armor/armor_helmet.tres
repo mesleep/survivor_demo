@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_helmet_basic.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_helmet"
 display_name = "基础头盔"
 description = "增加少量防御，没有移动速度惩罚。"

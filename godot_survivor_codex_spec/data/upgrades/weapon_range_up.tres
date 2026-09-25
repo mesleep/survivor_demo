@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_range.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"weapon_range_up"
 display_name = "全武器射程 +10%"
 description = "所有武器的索敌射程提高 10%。"

@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/projectiles/arrow_ice.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"enchant_ice"
 display_name = "质变：附魔箭·寒冰"
 description = "长弓：需要已质变为寒冰法术的法杖。箭矢命中减速并短暂冻结敌人。"

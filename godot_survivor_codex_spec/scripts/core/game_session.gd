@@ -9,6 +9,8 @@ signal run_ended(result: GameResult)
 signal boss_spawned(boss: EnemyActor)
 ## 玩家创建并完成依赖注入后发出；供在 start_run 之前已存在的 UI 延迟连接。
 signal run_started(player: PlayerActor)
+## 玩家在设置面板请求返回主菜单；由 GameEntry 接管，无监听时回退加载入口场景。
+signal return_to_menu_requested()
 
 @export var player_definition: CharacterDefinition
 @export var content_catalog: ContentCatalog
@@ -132,7 +134,13 @@ func start_run() -> void:
 	boss_has_spawned = false
 	boss = null
 
-	arena.configure(arena_definition)
+	# 地图：优先单局配置选择，其次导出默认，最后场景自带。
+	var run_arena: ArenaDefinition = arena_definition
+	if run_loadout != null and is_instance_valid(content_catalog):
+		var resolved_arena: ArenaDefinition = run_loadout.resolve_map(content_catalog)
+		if resolved_arena != null:
+			run_arena = resolved_arena
+	arena.configure(run_arena)
 	var player_node: Node = effective_character.scene.instantiate()
 	if player_node is not PlayerActor:
 		push_error("GameSession 启动失败：CharacterDefinition.scene 必须生成 PlayerActor。")
@@ -372,6 +380,15 @@ func restart_run() -> void:
 	var error: Error = get_tree().reload_current_scene()
 	if error != OK:
 		push_error("GameSession 重开失败：无法重新加载当前场景，错误码 %d。" % error)
+
+
+## 请求返回主菜单（T33）：有 GameEntry 接管则发信号，否则回退加载入口场景。
+func request_return_to_menu() -> void:
+	get_tree().paused = false
+	if return_to_menu_requested.get_connections().is_empty():
+		get_tree().change_scene_to_file("res://scenes/bootstrap/game_entry.tscn")
+		return
+	return_to_menu_requested.emit()
 
 
 func get_remaining_seconds() -> float:

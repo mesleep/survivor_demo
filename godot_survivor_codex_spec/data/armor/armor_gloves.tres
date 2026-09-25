@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_gloves_basic.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"armor_gloves"
 display_name = "基础手套"
 description = "提供少量防御，同时缩短攻击间隔并提高射程。"

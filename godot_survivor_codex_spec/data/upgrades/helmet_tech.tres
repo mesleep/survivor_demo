@@ -5,8 +5,8 @@
 [ext_resource type="Resource" path="res://data/armor/tech_helmet.tres" id="2"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"helmet_tech"
 display_name = "质变：科技头盔"
 description = "基础头盔：每秒获得经验，并提高宝石经验；与科技战甲、科技手套联动。"

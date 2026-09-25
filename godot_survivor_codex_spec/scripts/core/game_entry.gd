@@ -145,6 +145,7 @@ func _start_session(loadout: RunLoadout) -> void:
 	if session_scene == null:
 		push_error("GameEntry 缺少单局场景。")
 		return
+	var menu_muted: bool = _menu.get_preferred_muted() if is_instance_valid(_menu) else false
 	_clear_menu()
 	var session_node: Node = session_scene.instantiate()
 	if session_node is not GameSession:
@@ -162,7 +163,10 @@ func _start_session(loadout: RunLoadout) -> void:
 		_session.set_permanent_upgrades(profile.permanent_upgrades.duplicate())
 	if not _session.run_ended.is_connected(_on_run_ended):
 		_session.run_ended.connect(_on_run_ended)
+	if not _session.return_to_menu_requested.is_connected(show_menu):
+		_session.return_to_menu_requested.connect(show_menu)
 	_session.start_run()
+	_session.game_audio.set_muted(menu_muted)
 
 
 ## 结算后把本局金币累加到档案并保存；失败时保留内存余额并提示（T27）。

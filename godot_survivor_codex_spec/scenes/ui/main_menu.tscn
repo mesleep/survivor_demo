@@ -250,9 +250,25 @@ custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
 theme_override_constants/separation = 14
 
+[node name="MapArea" type="VBoxContainer" parent="SafeArea/Page/Footer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="MapTitle" type="Label" parent="SafeArea/Page/Footer/MapArea"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.68, 0.82, 0.89, 1)
+theme_override_font_sizes/font_size = 14
+text = "地图"
+
+[node name="MapContainer" type="HBoxContainer" parent="SafeArea/Page/Footer/MapArea"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
 [node name="HintLabel" type="Label" parent="SafeArea/Page/Footer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(390, 0)
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.89, 0.94, 0.96, 1)
@@ -263,13 +279,19 @@ vertical_alignment = 1
 
 [node name="UnlockAllButton" type="Button" parent="SafeArea/Page/Footer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(225, 54)
+custom_minimum_size = Vector2(170, 54)
 layout_mode = 2
 text = "测试：一键解锁全部"
 tooltip_text = "立即解锁当前角色、武器与永久强化，并保存到测试档案。"
 
+[node name="SettingsButton" type="Button" parent="SafeArea/Page/Footer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 54)
+layout_mode = 2
+text = "设置"
+
 [node name="StartButton" type="Button" parent="SafeArea/Page/Footer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 62)
+custom_minimum_size = Vector2(180, 62)
 layout_mode = 2
 text = "开始生存挑战  ▶"

@@ -70,6 +70,8 @@ func _run() -> void:
 	capped.max_stacks = 1
 	player.apply_upgrade(capped)
 	system.upgrade_pool = [capped]
+	# 本用例验证“满级不再提供”；关闭金币兜底以隔离该行为。
+	system.fallback_upgrades = []
 	system.request_choices(3)
 	_expect(system.get_current_choices().is_empty(), "达到最大层数的升级仍被提供。")
 	_expect(_applied_signal_count == 1, "UpgradeSystem 成功选择未恰好发送一次应用信号。")

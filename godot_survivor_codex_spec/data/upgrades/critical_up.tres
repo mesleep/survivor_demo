@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_critical.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"critical_up"
 display_name = "会心一击 +10%"
 description = "每次命中有额外 10% 概率造成双倍伤害。"

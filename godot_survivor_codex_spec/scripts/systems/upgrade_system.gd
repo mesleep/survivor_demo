@@ -9,6 +9,8 @@ signal choices_ready(choices: Array[UpgradeDefinition])
 signal upgrade_applied(definition: UpgradeDefinition)
 
 @export var upgrade_pool: Array[UpgradeDefinition] = []
+## 当池中没有任何可用升级时使用的兜底选项（如金币奖励）。
+@export var fallback_upgrades: Array[UpgradeDefinition] = []
 ## 装备成长保底：优先质变，否则给一张已持有装备的基础升级。
 @export var guarantee_progression_choice: bool = true
 @export_range(1.0, 30.0, 0.5) var ascension_weight_multiplier: float = 8.0
@@ -89,6 +91,11 @@ func _draw_choices(exclude: Array[UpgradeDefinition], count: int) -> void:
 			if not exclude.has(definition):
 				filtered.append(definition)
 		available = filtered
+	# 所有装备都满级且质变/专属都加满时，给出兜底奖励（金币），避免升级空转。
+	if available.is_empty() and not fallback_upgrades.is_empty():
+		for definition: UpgradeDefinition in fallback_upgrades:
+			if can_offer(definition):
+				available.append(definition)
 	var choice_count: int = mini(requested, available.size())
 	if choice_count > 0 and guarantee_progression_choice:
 		var progression: Array[UpgradeDefinition] = []

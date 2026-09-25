@@ -6,13 +6,14 @@ var session: GameSession
 var audio: GameAudio
 var user_paused: bool = false
 var _hint: Label
-var _pause_label: Label
+var _settings_panel: SettingsPanel
 var _status: Label
 var _boss_bar: ProgressBar
 var _loadout: Label
 var _coin_icon: TextureRect
 var _coin_label: Label
 var _tech_icon: TextureRect
+var _equipment_bar: HBoxContainer
 
 
 func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
@@ -27,12 +28,7 @@ func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
 	_hint.add_theme_constant_override("shadow_offset_x", 2)
 	_hint.add_theme_constant_override("shadow_offset_y", 2)
 	add_child(_hint)
-	_pause_label = Label.new()
-	_pause_label.position = Vector2(440, 300)
-	_pause_label.add_theme_font_size_override("font_size", 36)
-	_pause_label.text = "已暂停\n按 Esc 继续庭院冒险"
-	_pause_label.visible = false
-	add_child(_pause_label)
+	_build_settings_panel()
 	_status = Label.new()
 	_status.position = Vector2(880, 20)
 	_status.add_theme_font_size_override("font_size", 20)
@@ -46,6 +42,11 @@ func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
 	_boss_bar.show_percentage = false
 	_boss_bar.visible = false
 	add_child(_boss_bar)
+	_equipment_bar = HBoxContainer.new()
+	_equipment_bar.position = Vector2(20, 556)
+	_equipment_bar.add_theme_constant_override("separation", 14)
+	_equipment_bar.visible = false
+	add_child(_equipment_bar)
 	_loadout = Label.new()
 	_loadout.position = Vector2(20, 622)
 	_loadout.add_theme_font_size_override("font_size", 18)
@@ -59,6 +60,16 @@ func initialize(game_session: GameSession, game_audio: GameAudio) -> void:
 		session.run_started.connect(_on_run_started)
 	_update_loadout()
 	_update_hint()
+
+
+## 暂停/设置面板（T33）：Esc 打开，含声音开关与返回主菜单。
+func _build_settings_panel() -> void:
+	_settings_panel = (load("res://scenes/ui/settings_panel.tscn") as PackedScene).instantiate() as SettingsPanel
+	add_child(_settings_panel)
+	_settings_panel.initialize(audio.muted, true)
+	_settings_panel.closed.connect(_on_settings_closed)
+	_settings_panel.return_to_menu_requested.connect(_on_settings_return_to_menu)
+	_settings_panel.mute_toggled.connect(_on_settings_mute_toggled)
 
 
 ## 金币图标 + 数字，使用新增 D03 图标（T34）。
@@ -114,8 +125,13 @@ func _connect_player() -> void:
 func _process(_delta: float) -> void:
 	if not is_instance_valid(session):
 		return
+	if is_instance_valid(_settings_panel) and _settings_panel.visible and not session.is_run_active:
+		_settings_panel.visible = false
+		user_paused = false
 	_hint.visible = session.is_run_active and not session.level_up_panel.visible
 	_loadout.visible = _hint.visible
+	if is_instance_valid(_equipment_bar):
+		_equipment_bar.visible = _hint.visible
 	if is_instance_valid(_coin_icon):
 		_coin_icon.visible = _hint.visible
 		_coin_label.visible = _hint.visible
@@ -158,11 +174,33 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func toggle_pause() -> void:
 	if not session.is_run_active or session.upgrade_system.is_awaiting_choice():
 		return
-	if get_tree().paused and not user_paused:
+	if user_paused:
+		_settings_panel.close()
 		return
-	user_paused = not user_paused
-	get_tree().paused = user_paused
-	_pause_label.visible = user_paused
+	if get_tree().paused:
+		return
+	user_paused = true
+	get_tree().paused = true
+	_settings_panel.open()
+
+
+func _on_settings_closed() -> void:
+	user_paused = false
+	if session.is_run_active:
+		get_tree().paused = false
+
+
+func _on_settings_return_to_menu() -> void:
+	user_paused = false
+	if is_instance_valid(session):
+		session.request_return_to_menu()
+
+
+func _on_settings_mute_toggled(muted: bool) -> void:
+	audio.set_muted(muted)
+	if is_instance_valid(session.player):
+		session.player.damage_feedback_component.play_sound = not muted
+	_update_hint()
 
 
 func _on_weapon_added(_weapon: WeaponController) -> void:
@@ -186,29 +224,61 @@ func _on_coins_changed(current_coins: int) -> void:
 func _update_loadout(_upgrade_id: StringName = &"", _count: int = 0) -> void:
 	if not is_instance_valid(session) or not is_instance_valid(session.player):
 		_loadout.text = ""
+		_clear_equipment_bar()
 		return
-	var weapon_names: PackedStringArray = []
-	for weapon: WeaponController in session.player.weapon_controllers:
-		weapon_names.append("%s ×%d" % [weapon.definition.display_name, weapon.get_effective_projectile_count()])
-	var armor_names: PackedStringArray = []
-	for armor_id: StringName in session.player.get_equipped_armor_ids():
-		var armor: ArmorDefinition = session.player.get_armor_definition(armor_id)
-		if armor != null:
-			armor_names.append("%s(%s)" % [armor.display_name, armor.get_category_name()])
-	var parts: PackedStringArray = []
-	if not weapon_names.is_empty():
-		parts.append("武器：" + " · ".join(weapon_names))
-	if not armor_names.is_empty():
-		parts.append("防具：" + " · ".join(armor_names))
-	_loadout.text = "装备 %d/%d ｜ 防御 %d ｜ 移速 %d ｜ 金币 %d ｜ %s" % [
+	_rebuild_equipment_bar()
+	_loadout.text = "装备 %d/%d ｜ 防御 %d ｜ 移速 %d ｜ 金币 %d" % [
 		session.player.get_equipped_count(),
 		PlayerActor.MAX_EQUIPMENT_SLOTS,
 		roundi(session.player.get_defense()),
 		roundi(session.player.get_effective_move_speed()),
 		session.player.get_run_coins(),
-		" ｜ ".join(parts)
 	]
 
 
+## 装备栏：每件装备显示图标与名称，质变后显示质变名（T33）。
+func _rebuild_equipment_bar() -> void:
+	if not is_instance_valid(_equipment_bar):
+		return
+	_clear_equipment_bar()
+	for equipment_id: StringName in session.player.get_equipped_ids():
+		var entry := HBoxContainer.new()
+		entry.add_theme_constant_override("separation", 6)
+		var icon_rect := TextureRect.new()
+		icon_rect.texture = session.player.get_equipment_icon(equipment_id)
+		icon_rect.custom_minimum_size = Vector2(26, 26)
+		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		entry.add_child(icon_rect)
+		var label := Label.new()
+		var display_name: String = session.player.get_equipment_display_name(equipment_id)
+		if session.player.get_equipped_category(equipment_id) == &"weapon":
+			var controller: WeaponController = _find_weapon_controller(equipment_id)
+			if controller != null:
+				display_name += " ×%d" % controller.get_effective_projectile_count()
+		label.text = display_name
+		label.add_theme_font_size_override("font_size", 16)
+		label.add_theme_color_override("font_shadow_color", Color.BLACK)
+		label.add_theme_constant_override("shadow_offset_x", 2)
+		label.add_theme_constant_override("shadow_offset_y", 2)
+		entry.add_child(label)
+		_equipment_bar.add_child(entry)
+
+
+func _clear_equipment_bar() -> void:
+	if not is_instance_valid(_equipment_bar):
+		return
+	for child: Node in _equipment_bar.get_children():
+		_equipment_bar.remove_child(child)
+		child.queue_free()
+
+
+func _find_weapon_controller(weapon_id: StringName) -> WeaponController:
+	for controller: WeaponController in session.player.weapon_controllers:
+		if is_instance_valid(controller) and controller.definition.id == weapon_id:
+			return controller
+	return null
+
+
 func _update_hint() -> void:
-	_hint.text = "WASD / 方向键移动 · 自动攻击 · 拾取宝石升级 · Esc 暂停 · M 声音：%s" % ("关" if audio.muted else "开")
+	_hint.text = "WASD / 方向键移动 · 自动攻击 · 拾取宝石升级 · Esc 设置 · M 声音：%s" % ("关" if audio.muted else "开")

@@ -1,5 +1,17 @@
 # 开发任务清单
 
+## 用户追加：装备显示/设置/金币兜底/地图选择（2026-09-25）
+
+- [x] 装备栏显示图标；质变后显示“基础名·分支名”并使用质变图标
+- [x] 局内 Esc 暂停并打开设置面板（声音开关 + 返回主菜单）；主菜单也有设置
+- [x] 升级池无可用卡时给出金币兜底卡（满级后不再空转）
+- [x] 目录新增两张地图，主菜单可选并在单局应用
+- [x] 修复既有 `icon` 属性写在 `script` 之前导致图标被忽略的问题（防具与升级卡）
+- [x] 解析、启动、68 项快速冒烟、120 秒 soak 通过；实拍装备栏/设置/主菜单
+- [ ] 真实窗口人工点击与十分钟完整游玩验收
+
+验证：Godot 4.7.1 `--headless --path . --editor --quit` 解析 0；`--quit-after 300` 启动 0；`tests/smoke` 68 项快速冒烟 0；120 秒 soak 0。专项见 `equipment_display_smoke_test.gd`、`settings_panel_smoke_test.gd`、`coin_fallback_smoke_test.gd`、`map_selection_smoke_test.gd`。实拍 `art_review/v2_equipment_bar_preview.png`、`v2_settings_preview.png`、`v2_main_menu_preview.png`。
+
 ## 用户追加：十分钟终局与后期升级节奏（2026-09-25）
 
 - [x] 默认单局延长为 10 分钟，Boss 在 10:00 仅生成一次，普通敌人持续生成

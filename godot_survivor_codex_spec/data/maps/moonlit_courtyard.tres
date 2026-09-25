@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ArenaDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/maps/arena_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/v2_dark_comic/backgrounds/F01_moonlit_courtyard.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+background_texture = ExtResource("2")
+id = &"moonlit_courtyard"
+display_name = "月光庭院"
+size = Vector2(2560, 1440)
+grid_spacing = 128.0
+background_color = Color(0.09, 0.14, 0.23, 1)
+grid_color = Color(0.15, 0.22, 0.35, 1)
+border_color = Color(0.31, 0.47, 0.66, 1)

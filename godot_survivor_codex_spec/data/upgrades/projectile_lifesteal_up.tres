@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" path="res://assets/v2_dark_comic/ui/icon_attr_lifesteal.png" id="icon"]
 
 [resource]
-icon = ExtResource("icon")
 script = ExtResource("1")
+icon = ExtResource("icon")
 id = &"projectile_lifesteal_up"
 display_name = "生命汲取 +3%"
 description = "魔弹命中时恢复实际伤害的 3% 生命。"

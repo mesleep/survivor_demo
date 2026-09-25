@@ -22,25 +22,51 @@ var permanent_catalog: PermanentUpgradeCatalog
 
 @onready var character_container: VBoxContainer = %CharacterContainer
 @onready var weapon_container: VBoxContainer = %WeaponContainer
+@onready var map_container: HBoxContainer = %MapContainer
 @onready var hint_label: Label = %HintLabel
 @onready var start_button: Button = %StartButton
 @onready var unlock_all_button: Button = %UnlockAllButton
+@onready var settings_button: Button = %SettingsButton
 
 var _character_id: StringName = &""
 var _selected_weapon_ids: Array[StringName] = []
+var _map_id: StringName = &""
 var _character_buttons: Dictionary[StringName, Button] = {}
 var _weapon_buttons: Dictionary[StringName, Button] = {}
+var _map_buttons: Dictionary[StringName, Button] = {}
 var _pending_loadout: RunLoadout
 var _start_locked: bool = false
 var _status_text: String = ""
+var _settings_panel: SettingsPanel
+var _menu_muted: bool = false
 
 
 func _ready() -> void:
 	start_button.pressed.connect(request_start)
 	unlock_all_button.pressed.connect(_on_unlock_all_pressed)
+	settings_button.pressed.connect(_on_settings_pressed)
 	_style_button(start_button)
 	_style_button(unlock_all_button)
+	_style_button(settings_button)
 	_build()
+
+
+## 主菜单设置：声音开关（进入单局时应用）。
+func _on_settings_pressed() -> void:
+	if not is_instance_valid(_settings_panel):
+		_settings_panel = (load("res://scenes/ui/settings_panel.tscn") as PackedScene).instantiate() as SettingsPanel
+		add_child(_settings_panel)
+		_settings_panel.initialize(_menu_muted, false)
+		_settings_panel.mute_toggled.connect(_on_menu_mute_toggled)
+	_settings_panel.open()
+
+
+func _on_menu_mute_toggled(muted: bool) -> void:
+	_menu_muted = muted
+
+
+func get_preferred_muted() -> bool:
+	return _menu_muted
 
 
 ## 统一按钮样式；动态生成的按钮都走这里（T34 界面收口）。
@@ -151,8 +177,22 @@ func get_character_id() -> StringName:
 	return _character_id
 
 
+func get_map_id() -> StringName:
+	return _map_id
+
+
+## 选择本局地图；未知 ID 返回 false。
+func select_map(map_id: StringName) -> bool:
+	if not is_instance_valid(catalog) or catalog.get_map(map_id) == null:
+		return false
+	_map_id = map_id
+	_sync_map_buttons()
+	_update_hint()
+	return true
+
+
 func get_selected_loadout() -> RunLoadout:
-	return RunLoadout.new(_character_id, _selected_weapon_ids, _starting_weapon_ids())
+	return RunLoadout.new(_character_id, _selected_weapon_ids, _starting_weapon_ids(), _map_id)
 
 
 ## 校验当前选择；有效时锁定按钮并发出 start_requested，无效时只更新提示。
@@ -314,6 +354,8 @@ func _build() -> void:
 		weapon_container.add_child(button)
 		_weapon_buttons[weapon.id] = button
 
+	_build_map_buttons(default_loadout.map_id)
+
 	var start_character_id: StringName = default_loadout.character_id
 	if start_character_id == StringName() or not _character_buttons.has(start_character_id) \
 			or not _is_character_available(start_character_id):
@@ -330,6 +372,61 @@ func _build() -> void:
 	_sync_weapon_buttons()
 	_build_permanent_section()
 	_update_hint()
+
+
+## 地图选择：按目录生成按钮，默认选中快照或第一张（T33）。
+func _build_map_buttons(preferred_map_id: StringName) -> void:
+	_clear_map_buttons()
+	_map_id = &""
+	if not is_instance_valid(catalog):
+		return
+	var group := ButtonGroup.new()
+	for map: ArenaDefinition in catalog.maps:
+		if map == null:
+			continue
+		var button := Button.new()
+		_style_button(button)
+		button.custom_minimum_size = Vector2(112, 40)
+		button.text = map.display_name
+		button.toggle_mode = true
+		button.button_group = group
+		button.pressed.connect(_on_map_pressed.bind(map.id))
+		map_container.add_child(button)
+		_map_buttons[map.id] = button
+	var start_id: StringName = preferred_map_id
+	if start_id == StringName() or not _map_buttons.has(start_id):
+		start_id = catalog.maps[0].id if not catalog.maps.is_empty() and catalog.maps[0] != null else StringName()
+	if start_id != StringName():
+		select_map(start_id)
+	else:
+		_sync_map_buttons()
+
+
+func _on_map_pressed(map_id: StringName) -> void:
+	select_map(map_id)
+
+
+func _sync_map_buttons() -> void:
+	for map_id: StringName in _map_buttons.keys():
+		var button: Button = _map_buttons[map_id]
+		var selected: bool = map_id == _map_id
+		button.button_pressed = selected
+		button.text = ("◆ " if selected else "◇ ") + _map_display_name(map_id)
+
+
+func _map_display_name(map_id: StringName) -> String:
+	if is_instance_valid(catalog):
+		var map: ArenaDefinition = catalog.get_map(map_id)
+		if map != null:
+			return map.display_name
+	return String(map_id)
+
+
+func _clear_map_buttons() -> void:
+	for child: Node in map_container.get_children():
+		map_container.remove_child(child)
+		child.queue_free()
+	_map_buttons.clear()
 
 
 ## 永久强化区：跨角色共享，显示等级/价格，点击购买（T30）。
@@ -459,8 +556,9 @@ func _update_hint() -> void:
 		character = catalog.get_character(_character_id)
 	var character_name: String = character.display_name if character != null else "未选择"
 	var coins_suffix: String = " ｜ 金币 %d" % profile.coins if profile != null else ""
-	hint_label.text = "角色：%s ｜ 候选武器 %d/%d%s（起始武器自动保留）" % [
-		character_name, _selected_weapon_ids.size(), RunLoadout.MAX_CANDIDATE_WEAPONS, coins_suffix
+	var map_name: String = _map_display_name(_map_id) if _map_id != StringName() else "未选择"
+	hint_label.text = "角色：%s ｜ 地图：%s ｜ 候选武器 %d/%d%s（起始武器自动保留）" % [
+		character_name, map_name, _selected_weapon_ids.size(), RunLoadout.MAX_CANDIDATE_WEAPONS, coins_suffix
 	]
 	if not _status_text.is_empty():
 		hint_label.text += "\n%s" % _status_text
