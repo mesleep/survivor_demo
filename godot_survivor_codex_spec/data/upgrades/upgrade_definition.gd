@@ -53,6 +53,12 @@ enum UpgradeType {
 	SPLIT_COUNT,
 	## 附魔箭：把弓的弹体切换为对应法杖质变的附魔箭（T20，D08 快照继承）。
 	ENCHANT_ARROW,
+	## 反伤刺甲：启用刺圈并按档案设置受击返还比例（T21）。
+	THORN_AURA,
+	## 刺圈半径倍率（T21 反伤刺甲专属升级，value 为每级增量）。
+	THORN_RADIUS,
+	## 受击返还比例增量（T21 反伤刺甲专属升级，value 为每级增量）。
+	REFLECT_RATIO,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -91,6 +97,8 @@ enum UpgradeCategory {
 @export var required_equipment_id: StringName
 ## 前置装备必须已选择的分支 ID；为空只要求持有该装备。
 @export var required_equipment_branch_id: StringName
+## THORN_AURA 质变引用的反伤刺甲数值档案（T21）。
+@export var thorn_armor: ThornArmorDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

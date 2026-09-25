@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"armor_thorns_radius_up"
+display_name = "反伤刺甲·扩刺"
+description = "反伤刺甲专属：刺圈范围扩大 20%。"
+type = 34
+category = 4
+value = 0.2
+target_equipment_id = &"armor_basic"
+branch_id = &"thorns"
+max_stacks = 3
+weight = 1.0

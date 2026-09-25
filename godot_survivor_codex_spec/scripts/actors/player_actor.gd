@@ -47,6 +47,8 @@ var _equipped_equipment_ids: Array[StringName] = []
 var _equipment_categories: Dictionary[StringName, StringName] = {}
 var _armor_definitions: Dictionary[StringName, ArmorDefinition] = {}
 var _equipment_progress: Dictionary[StringName, EquipmentProgress] = {}
+var _thorn_aura: ThornAuraComponent
+var _thorn_aura_radius_multiplier: float = 1.0
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -87,6 +89,9 @@ func initialize(new_definition: Resource) -> void:
 	_armor_defense_bonus = 0.0
 	_armor_move_penalty_ratio = 0.0
 	set_defense(0.0)
+	set_damage_reflect_ratio(0.0)
+	_clear_thorn_aura()
+	_thorn_aura_radius_multiplier = 1.0
 	_regeneration = 0.0
 	_regeneration_clock = 0.0
 	_weapon_modifier_history.clear()
@@ -500,6 +505,14 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 			_apply_weapon_modifier(split_modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.ENCHANT_ARROW:
 			_apply_projectile_override(upgrade.projectile_definition, upgrade.get_target_equipment_id())
+		UpgradeDefinition.UpgradeType.THORN_AURA:
+			_enable_thorn_aura(upgrade.thorn_armor)
+		UpgradeDefinition.UpgradeType.THORN_RADIUS:
+			_thorn_aura_radius_multiplier *= maxf(1.0 + upgrade.value, 0.0)
+			if is_instance_valid(_thorn_aura):
+				_thorn_aura.set_radius_multiplier(_thorn_aura_radius_multiplier)
+		UpgradeDefinition.UpgradeType.REFLECT_RATIO:
+			add_damage_reflect_ratio(upgrade.value)
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
@@ -585,6 +598,29 @@ func _on_pickup_detected(pickup: Area2D) -> void:
 
 func _get_base_max_health() -> float:
 	return definition.max_health if definition != null else 1.0
+
+
+## 启用反伤刺甲：设置受击返还比例并挂载持续刺圈（T21）。
+func _enable_thorn_aura(definition: ThornArmorDefinition) -> void:
+	if definition == null:
+		return
+	_clear_thorn_aura()
+	add_damage_reflect_ratio(definition.hit_reflect_ratio)
+	_thorn_aura = ThornAuraComponent.new()
+	_thorn_aura.name = "ThornAura"
+	add_child(_thorn_aura)
+	_thorn_aura.initialize(self, definition)
+	_thorn_aura.set_radius_multiplier(_thorn_aura_radius_multiplier)
+
+
+func _clear_thorn_aura() -> void:
+	if is_instance_valid(_thorn_aura):
+		_thorn_aura.queue_free()
+	_thorn_aura = null
+
+
+func get_thorn_aura() -> ThornAuraComponent:
+	return _thorn_aura
 
 
 func _apply_weapon_modifier(modifier: WeaponRuntimeModifier, target_weapon_id: StringName = &"") -> void:
