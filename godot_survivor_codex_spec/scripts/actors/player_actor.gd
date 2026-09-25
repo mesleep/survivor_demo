@@ -13,6 +13,8 @@ signal upgrade_state_changed(upgrade_id: StringName, stack_count: int)
 signal weapon_added(controller: WeaponController)
 ## 装备清单变化（含起始武器）；参数为当前装备 ID 副本，供 UI 只读展示。
 signal equipment_changed(equipped_ids: Array[StringName])
+## 单件装备成长状态变化；携带只读快照，UI 不直接修改运行时对象。
+signal equipment_progress_changed(equipment_id: StringName, snapshot: EquipmentProgress)
 
 ## D02：武器与防具共用六格，同一 ID 不重复装备；升级不占新格。
 const MAX_EQUIPMENT_SLOTS := 6
@@ -36,6 +38,7 @@ var _projectile_parent: Node
 var _targeting_service: TargetingService
 var _candidate_weapon_ids: Array[StringName] = []
 var _equipped_equipment_ids: Array[StringName] = []
+var _equipment_progress: Dictionary[StringName, EquipmentProgress] = {}
 
 @onready var camera: Camera2D = %Camera2D
 @onready var pickup_component: PickupComponent = %PickupComponent
@@ -76,6 +79,7 @@ func initialize(new_definition: Resource) -> void:
 	_weapon_modifier_history.clear()
 	_candidate_weapon_ids.clear()
 	_equipped_equipment_ids.clear()
+	_equipment_progress.clear()
 	pickup_component.initialize(definition.pickup_radius)
 	set_physics_process(true)
 	level_progress_changed.emit(_current_level, _current_level_experience, get_required_experience())
@@ -101,6 +105,7 @@ func configure_weapons(
 ) -> void:
 	clear_weapons()
 	_equipped_equipment_ids.clear()
+	_equipment_progress.clear()
 	_projectile_parent = projectile_parent
 	_targeting_service = targeting_service
 	if not is_instance_valid(projectile_parent) or not is_instance_valid(targeting_service):
@@ -191,8 +196,65 @@ func _register_equipment(equipment_id: StringName) -> void:
 		return
 	if _equipped_equipment_ids.size() >= MAX_EQUIPMENT_SLOTS:
 		return
+	if not _equipment_progress.has(equipment_id):
+		_equipment_progress[equipment_id] = EquipmentProgress.new(equipment_id)
 	_equipped_equipment_ids.append(equipment_id)
 	equipment_changed.emit(_equipped_equipment_ids.duplicate())
+	_emit_equipment_progress(equipment_id)
+
+
+## 返回单件装备成长的只读快照；未持有时返回 null。
+func get_progress(equipment_id: StringName) -> EquipmentProgress:
+	if not _equipment_progress.has(equipment_id):
+		return null
+	return _equipment_progress[equipment_id].copy()
+
+
+func has_equipment_progress(equipment_id: StringName) -> bool:
+	return _equipment_progress.has(equipment_id)
+
+
+## 提升基础等级，每件装备独立，达到上限后返回 false。
+func add_equipment_base_level(equipment_id: StringName) -> bool:
+	if not _equipment_progress.has(equipment_id):
+		return false
+	if not _equipment_progress[equipment_id].add_base_level():
+		return false
+	_emit_equipment_progress(equipment_id)
+	return true
+
+
+## 质变资格：已持有、基础满级且尚未选择分支，且分支 ID 非空。
+func can_choose_equipment_branch(equipment_id: StringName, branch_id: StringName) -> bool:
+	if branch_id == StringName() or not _equipment_progress.has(equipment_id):
+		return false
+	return _equipment_progress[equipment_id].can_choose_branch()
+
+
+## 选择一次互斥质变；已有分支后再次调用返回 false。
+func choose_equipment_branch(equipment_id: StringName, branch_id: StringName) -> bool:
+	if not can_choose_equipment_branch(equipment_id, branch_id):
+		return false
+	if not _equipment_progress[equipment_id].choose_branch(branch_id):
+		return false
+	_emit_equipment_progress(equipment_id)
+	return true
+
+
+## 提升质变专属升级层数；需先选分支且未达专属上限。
+func add_equipment_branch_upgrade(equipment_id: StringName, upgrade_id: StringName) -> bool:
+	if not _equipment_progress.has(equipment_id):
+		return false
+	if not _equipment_progress[equipment_id].add_branch_upgrade(upgrade_id):
+		return false
+	_emit_equipment_progress(equipment_id)
+	return true
+
+
+func _emit_equipment_progress(equipment_id: StringName) -> void:
+	if not _equipment_progress.has(equipment_id):
+		return
+	equipment_progress_changed.emit(equipment_id, _equipment_progress[equipment_id].copy())
 
 
 func clear_weapons() -> void:
