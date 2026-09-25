@@ -18,6 +18,9 @@ var pierce_bonus: int = 0
 var speed_multiplier: float = 1.0
 var size_multiplier: float = 1.0
 var critical_chance: float = 0.0
+## 爆炸运行时倍率（T16）；只影响本次弹体，不回写共享 ExplosionDefinition。
+var explosion_radius_multiplier: float = 1.0
+var explosion_damage_multiplier: float = 1.0
 
 
 func _init(

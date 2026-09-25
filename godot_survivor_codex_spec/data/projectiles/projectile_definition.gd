@@ -22,3 +22,5 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export_range(0, 1000, 1) var pierce_count: int = 0
 @export_range(1.0, 1000.0, 0.5) var hit_radius: float = 8.0
 @export_range(0.0, 100000.0, 0.1) var knockback_strength: float = 0.0
+## 命中后的一次性范围爆炸配置；为空表示不爆炸（T16）。
+@export var explosion: ExplosionDefinition

@@ -477,6 +477,16 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 				UpgradeDefinition.UpgradeType.VOLLEY_COUNT:
 					modifier.volley_count_bonus = roundi(upgrade.value)
 			_apply_weapon_modifier(modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.EXPLOSION:
+			_apply_projectile_override(upgrade.projectile_definition, upgrade.get_target_equipment_id())
+		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
+			var radius_modifier := WeaponRuntimeModifier.new()
+			radius_modifier.explosion_radius_multiplier = maxf(1.0 + upgrade.value, 0.0)
+			_apply_weapon_modifier(radius_modifier, upgrade.required_weapon_id)
+		UpgradeDefinition.UpgradeType.EXPLOSION_DAMAGE:
+			var explosion_damage_modifier := WeaponRuntimeModifier.new()
+			explosion_damage_modifier.explosion_damage_multiplier = maxf(1.0 + upgrade.value, 0.0)
+			_apply_weapon_modifier(explosion_damage_modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.REGENERATION:
 			_regeneration += upgrade.value
 		UpgradeDefinition.UpgradeType.ACQUIRE_WEAPON:
@@ -559,3 +569,14 @@ func _apply_weapon_modifier(modifier: WeaponRuntimeModifier, target_weapon_id: S
 	for controller: WeaponController in weapon_controllers:
 		if is_instance_valid(controller) and (target_weapon_id == StringName() or controller.definition.id == target_weapon_id):
 			controller.apply_runtime_modifier(modifier)
+
+
+## 质变切换目标武器的弹体（如爆炸法球）；只改运行时覆盖，不写共享 Resource。
+func _apply_projectile_override(
+		projectile_definition: ProjectileDefinition, target_weapon_id: StringName = &""
+) -> void:
+	if projectile_definition == null:
+		return
+	for controller: WeaponController in weapon_controllers:
+		if is_instance_valid(controller) and (target_weapon_id == StringName() or controller.definition.id == target_weapon_id):
+			controller.set_projectile_definition_override(projectile_definition)

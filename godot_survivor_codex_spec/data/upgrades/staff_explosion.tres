@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/staff_orb_explosion.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_explosion"
+display_name = "质变：爆炸法术"
+description = "蓄力法杖：法球命中首个敌人后爆炸，对周围敌人造成较低的溅射伤害。"
+type = 22
+category = 3
+value = 0.0
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"explosion"
+max_stacks = 1
+weight = 1.0
+projectile_definition = ExtResource("2")

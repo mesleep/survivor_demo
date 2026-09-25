@@ -117,6 +117,13 @@
 - 新增蓄力法杖与法球、获取卡与基础强化并接入目录/升级池（外观占位）。
 - 新增 `staff_charge_smoke_test.gd`；解析、启动与 41 项快速冒烟通过。
 
+### T16 爆炸与范围命中（2026-09-25）
+
+- 新增可配 `ExplosionDefinition`（半径、溅射伤害倍率、是否命中直击目标、碰撞掩码、目标上限、击退与特效参数）与复用查询 `AreaHitResolver`，同一次爆炸按 Actor 实例去重并过滤死亡/已释放/同阵营目标。
+- `ProjectileBase` 命中后触发一次受控范围爆炸并立即停用；直击目标是否再吃溅射由 `hits_direct_target` 配置；表现由一次性 `ExplosionEffect` 承担，未提供 E02 素材时绘制占位圆环。
+- 新增“爆炸法术”质变及“裂爆（范围 +25%/级）”“灼爆（溅射伤害 +20%/级）”专属升级；`WeaponController` 支持运行时弹体覆盖与爆炸倍率，`UpgradeDefinition` 新增 `EXPLOSION`/`EXPLOSION_RADIUS`/`EXPLOSION_DAMAGE` 与 `projectile_definition`。
+- `GameSession` 结算时同时清理爆炸特效；新增 `explosion_aoe_smoke_test.gd`；解析、启动与 42 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

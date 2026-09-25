@@ -8,6 +8,8 @@ extends Area2D
 
 signal projectile_hit(target: ActorBase, event: DamageEvent)
 signal deactivated(projectile: ProjectileBase)
+## 爆炸弹命中后触发一次；携带爆炸中心与本次唯一命中数，供表现和测试监听。
+signal explosion_triggered(center: Vector2, hit_count: int)
 
 @export var free_on_deactivate: bool = true
 
@@ -144,11 +146,76 @@ func on_hit(target: Node) -> bool:
 			)
 	projectile_hit.emit(target_actor, event)
 
+	# 爆炸弹以首击为终点：引爆后立即停用，穿透属性不参与后续飞行。
+	if definition.explosion != null:
+		_detonate(target_actor)
+		deactivate()
+		return true
+
 	if _remaining_pierces <= 0:
 		deactivate()
 	else:
 		_remaining_pierces -= 1
 	return true
+
+
+## 在命中位置执行一次受控范围查询并结算溅射；表现与规则分离（T16）。
+##
+## 同一次爆炸按 Actor 实例去重；直击目标是否再吃溅射由 hits_direct_target 配置。
+func _detonate(direct_target: ActorBase) -> void:
+	var explosion: ExplosionDefinition = definition.explosion
+	if explosion == null or context == null:
+		return
+	var radius: float = maxf(
+		explosion.radius * maxf(context.explosion_radius_multiplier, 0.0), 0.0
+	)
+	var splash_damage: float = maxf(
+		definition.damage
+			* maxf(context.damage_multiplier, 0.0)
+			* maxf(explosion.damage_multiplier, 0.0)
+			* maxf(context.explosion_damage_multiplier, 0.0),
+		0.0
+	)
+	var targets: Array[ActorBase] = AreaHitResolver.collect_actors(
+		get_world_2d(),
+		global_position,
+		radius,
+		explosion.collision_mask,
+		context.team_id,
+		explosion.max_targets
+	)
+	var hit_count: int = 0
+	for actor: ActorBase in targets:
+		if actor == direct_target and not explosion.hits_direct_target:
+			continue
+		if not is_instance_valid(actor) or actor.health_component.is_dead():
+			continue
+		var splash_event := DamageEvent.new(splash_damage, context.shooter, global_position)
+		splash_event.tags = [&"aoe", &"explosion"]
+		if context.weapon_id != StringName():
+			splash_event.tags.append(context.weapon_id)
+		splash_event.knockback_strength = explosion.knockback_strength
+		actor.apply_damage(splash_event)
+		hit_count += 1
+	_spawn_explosion_effect(explosion, radius)
+	explosion_triggered.emit(global_position, hit_count)
+
+
+## 生成一次性的透明爆炸表现节点；素材缺失时由 ExplosionEffect 绘制占位圆环。
+func _spawn_explosion_effect(explosion: ExplosionDefinition, radius: float) -> void:
+	var parent: Node = get_parent()
+	if not is_instance_valid(parent):
+		return
+	var effect := ExplosionEffect.new()
+	parent.add_child(effect)
+	effect.global_position = global_position
+	effect.setup(
+		radius,
+		explosion.visual_duration_seconds,
+		explosion.visual_color,
+		explosion.visual_frames,
+		explosion.visual_scale
+	)
 
 
 ## 停用碰撞、运动和 Timer；默认释放节点，也可供测试或未来对象复用保留。

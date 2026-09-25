@@ -31,6 +31,12 @@ enum UpgradeType {
 	IMMUNE_CHANCE,
 	## 同一次攻击周期内额外射击轮数（T13，独立于弹数与穿透）。
 	VOLLEY_COUNT,
+	## 命中后触发一次性范围爆炸（T16）；弹体由 projectile_definition 指定，value 未使用。
+	EXPLOSION,
+	## 爆炸范围倍率（T16 爆炸分支专属升级，value 为每级增量）。
+	EXPLOSION_RADIUS,
+	## 爆炸溅射伤害倍率（T16 爆炸分支专属升级，value 为每级增量）。
+	EXPLOSION_DAMAGE,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -61,6 +67,8 @@ enum UpgradeCategory {
 @export var weapon_definition: WeaponDefinition
 ## 获取防具类升级所授予的只读配置（与 weapon_definition 二选一）。
 @export var armor_definition: ArmorDefinition
+## EXPLOSION 质变切换到的弹体配置（T16）。
+@export var projectile_definition: ProjectileDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

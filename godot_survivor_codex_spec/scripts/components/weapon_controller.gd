@@ -45,6 +45,10 @@ var _pierce_bonus: int = 0
 var _speed_multiplier: float = 1.0
 var _size_multiplier: float = 1.0
 var _critical_chance: float = 0.0
+## 质变切换后的弹体覆盖；为空时使用 WeaponDefinition 上的共享弹体（T16 爆炸分支）。
+var _projectile_definition_override: ProjectileDefinition
+var _explosion_radius_multiplier: float = 1.0
+var _explosion_damage_multiplier: float = 1.0
 
 
 func _ready() -> void:
@@ -118,10 +122,11 @@ func set_targeting_service(new_targeting_service: TargetingService) -> void:
 
 
 func can_fire() -> bool:
+	var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
 	return (
 		definition != null
-		and definition.projectile_definition != null
-		and definition.projectile_definition.scene != null
+		and projectile_definition != null
+		and projectile_definition.scene != null
 		and is_instance_valid(owner_actor)
 		and is_instance_valid(projectile_parent)
 		and not owner_actor.health_component.is_dead()
@@ -174,10 +179,13 @@ func request_fire(target: Node2D) -> bool:
 func _fire_volley(
 		base_direction: Vector2, requested_count: int, target: Node2D, damage_multiplier: float
 ) -> int:
+	var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
+	if projectile_definition == null:
+		return 0
 	var spawned_count: int = 0
 	for index: int in range(requested_count):
 		var direction: Vector2 = base_direction.rotated(_get_spread_offset_radians(index, requested_count))
-		if definition.projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
+		if projectile_definition.motion_type == ProjectileDefinition.MotionType.ORBIT:
 			direction = Vector2.RIGHT.rotated(TAU * float(index) / requested_count)
 		var context := ProjectileSpawnContext.new(
 			owner_actor,
@@ -189,7 +197,9 @@ func _fire_volley(
 		context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
 		context.target = target
 		context.weapon_id = definition.id
-		if spawn_projectile(definition.projectile_definition, context) != null:
+		context.explosion_radius_multiplier = _explosion_radius_multiplier
+		context.explosion_damage_multiplier = _explosion_damage_multiplier
+		if spawn_projectile(projectile_definition, context) != null:
 			spawned_count += 1
 	return spawned_count
 
@@ -357,6 +367,8 @@ func apply_runtime_modifier(modifier: WeaponRuntimeModifier) -> void:
 		1.0
 	)
 	_runtime_volley_count_bonus += modifier.volley_count_bonus
+	_explosion_radius_multiplier *= maxf(modifier.explosion_radius_multiplier, 0.0)
+	_explosion_damage_multiplier *= maxf(modifier.explosion_damage_multiplier, 0.0)
 
 
 func reset_runtime_state() -> void:
@@ -364,6 +376,9 @@ func reset_runtime_state() -> void:
 	_speed_multiplier = 1.0
 	_size_multiplier = 1.0
 	_critical_chance = 0.0
+	_projectile_definition_override = null
+	_explosion_radius_multiplier = 1.0
+	_explosion_damage_multiplier = 1.0
 	_repeat_shot_generation += 1
 	_cooldown_remaining = 0.0
 	_runtime_cooldown_multiplier = 1.0
@@ -417,6 +432,27 @@ func set_random_seed(seed: int) -> void:
 	_random.seed = seed
 
 
+## 质变分支可覆盖弹体（如爆炸法球）；为空时回退武器共享弹体。
+func get_effective_projectile_definition() -> ProjectileDefinition:
+	if _projectile_definition_override != null:
+		return _projectile_definition_override
+	if definition == null:
+		return null
+	return definition.projectile_definition
+
+
+func set_projectile_definition_override(projectile_definition: ProjectileDefinition) -> void:
+	_projectile_definition_override = projectile_definition
+
+
+func get_explosion_radius_multiplier() -> float:
+	return _explosion_radius_multiplier
+
+
+func get_explosion_damage_multiplier() -> float:
+	return _explosion_damage_multiplier
+
+
 ## 合并角色攻击范围上限、武器自身射程与全武器射程倍率（D06）。
 ##
 ## 索敌范围取“角色上限与武器射程的较小值”，再乘以角色级全武器射程倍率；
@@ -452,6 +488,9 @@ func _fire_repeat_shot_after_delay(
 	var direction := owner_actor.get_aim_position().direction_to(target_position)
 	if direction.is_zero_approx():
 		direction = Vector2.RIGHT
+	var projectile_definition: ProjectileDefinition = get_effective_projectile_definition()
+	if projectile_definition == null:
+		return
 	var context := ProjectileSpawnContext.new(
 		owner_actor,
 		owner_actor.get_team_id(),
@@ -461,7 +500,9 @@ func _fire_repeat_shot_after_delay(
 	context.damage_multiplier = _runtime_damage_multiplier
 	context.lifesteal_ratio = _runtime_projectile_lifesteal_ratio
 	context.weapon_id = definition.id
-	if spawn_projectile(definition.projectile_definition, context) == null:
+	context.explosion_radius_multiplier = _explosion_radius_multiplier
+	context.explosion_damage_multiplier = _explosion_damage_multiplier
+	if spawn_projectile(projectile_definition, context) == null:
 		return
 	fire_requested.emit(
 		definition,

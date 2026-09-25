@@ -351,3 +351,5 @@ func _stop_combat_nodes() -> void:
 	for child: Node in projectiles.get_children():
 		if child is ProjectileBase:
 			(child as ProjectileBase).deactivate()
+		elif child is ExplosionEffect:
+			(child as ExplosionEffect).finish()
