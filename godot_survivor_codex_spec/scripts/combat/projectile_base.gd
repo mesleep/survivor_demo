@@ -145,6 +145,7 @@ func on_hit(target: Node) -> bool:
 				damage_dealt * clampf(context.lifesteal_ratio, 0.0, 1.0)
 			)
 	projectile_hit.emit(target_actor, event)
+	_apply_on_hit_effects(target_actor)
 
 	# 爆炸弹以首击为终点：引爆后立即停用，穿透属性不参与后续飞行。
 	if definition.explosion != null:
@@ -157,6 +158,37 @@ func on_hit(target: Node) -> bool:
 	else:
 		_remaining_pierces -= 1
 	return true
+
+
+## 命中后的附加效果：给目标挂持续伤害、在命中点留下地面区域（T17）。
+##
+## 与爆炸分离，火舌 DoT 和地面火坑各自是独立可复用能力。
+func _apply_on_hit_effects(target_actor: ActorBase) -> void:
+	if definition.damage_over_time != null:
+		target_actor.apply_damage_over_time(
+			definition.damage_over_time,
+			context.shooter,
+			maxf(context.damage_multiplier, 0.0)
+		)
+	if definition.ground_area != null:
+		_spawn_ground_area(definition.ground_area)
+
+
+## 生成地面持续伤害区域；来源离树后区域仍按自身时长结算。
+func _spawn_ground_area(area_definition: GroundDamageAreaDefinition) -> void:
+	var parent: Node = get_parent()
+	if not is_instance_valid(parent):
+		return
+	var area := GroundDamageArea.new()
+	parent.add_child(area)
+	area.global_position = global_position
+	area.setup(
+		area_definition,
+		context.shooter,
+		context.team_id,
+		maxf(context.damage_multiplier, 0.0),
+		maxf(context.ground_area_duration_multiplier, 0.0)
+	)
 
 
 ## 在命中位置执行一次受控范围查询并结算溅射；表现与规则分离（T16）。

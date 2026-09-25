@@ -477,8 +477,12 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 				UpgradeDefinition.UpgradeType.VOLLEY_COUNT:
 					modifier.volley_count_bonus = roundi(upgrade.value)
 			_apply_weapon_modifier(modifier, upgrade.required_weapon_id)
-		UpgradeDefinition.UpgradeType.EXPLOSION:
+		UpgradeDefinition.UpgradeType.EXPLOSION, UpgradeDefinition.UpgradeType.FLAME:
 			_apply_projectile_override(upgrade.projectile_definition, upgrade.get_target_equipment_id())
+		UpgradeDefinition.UpgradeType.AREA_DURATION:
+			var area_duration_modifier := WeaponRuntimeModifier.new()
+			area_duration_modifier.ground_area_duration_multiplier = maxf(1.0 + upgrade.value, 0.0)
+			_apply_weapon_modifier(area_duration_modifier, upgrade.required_weapon_id)
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
 			var radius_modifier := WeaponRuntimeModifier.new()
 			radius_modifier.explosion_radius_multiplier = maxf(1.0 + upgrade.value, 0.0)

@@ -21,6 +21,8 @@ var volley_count_bonus: int = 0
 ## 爆炸范围倍率与溅射伤害倍率（T16 爆炸分支专属升级使用）。
 var explosion_radius_multiplier: float = 1.0
 var explosion_damage_multiplier: float = 1.0
+## 地面区域持续时间倍率（T17 火焰分支专属升级使用）。
+var ground_area_duration_multiplier: float = 1.0
 
 
 func _init(

@@ -37,7 +37,7 @@ func _test_multishot_volleys() -> void:
 	if bow_controller == null:
 		await _free_node(main_node)
 		return
-	_disable_auto_fire(player)
+	_disable_auto_fire(session, player)
 	_enable_ascension(player, bow_controller)
 
 	var multishot: UpgradeDefinition = load(MULTISHOT_PATH) as UpgradeDefinition
@@ -65,7 +65,7 @@ func _test_rounds_and_pierce_separate() -> void:
 	var bow: WeaponDefinition = (load(CATALOG_PATH) as ContentCatalog).get_weapon(&"bow")
 	player.try_acquire_weapon(bow)
 	var bow_controller: WeaponController = _find_controller(player, &"bow")
-	_disable_auto_fire(player)
+	_disable_auto_fire(session, player)
 	_enable_ascension(player, bow_controller)
 	_expect(player.apply_upgrade(load(MULTISHOT_PATH) as UpgradeDefinition), "应能选择多重射击。")
 
@@ -95,7 +95,7 @@ func _test_reset_cancels_extra_volleys() -> void:
 	var bow: WeaponDefinition = (load(CATALOG_PATH) as ContentCatalog).get_weapon(&"bow")
 	player.try_acquire_weapon(bow)
 	var bow_controller: WeaponController = _find_controller(player, &"bow")
-	_disable_auto_fire(player)
+	_disable_auto_fire(session, player)
 	_enable_ascension(player, bow_controller)
 	player.apply_upgrade(load(MULTISHOT_PATH) as UpgradeDefinition)
 
@@ -115,10 +115,15 @@ func _enable_ascension(player: PlayerActor, controller: WeaponController) -> voi
 	_expect(controller != null and player.get_progress(&"bow").is_base_maxed(), "长弓应达到质变门槛。")
 
 
-func _disable_auto_fire(player: PlayerActor) -> void:
+## 停用自动发射，并立即移除首帧可能已自动发射的起始武器弹体，
+## 使弹体计数只反映本测试的长弓；否则计数依赖生成点是否落入起始武器射程。
+func _disable_auto_fire(session: GameSession, player: PlayerActor) -> void:
 	for controller: WeaponController in player.weapon_controllers:
 		if is_instance_valid(controller):
 			controller.set_process(false)
+	for child: Node in session.projectiles.get_children():
+		session.projectiles.remove_child(child)
+		child.queue_free()
 
 
 func _first_projectile(session: GameSession) -> ProjectileBase:

@@ -37,6 +37,10 @@ enum UpgradeType {
 	EXPLOSION_RADIUS,
 	## 爆炸溅射伤害倍率（T16 爆炸分支专属升级，value 为每级增量）。
 	EXPLOSION_DAMAGE,
+	## 命中后施加持续伤害并留下地面区域（T17）；弹体由 projectile_definition 指定。
+	FLAME,
+	## 地面区域持续时间倍率（T17 火焰分支专属升级，value 为每级增量）。
+	AREA_DURATION,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。

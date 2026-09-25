@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GroundDamageAreaDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/combat/ground_damage_area_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"fire_patch"
+radius = 70.0
+duration_seconds = 3.0
+tick_interval_seconds = 0.5
+damage_per_tick = 2.0
+collision_mask = 4
+max_targets = 64
+visual_scale = 1.0
+visual_color = Color(1, 0.42, 0.12, 0.35)

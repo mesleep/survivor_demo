@@ -21,6 +21,8 @@ var critical_chance: float = 0.0
 ## 爆炸运行时倍率（T16）；只影响本次弹体，不回写共享 ExplosionDefinition。
 var explosion_radius_multiplier: float = 1.0
 var explosion_damage_multiplier: float = 1.0
+## 地面区域持续时间倍率（T17）；只影响本次生成的区域。
+var ground_area_duration_multiplier: float = 1.0
 
 
 func _init(

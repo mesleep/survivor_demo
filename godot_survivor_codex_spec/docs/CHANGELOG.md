@@ -124,6 +124,15 @@
 - 新增“爆炸法术”质变及“裂爆（范围 +25%/级）”“灼爆（溅射伤害 +20%/级）”专属升级；`WeaponController` 支持运行时弹体覆盖与爆炸倍率，`UpgradeDefinition` 新增 `EXPLOSION`/`EXPLOSION_RADIUS`/`EXPLOSION_DAMAGE` 与 `projectile_definition`。
 - `GameSession` 结算时同时清理爆炸特效；新增 `explosion_aoe_smoke_test.gd`；解析、启动与 42 项快速冒烟、120 秒 soak 通过。
 
+### T17 火焰持续伤害与地面火坑（2026-09-25）
+
+- 新增可配 `DamageOverTimeEffect` 与 `StatusEffectComponent`：DoT 按 tick 间隔结算、同 ID 刷新不叠层、带 `dot` 标签不反伤/不吸血/不暴击（D14）。
+- 新增可配 `GroundDamageAreaDefinition` 与 `GroundDamageArea`：独立地面区域按 tick 对范围内敌人结算，复用去重查询，来源离树后继续到自身时长结束。
+- `ProjectileDefinition` 新增 `damage_over_time` 与 `ground_area`；`ProjectileBase` 命中后挂 DoT 并生成火坑，与爆炸能力分离。
+- 新增“火焰法术”质变及“烈燃（+20% 火焰伤害）”“余烬（火坑时长 +25%）”专属升级；`UpgradeDefinition` 新增 `FLAME`/`AREA_DURATION`，控制器新增地面持续时间倍率。
+- `ActorBase` 自动挂载状态组件并在初始化/死亡时清空；`GameSession` 结算清理火坑。
+- 修复 T16 之前既有的 `bow_multishot` 首帧自动发射弹体计数抖动（仅测试）；新增 `flame_dot_smoke_test.gd`；解析、启动与 43 项快速冒烟、120 秒 soak 通过。
+
 ### 四宠庭院与武器扩展（2026-09-20）
 
 - 新增虎妞、黑豹、小四、小七四帧动画；虎妞二次修订为小眼绷脸，黑豹引用原图。

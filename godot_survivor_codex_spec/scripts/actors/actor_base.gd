@@ -29,6 +29,9 @@ var _immune_chance: float = 0.0
 var _damage_reflect_ratio: float = 0.0
 var _damage_random := RandomNumberGenerator.new()
 
+## 持续伤害等状态运行时组件；由 ActorBase 在 _ready 时自动创建，场景无需改动。
+var status_effect_component: StatusEffectComponent
+
 @onready var health_component: HealthComponent = %HealthComponent
 @onready var hurtbox_component: HurtboxComponent = %HurtboxComponent
 @onready var damage_feedback_component: DamageFeedbackComponent = %DamageFeedbackComponent
@@ -42,6 +45,11 @@ func _ready() -> void:
 	hurtbox_component.initialize(self)
 	damage_feedback_component.initialize(health_component, visual)
 	damage_feedback_component.bind_actor(self)
+	if status_effect_component == null:
+		status_effect_component = StatusEffectComponent.new()
+		status_effect_component.name = "StatusEffectComponent"
+		add_child(status_effect_component)
+		status_effect_component.initialize(self)
 
 
 ## 从共享 Resource 初始化 Actor 的独立运行时生命状态。
@@ -56,6 +64,8 @@ func initialize(new_definition: Resource) -> void:
 	_death_forwarded = false
 	health_component.initialize(_get_base_max_health())
 	hurtbox_component.initialize(self)
+	if status_effect_component != null:
+		status_effect_component.clear()
 
 
 ## 统一伤害结算：免疫/闪避 → 防御 → 扣血 → 反伤（D07）。
@@ -97,6 +107,15 @@ func apply_damage(event: DamageEvent) -> DamageResult:
 	result.killed = health_component.is_dead()
 	_try_reflect(event, result)
 	return result
+
+
+## 施加持续伤害状态（T17）；同一效果 ID 刷新而非叠层。
+func apply_damage_over_time(
+		effect: DamageOverTimeEffect, source: Node, damage_multiplier: float = 1.0
+) -> bool:
+	if status_effect_component == null:
+		return false
+	return status_effect_component.apply_dot(effect, source, damage_multiplier)
 
 
 ## 注入可调伤害规则（通常由 GameSession 下发给玩家）。
@@ -197,6 +216,8 @@ func die(event: DamageEvent) -> void:
 	_death_forwarded = true
 	velocity = Vector2.ZERO
 	set_physics_process(false)
+	if status_effect_component != null:
+		status_effect_component.clear()
 	hurtbox_component.set_deferred("monitorable", false)
 	actor_died.emit(self, event)
 	if free_on_death:

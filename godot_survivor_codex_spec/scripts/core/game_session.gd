@@ -353,3 +353,5 @@ func _stop_combat_nodes() -> void:
 			(child as ProjectileBase).deactivate()
 		elif child is ExplosionEffect:
 			(child as ExplosionEffect).finish()
+		elif child is GroundDamageArea:
+			(child as GroundDamageArea).finish()

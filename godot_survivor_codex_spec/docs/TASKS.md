@@ -719,3 +719,15 @@
 - [ ] E02/D02 正式素材与 GUI 爆炸范围人工验收
 
 验证记录：见 `docs/实施蓝图/执行记录.md` 的 T16 条目。
+
+### T17 火焰持续伤害与地面火坑
+
+- [x] D14 首版定案：DoT tick/时长、同 ID 刷新不叠层、dot 不反伤/不吸血/不暴击
+- [x] `DamageOverTimeEffect` + `StatusEffectComponent` 可复用持续伤害状态
+- [x] `GroundDamageAreaDefinition` + `GroundDamageArea` 独立火坑区域能力
+- [x] 火焰法术质变 + 烈燃/余烬专属升级并接入升级池
+- [x] 专项测试 + 43 项快速回归、120 秒 soak 通过
+- [x] 顺带修复 T16 前既有的 bow_multishot 首帧弹体计数抖动（仅测试）
+- [ ] E02/D02 正式素材与 GUI 火焰范围/手感人工验收
+
+验证记录：见 `docs/实施蓝图/执行记录.md` 的 T17 条目。

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/staff_flame_bolt.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"staff_flame"
+display_name = "质变：火焰法术"
+description = "蓄力法杖：改为喷吐火焰，命中造成持续伤害并在地面留下燃烧火坑。"
+type = 25
+category = 3
+value = 0.0
+required_weapon_id = &"staff"
+target_equipment_id = &"staff"
+branch_id = &"flame"
+max_stacks = 1
+weight = 1.0
+projectile_definition = ExtResource("2")

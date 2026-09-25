@@ -24,3 +24,7 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export_range(0.0, 100000.0, 0.1) var knockback_strength: float = 0.0
 ## 命中后的一次性范围爆炸配置；为空表示不爆炸（T16）。
 @export var explosion: ExplosionDefinition
+## 命中后施加的持续伤害效果；为空表示无 DoT（T17）。
+@export var damage_over_time: DamageOverTimeEffect
+## 命中后在地面留下的持续伤害区域；为空表示不留火坑（T17）。
+@export var ground_area: GroundDamageAreaDefinition

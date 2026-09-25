@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DamageOverTimeEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/combat/damage_over_time_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flame_dot"
+tick_interval_seconds = 0.5
+duration_seconds = 2.0
+damage_per_tick = 3.0
+can_crit = false
+allow_lifesteal = false
