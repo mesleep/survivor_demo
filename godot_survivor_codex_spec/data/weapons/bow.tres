@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/weapons/weapon_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/projectiles/arrow_projectile.tres" id="2"]
+[ext_resource type="SpriteFrames" path="res://data/visuals/v2_dark_comic/wand_frames.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = &"bow"
+display_name = "长弓"
+visual_frames = ExtResource("3")
+projectile_definition = ExtResource("2")
+cooldown_seconds = 1.2
+projectile_count = 1
+spread_degrees = 0.0
+target_range = 1000.0

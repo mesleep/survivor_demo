@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="ContentCatalog" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="ContentCatalog" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://data/catalog/content_catalog.gd" id="1_catalog"]
 [ext_resource type="Script" path="res://data/characters/character_definition.gd" id="2_character_type"]
@@ -10,9 +10,10 @@
 [ext_resource type="Resource" path="res://data/weapons/bell.tres" id="8_bell"]
 [ext_resource type="Script" path="res://data/armor/armor_definition.gd" id="9_armor_type"]
 [ext_resource type="Resource" path="res://data/armor/armor_basic.tres" id="10_armor"]
+[ext_resource type="Resource" path="res://data/weapons/bow.tres" id="11_bow"]
 
 [resource]
 script = ExtResource("1_catalog")
 characters = Array[ExtResource("2_character_type")]([ExtResource("3_character")])
-weapons = Array[ExtResource("4_weapon_type")]([ExtResource("5_starter"), ExtResource("6_leaf"), ExtResource("7_bone"), ExtResource("8_bell")])
+weapons = Array[ExtResource("4_weapon_type")]([ExtResource("5_starter"), ExtResource("6_leaf"), ExtResource("7_bone"), ExtResource("8_bell"), ExtResource("11_bow")])
 armors = Array[ExtResource("9_armor_type")]([ExtResource("10_armor")])
