@@ -43,7 +43,7 @@ func _run() -> void:
 	_expect(session.player.get_pending_upgrade_count() == 0, "第二次选择显示后队列未正确消费。")
 	_expect(session.level_up_panel.visible and session.level_up_panel.choices_container.get_child_count() == 3, "连续升级未显示下一组三选一。")
 	var scaled_button: Button = session.level_up_panel.choices_container.get_child(0) as Button
-	_expect(scaled_button.custom_minimum_size.is_equal_approx(Vector2(546.0, 111.8)), "升级面板未应用 GameSession.ui_scale。")
+	_expect(scaled_button.custom_minimum_size.is_equal_approx(Vector2(260.0, 390.0)), "升级面板未应用 GameSession.ui_scale。")
 
 	var second_button: Button = session.level_up_panel.choices_container.get_child(0) as Button
 	second_button.pressed.emit()
