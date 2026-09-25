@@ -59,6 +59,12 @@ enum UpgradeType {
 	THORN_RADIUS,
 	## 受击返还比例增量（T21 反伤刺甲专属升级，value 为每级增量）。
 	REFLECT_RATIO,
+	## 骑士盔甲：写入固定减伤与完全免伤概率（T22）。
+	KNIGHT_ARMOR,
+	## 骑士盔甲固定减伤增量（T22 专属升级，value 为每级增量）。
+	KNIGHT_DEFENSE,
+	## 骑士盔甲完全免伤概率增量（T22 专属升级，value 为每级增量）。
+	KNIGHT_IMMUNE,
 }
 
 ## 升级分类：决定统一的前置、互斥与上限过滤（T06）。
@@ -99,6 +105,8 @@ enum UpgradeCategory {
 @export var required_equipment_branch_id: StringName
 ## THORN_AURA 质变引用的反伤刺甲数值档案（T21）。
 @export var thorn_armor: ThornArmorDefinition
+## KNIGHT_ARMOR 质变引用的骑士盔甲数值档案（T22）。
+@export var knight_armor: KnightArmorDefinition
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

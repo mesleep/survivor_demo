@@ -36,6 +36,7 @@ var _pickup_range_multiplier: float = 1.0
 var _all_weapon_range_multiplier: float = 1.0
 var _upgrade_defense_bonus: float = 0.0
 var _armor_defense_bonus: float = 0.0
+var _knight_defense_bonus: float = 0.0
 var _armor_move_penalty_ratio: float = 0.0
 var _regeneration: float = 0.0
 var _regeneration_clock: float = 0.0
@@ -87,8 +88,10 @@ func initialize(new_definition: Resource) -> void:
 	_all_weapon_range_multiplier = 1.0
 	_upgrade_defense_bonus = 0.0
 	_armor_defense_bonus = 0.0
+	_knight_defense_bonus = 0.0
 	_armor_move_penalty_ratio = 0.0
 	set_defense(0.0)
+	set_immune_chance(0.0)
 	set_damage_reflect_ratio(0.0)
 	_clear_thorn_aura()
 	_thorn_aura_radius_multiplier = 1.0
@@ -267,7 +270,7 @@ func _refresh_armor_bonuses() -> void:
 
 
 func _refresh_defense() -> void:
-	set_defense(_upgrade_defense_bonus + _armor_defense_bonus)
+	set_defense(_upgrade_defense_bonus + _armor_defense_bonus + _knight_defense_bonus)
 
 
 func get_armor_move_penalty_ratio() -> float:
@@ -513,6 +516,13 @@ func apply_upgrade(upgrade: UpgradeDefinition) -> bool:
 				_thorn_aura.set_radius_multiplier(_thorn_aura_radius_multiplier)
 		UpgradeDefinition.UpgradeType.REFLECT_RATIO:
 			add_damage_reflect_ratio(upgrade.value)
+		UpgradeDefinition.UpgradeType.KNIGHT_ARMOR:
+			_enable_knight_armor(upgrade.knight_armor)
+		UpgradeDefinition.UpgradeType.KNIGHT_DEFENSE:
+			_knight_defense_bonus += upgrade.value
+			_refresh_defense()
+		UpgradeDefinition.UpgradeType.KNIGHT_IMMUNE:
+			add_immune_chance(upgrade.value)
 		UpgradeDefinition.UpgradeType.WEAPON_MODIFIER:
 			pass
 		UpgradeDefinition.UpgradeType.EXPLOSION_RADIUS:
@@ -611,6 +621,15 @@ func _enable_thorn_aura(definition: ThornArmorDefinition) -> void:
 	add_child(_thorn_aura)
 	_thorn_aura.initialize(self, definition)
 	_thorn_aura.set_radius_multiplier(_thorn_aura_radius_multiplier)
+
+
+## 启用骑士盔甲：写入固定减伤并叠加完全免伤概率（T22）。
+func _enable_knight_armor(definition: KnightArmorDefinition) -> void:
+	if definition == null:
+		return
+	_knight_defense_bonus = definition.bonus_defense
+	_refresh_defense()
+	add_immune_chance(definition.immune_chance)
 
 
 func _clear_thorn_aura() -> void:

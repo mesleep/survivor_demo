@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/upgrades/upgrade_definition.gd" id="1"]
+[ext_resource type="Resource" path="res://data/armor/armor_knight.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"armor_knight"
+display_name = "质变：骑士盔甲"
+description = "基础盔甲：大幅减少受到的伤害，并获得一定概率完全免伤。"
+type = 36
+category = 3
+value = 0.0
+target_equipment_id = &"armor_basic"
+branch_id = &"knight"
+max_stacks = 1
+weight = 1.0
+knight_armor = ExtResource("2")

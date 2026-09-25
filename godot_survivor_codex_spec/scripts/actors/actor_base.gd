@@ -201,6 +201,10 @@ func get_immune_chance() -> float:
 	return clampf(_immune_chance, 0.0, get_max_immune_chance())
 
 
+func set_immune_chance(value: float) -> void:
+	_immune_chance = clampf(value, 0.0, get_max_immune_chance())
+
+
 func add_immune_chance(value: float) -> void:
 	_immune_chance = clampf(_immune_chance + value, 0.0, get_max_immune_chance())
 

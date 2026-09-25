@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="KnightArmorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/armor/knight_armor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+bonus_defense = 6.0
+immune_chance = 0.1
