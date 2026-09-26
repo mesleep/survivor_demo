@@ -569,7 +569,7 @@ func _update_hint() -> void:
 	var character_name: String = character.display_name if character != null else "未选择"
 	var coins_suffix: String = " ｜ 金币 %d" % profile.coins if profile != null else ""
 	var map_name: String = _map_display_name(_map_id) if _map_id != StringName() else "未选择"
-	hint_label.text = "角色：%s ｜ 地图：%s ｜ 候选武器 %d/%d%s（起始武器自动保留）" % [
+	hint_label.text = "%s ｜ %s ｜ 武器 %d/%d%s" % [
 		character_name, map_name, _selected_weapon_ids.size(), RunLoadout.MAX_CANDIDATE_WEAPONS, coins_suffix
 	]
 	if not _status_text.is_empty():

@@ -101,11 +101,30 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HeaderTag" type="Label" parent="SafeArea/Page/Header"]
+[node name="HeaderTag" type="VBoxContainer" parent="SafeArea/Page/Header"]
+custom_minimum_size = Vector2(470, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+
+[node name="TagLine" type="Label" parent="SafeArea/Page/Header/HeaderTag"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.82, 0.89, 1)
 theme_override_font_sizes/font_size = 16
 text = "选择角色  ·  配置装备  ·  迎战月夜"
+horizontal_alignment = 2
+
+[node name="HintLabel" type="Label" parent="SafeArea/Page/Header/HeaderTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.94, 0.96, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.85)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 15
+text = "角色：未选择"
+autowrap_mode = 2
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="Cards" type="HBoxContainer" parent="SafeArea/Page"]
@@ -245,7 +264,7 @@ theme_override_constants/separation = 8
 [node name="Footer" type="HBoxContainer" parent="SafeArea/Page"]
 custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 12
 
 [node name="MapArea" type="HBoxContainer" parent="SafeArea/Page/Footer"]
 custom_minimum_size = Vector2(250, 0)
@@ -264,22 +283,15 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HintLabel" type="Label" parent="SafeArea/Page/Footer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(280, 0)
+[node name="FooterSpacer" type="Control" parent="SafeArea/Page/Footer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.89, 0.94, 0.96, 1)
-theme_override_font_sizes/font_size = 16
-text = "角色：未选择"
-autowrap_mode = 2
-vertical_alignment = 1
 
 [node name="UnlockAllButton" type="Button" parent="SafeArea/Page/Footer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(170, 54)
 layout_mode = 2
-text = "测试：一键解锁全部"
+text = "测试：一键解锁"
 tooltip_text = "立即解锁当前角色、武器与永久强化，并保存到测试档案。"
 
 [node name="SettingsButton" type="Button" parent="SafeArea/Page/Footer"]
