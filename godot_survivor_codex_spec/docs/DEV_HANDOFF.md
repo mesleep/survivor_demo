@@ -12,7 +12,7 @@
 - 基线命令：
   - 解析：`"$GODOT" --headless --path . --editor --quit`
   - 启动：`"$GODOT" --headless --path . --quit-after 300`
-  - 快速冒烟：逐个运行 `tests/smoke/*_test.gd`（排除 `enemy_spawner_soak_test.gd`），当前 **68 项全部退出码 0**
+  - 快速冒烟：逐个运行 `tests/smoke/*_test.gd`（排除 `enemy_spawner_soak_test.gd`），当前 **70 项全部退出码 0**
   - 压力：`"$GODOT" --headless --path . --script res://tests/smoke/enemy_spawner_soak_test.gd`（120 秒，30 敌上限）
   - 图形实拍（需非 headless）：`tests/smoke/v2_art_preview.gd`（`-- --upgrade` / `-- --end` / `-- --hit`）、`menu_preview.gd`、`option_preview.gd`、`new_content_preview.gd`、`new_asset_sheet_preview.gd`，输出到 `art_review/`
 - 工作树状态：干净（本会话三笔提交已包含 11 个属性图标 PNG/`.import` 与本文件）。
@@ -64,6 +64,9 @@
 - `fix: 修复菜单与暂停按钮贴图被压扁`：`fb1a600` 为省宽度把按钮样式内容边距压到 12/6，按钮实际高度低于贴图上下 60px 的九宫格边距而变形。现保留上下纹理边距、只收窄左右内容边距；主菜单地图区改横排，1280 宽内不溢出。
 - `feat: 接入 11 个通用属性升级图标`：`fire_rate/projectile_count/projectile_size/projectile_speed/repeat_shot/bonus_projectile/max_health/heal/dodge/immune/pierce` 全部补 `icon`；`wire_combat_visuals.py` 修正 `icon` 必须插在 `script` 之后的顺序问题；`v2_art_validation.gd` 新增“所有升级必须有新版图标”检查。
 - `feat: 主菜单卡片/标签与竖版升级卡应用新素材`：卡片应用 `menu_card_base`，分区标题应用 `menu_tab`；`LevelUpPanel` 三选一改为竖版卡面（200×300，随 `ui_scale`）并应用 `ui_upgrade_card`，图标置顶、标题/描述居中，刷新按钮保留。
+- `fix: 修复主菜单按钮文字超出背景框`：按钮样式恢复完整九宫格内容边距，角色/武器/地图信息移到标题右侧，底部只留地图与操作按钮。
+- `feat: 数值/素材工作台与存档重置`：主菜单设置新增「重置存档」（带确认）与「数值/素材工作台」。工作台按 13 类枚举 `data/` 资源，中文字段名取脚本 `##` 注释，支持改数值（即时生效）、更换素材/引用并保存回 `.tres`。主要定义脚本补了中文 `@export_group`。新档默认解锁免费角色起始武器，购买角色附送起始武器（否则 0 金新档无武器）。
+- 数据/素材总入口见 `docs/数据与素材索引.md`。
 
 ### 美术素材（外部 AI 生成，已接入）
 - 第一批（`f232b74`）：武器/弹体/特效/金币/图标 84 PNG → 19 个 SpriteFrames。
@@ -102,9 +105,10 @@
 - `AreaHitResolver`：受控圆形查询 + 按 Actor 实例去重，供爆炸/火坑/刺圈/近战使用。
 
 ### 3.5 UI 与输入
-- `GameEntry` → `MainMenu`（角色/武器/地图/永久强化/解锁/设置/退出）；`SessionControls`（局内 HUD 附加层：金币、装备栏、状态、Boss 血条、设置面板）；`SettingsPanel`（声音/返回主菜单/继续/退出）；`LevelUpPanel`（竖版三卡 + 刷新按钮）；`EndPanel`。
+- `GameEntry` → `MainMenu`（角色/武器/地图/永久强化/解锁/设置/退出；角色/武器/地图信息显示在标题右侧）；`SessionControls`（局内 HUD 附加层：金币、装备栏、状态、Boss 血条、设置面板）；`SettingsPanel`（声音/重置存档/数值素材工作台/返回主菜单/继续/退出，暂停时隐藏重置与工作台）；`LevelUpPanel`（竖版三卡 + 刷新按钮）；`EndPanel`。
 - 输入：WASD/方向键移动；Esc 打开/关闭设置（暂停）；M 静音；升级/结算时暂停。
-- 主题：`data/visuals/v2_dark_comic/menu_*_style.tres`（九宫格面板/按钮三态；按钮只收窄了左右 `content_margin`，上下保留纹理边距以防贴图压扁）。
+- 主题：`data/visuals/v2_dark_comic/menu_*_style.tres`（九宫格面板/按钮三态；按钮使用完整纹理内容边距，保证文字落在边框内）。
+- 开发工具：`ConfigWorkbench`（`scripts/tools/config_workbench*.gd` + `scenes/tools/config_workbench.tscn`），入口在主菜单设置；服务层可 headless 测试，保存直接写 `res://` 的 `.tres`。
 
 ### 3.6 关键规则决策
 见 `docs/实施蓝图/规则决策.md` D01–D32。重点：D04 装备基础 1→5、满级二选一互斥质变、专属 3 级；D06 射程语义；D07 伤害顺序；D08 附魔快照；D09 科技三件套；D10 经济；D11 永久成长；D12 新内容；D13 爆炸；D14 火焰；D15 威能；D16 寒冰；D17 附魔；D18 刺甲；D19 骑士；D20 狂战；D21 头脚手；D22 科技套装；D23 金币；D24 存档；D25 刷新；D26 解锁；D27 永久强化；D28 射手；D29 剑；D30 新敌人/地图；D31 激光（同时获得、交替攻击）；D32 装备显示/设置/兜底/地图。
@@ -162,7 +166,8 @@
 1. **T35 真实人工游玩未完成**（唯一硬性未完成项）：需在目标机实际游玩约 5–10 分钟，验收移动/自动攻击/升级三选一/刷新/Boss/胜负/重开、双角色可辨认、新敌人（远程/精英）与激光强度、手感与音效、macOS 长时间稳定性、长期数值平衡；并重点看新的竖版升级卡与菜单卡框在实际点击/分辨率下的表现。
 2. **可选美术缺口**：`ui/icon_menu_{shop,unlock,permanent,achievement,skin}.png`（D06 局外菜单图标）、`enemies/B09_月夜领主_头像.png`（Boss 血条徽记）。不影响可玩。
 3. **未实现的次要内容**：近战质变、非金币解锁条件、永久强化的重置/退款、正式商店版式（F03 已在主菜单部分使用）、C08 激光之外的套装扩展。
-4. **未单独截图验证**：局内金币/科技徽记图标已接入但未单独实拍；主菜单设置面板未单独实拍（暂停设置面板已实拍）。
+4. **未单独截图验证**：局内金币/科技徽记图标已接入但未单独实拍；主菜单设置面板已随 2026-09-26 工作台一并实拍（`v2_menu_settings_preview.png`）。
+5. **工作台范围**：SpriteFrames 等复杂资源不在工作台内直接编辑，需在上层定义的 `visual_frames` 字段更换引用；工作台保存直接写 `res://`，只适合开发环境。
 
 ## 6. 已知 bug / 风险
 
@@ -173,12 +178,13 @@
 5. **预览脚本退出有对象未释放 warning**（仅预览脚本，不影响游戏与回归）。
 6. 主菜单默认解锁“价格为 0”的角色/武器；射手（120 金）与部分武器需在菜单购买或点“测试：一键解锁全部”。
 7. 主菜单永久强化 5 项在卡片内需要滚动查看；升级卡竖版布局下长标题会自动折行，属预期。
+8. 新档默认只解锁免费角色的起始武器；若把某角色/武器的 `unlock_cost` 改回 0，需要重开菜单（`GameEntry._ensure_profile_store` 在启动时计算默认解锁）。
 
 ## 7. 下一步建议执行顺序
 
-1. **T35 人工游玩验收**：由用户在目标机执行；据反馈调 Resource 数值（不写死）。这是当前唯一硬性未完成项。
-2. 可选：补 D06 菜单图标与 Boss 徽记；补主菜单设置面板实拍；补局内金币/科技徽记实拍。
-3. 若继续扩展内容：按 `docs/实施蓝图/任务模板.md` 新增原子任务卡，保持“一次一个任务、单独提交、先测试后实现”。
+1. **T35 人工游玩验收**：由用户在目标机执行；据反馈用工作台或 Resource 调数值（不写死）。这是当前唯一硬性未完成项。
+2. 可选：补 D06 菜单图标与 Boss 徽记；补局内金币/科技徽记实拍。
+3. 若继续扩展内容：按 `docs/实施蓝图/任务模板.md` 新增原子任务卡，保持“一次一个任务、单独提交、先测试后实现”；新字段记得在 `@export` 上方补 `##` 中文注释，工作台会自动显示。
 
 ## 8. 新会话继续工作时必须知道的上下文
 
@@ -189,6 +195,7 @@
 - **测试确定性**：新增/修改测试用受控随机种子、受控计时/敌人容器；避免升级暂停与真实波次干扰。
 - **当前默认内容**：角色 2（法师/射手）、武器 3（弓/法杖/剑）、防具 3、地图 2；单局 10 分钟；Boss 在 10:00。
 - **UI 素材现状**：11 个通用属性图标已接入；主菜单用 `menu_card_style`/`menu_tab_style`，升级三选一用 `upgrade_card_style`（竖版 200×300，随 `ui_scale`）。
+- **数据/素材入口**：改数值与换素材见 `docs/数据与素材索引.md`；游戏内工作台在主菜单 → 设置 → 「数值/素材工作台」。
 - **实拍命令**（非 headless）：`"$GODOT" --path . --script res://tests/smoke/<preview>.gd`，截图在 `art_review/`。
 
 （本文只描述现状，未修改任何业务代码。）
