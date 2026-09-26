@@ -6,6 +6,7 @@
 class_name MovementSlowEffect
 extends Resource
 
+@export_group("基础信息")
 @export var id: StringName
 ## 减速比例：0 不减速，0.4 表示移速变为 60%。
 @export_range(0.0, 0.95, 0.01) var slow_ratio: float = 0.4

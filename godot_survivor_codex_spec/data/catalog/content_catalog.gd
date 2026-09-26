@@ -7,6 +7,7 @@
 class_name ContentCatalog
 extends Resource
 
+@export_group("内容目录")
 @export var characters: Array[CharacterDefinition] = []
 @export var weapons: Array[WeaponDefinition] = []
 @export var armors: Array[ArmorDefinition] = []

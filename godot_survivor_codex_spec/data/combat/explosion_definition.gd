@@ -6,6 +6,7 @@
 class_name ExplosionDefinition
 extends Resource
 
+@export_group("范围与伤害")
 ## 溅射半径（像素）。
 @export_range(0.0, 2000.0, 1.0) var radius: float = 90.0
 ## 溅射伤害 = 本次直击伤害 × 该倍率。
@@ -17,6 +18,7 @@ extends Resource
 ## 单次爆炸最多结算的目标数，防止极端密度下查询失控。
 @export_range(1, 256, 1) var max_targets: int = 64
 @export_range(0.0, 100000.0, 0.1) var knockback_strength: float = 0.0
+@export_group("表现")
 ## 爆炸特效；为空时由 ExplosionEffect 绘制占位圆环（E02 素材待生成）。
 @export var visual_frames: SpriteFrames
 @export_range(0.01, 10.0, 0.01) var visual_scale: float = 1.0

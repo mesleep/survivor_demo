@@ -6,11 +6,14 @@
 class_name DamageOverTimeEffect
 extends Resource
 
+@export_group("基础信息")
 @export var id: StringName
 @export_range(0.05, 10.0, 0.05) var tick_interval_seconds: float = 0.5
 @export_range(0.1, 60.0, 0.1) var duration_seconds: float = 2.0
+@export_group("伤害")
 ## 每跳基础伤害；实际值还会乘以施加时的伤害倍率。
 @export_range(0.0, 100000.0, 0.1) var damage_per_tick: float = 3.0
+@export_group("结算标签")
 ## 首版 DoT 不暴击、不吸血；标签为 dot，按 D07 不触发反伤。
 @export var can_crit: bool = false
 @export var allow_lifesteal: bool = false

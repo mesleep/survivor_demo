@@ -90,6 +90,7 @@ enum UpgradeCategory {
 	BRANCH_UPGRADE,
 }
 
+@export_group("基础信息")
 @export var id: StringName
 @export var display_name: String
 @export_multiline var description: String
@@ -97,12 +98,14 @@ enum UpgradeCategory {
 @export var type: UpgradeType
 @export var category: UpgradeCategory = UpgradeCategory.GENERIC
 @export var value: float
+@export_group("装备要求")
 ## 非空时只对指定武器生效，未持有时不会进入候选池。
 @export var required_weapon_id: StringName
 ## 目标装备 ID；为空时回退 required_weapon_id，避免重复维护两份 ID。
 @export var target_equipment_id: StringName
 ## 质变卡：本卡授予的分支 ID；分支专属卡：要求已选中的分支 ID。
 @export var branch_id: StringName
+@export_group("授予内容")
 ## 获取武器类升级所授予的只读配置。
 @export var weapon_definition: WeaponDefinition
 ## 获取防具类升级所授予的只读配置（与 weapon_definition 二选一）。
@@ -111,10 +114,12 @@ enum UpgradeCategory {
 @export var projectile_definition: ProjectileDefinition
 ## 捆绑武器修正（T18 威能质变等）；非空时在升级应用时合并到目标武器。
 @export var weapon_modifier: WeaponRuntimeModifier
+@export_group("前置条件")
 ## 前置装备要求（T20 附魔箭需要已质变法杖），与 required_weapon_id 独立。
 @export var required_equipment_id: StringName
 ## 前置装备必须已选择的分支 ID；为空只要求持有该装备。
 @export var required_equipment_branch_id: StringName
+@export_group("质变档案")
 ## THORN_AURA 质变引用的反伤刺甲数值档案（T21）。
 @export var thorn_armor: ThornArmorDefinition
 ## KNIGHT_ARMOR 质变引用的骑士盔甲数值档案（T22）。
@@ -123,6 +128,7 @@ enum UpgradeCategory {
 @export var berserk_armor: BerserkArmorDefinition
 ## TECH_ASCENSION 质变引用的科技单件数值档案（T24）。
 @export var tech_armor: TechArmorDefinition
+@export_group("抽取规则")
 @export_range(1, 100, 1) var max_stacks: int = 5
 @export_range(0.0, 100.0, 0.1) var weight: float = 1.0
 

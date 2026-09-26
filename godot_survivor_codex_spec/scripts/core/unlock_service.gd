@@ -54,6 +54,10 @@ func purchase_character(catalog: ContentCatalog, character_id: StringName) -> Re
 	var snapshot: Profile = profile.copy()
 	if not profile.try_unlock_character(character_id, definition.unlock_cost):
 		return Result.INSUFFICIENT_COINS
+	# 购买角色附送其起始武器，避免买下角色后因武器未解锁而无法开局。
+	for weapon: WeaponDefinition in definition.starting_weapons:
+		if weapon != null and not profile.unlocked_weapon_ids.has(weapon.id):
+			profile.unlocked_weapon_ids.append(weapon.id)
 	return _commit(snapshot)
 
 

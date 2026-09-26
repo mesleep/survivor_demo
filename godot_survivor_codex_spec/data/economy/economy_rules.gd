@@ -6,6 +6,7 @@
 class_name EconomyRules
 extends Resource
 
+@export_group("金币经济")
 ## 敌人死亡时掉落金币的概率。
 @export_range(0.0, 1.0, 0.01) var coin_drop_chance: float = 0.15
 ## 每次掉落生成的金币数量。

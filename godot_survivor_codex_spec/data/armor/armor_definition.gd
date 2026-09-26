@@ -8,11 +8,13 @@ extends Resource
 
 enum ArmorCategory { ARMOR, HELMET, GLOVES }
 
+@export_group("基础信息")
 @export var id: StringName
 @export var display_name: String
 @export_multiline var description: String
 @export var icon: Texture2D
 @export var category: ArmorCategory = ArmorCategory.ARMOR
+@export_group("数值成长")
 ## 穿戴时立即获得的固定防御。
 @export_range(0.0, 1000.0, 0.5) var defense_base: float = 0.0
 ## 每提升 1 级基础等级额外增加的防御。
@@ -29,6 +31,7 @@ enum ArmorCategory { ARMOR, HELMET, GLOVES }
 @export_range(0.0, 2.0, 0.05) var attack_range_bonus: float = 0.0
 ## 每提升 1 级额外增加的射程加成比例。
 @export_range(0.0, 2.0, 0.05) var attack_range_bonus_per_level: float = 0.0
+@export_group("升级卡")
 ## 预留：基础升级与质变卡；T11 起填充，当前只保存引用，不在此脚本套用效果。
 @export var base_upgrades: Array[UpgradeDefinition] = []
 @export var branch_upgrades: Array[UpgradeDefinition] = []

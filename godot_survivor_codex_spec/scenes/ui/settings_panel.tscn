@@ -59,6 +59,20 @@ custom_minimum_size = Vector2(240, 50)
 layout_mode = 2
 text = "声音：开"
 
+[node name="ResetButton" type="Button" parent="Center/Panel/Margin/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 50)
+layout_mode = 2
+text = "重置存档"
+tooltip_text = "清空金币、解锁与永久强化，恢复初始存档。"
+
+[node name="ToolsButton" type="Button" parent="Center/Panel/Margin/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 50)
+layout_mode = 2
+text = "数值/素材工作台"
+tooltip_text = "打开分类好的数值与素材面板，可随时修改并保存。"
+
 [node name="ReturnButton" type="Button" parent="Center/Panel/Margin/Column"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(240, 50)

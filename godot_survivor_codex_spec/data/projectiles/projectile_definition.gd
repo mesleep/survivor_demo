@@ -8,6 +8,7 @@ extends Resource
 
 enum MotionType { STRAIGHT, RETURNING, ORBIT }
 
+@export_group("运动与表现")
 @export var motion_type: MotionType = MotionType.STRAIGHT
 @export var visual_frames: SpriteFrames
 @export var visual_scale: float = 0.1
@@ -16,6 +17,7 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export var orbit_radius: float = 100.0
 @export var orbit_speed: float = 3.0
 
+@export_group("基础信息")
 @export var id: StringName
 @export var scene: PackedScene
 @export_range(0.0, 1000000.0, 0.1) var damage: float = 10.0
@@ -26,6 +28,7 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export_range(0.0, 100000.0, 0.1) var knockback_strength: float = 0.0
 ## 命中检测的物理层；玩家武器默认 4（敌人受击层），敌人弹体为 2（玩家受击层）。
 @export_flags_2d_physics var collision_mask: int = 4
+@export_group("表现与特效")
 ## 尾焰序列帧（E05 导弹）；为空则无尾焰。
 @export var trail_frames: SpriteFrames
 @export_range(0.01, 5.0, 0.01) var trail_scale: float = 0.2
@@ -39,6 +42,7 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export var muzzle_frames: SpriteFrames
 @export_range(1.0, 500.0, 1.0) var muzzle_radius: float = 26.0
 @export_range(0.05, 2.0, 0.01) var muzzle_duration: float = 0.18
+@export_group("附加效果")
 ## 命中后的一次性范围爆炸配置；为空表示不爆炸（T16）。
 @export var explosion: ExplosionDefinition
 ## 命中后施加的持续伤害效果；为空表示无 DoT（T17）。
@@ -49,6 +53,7 @@ enum MotionType { STRAIGHT, RETURNING, ORBIT }
 @export var on_hit_slow: MovementSlowEffect
 ## 命中后施加的冻结；为空表示不冻结（T19）。
 @export var on_hit_freeze: FreezeEffect
+@export_group("分裂")
 ## 命中后分裂出的小弹体；为空表示不分裂（T19）。小弹体自身不应再配置分裂，避免递归。
 @export var split_projectile: ProjectileDefinition
 @export_range(0, 32, 1) var split_count: int = 0

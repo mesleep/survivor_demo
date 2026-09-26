@@ -48,6 +48,11 @@ func _test_ingame_settings_and_return() -> void:
 		controls._settings_panel._quit_button != null and controls._settings_panel._quit_button.visible,
 		"暂停菜单应显示退出游戏按钮。"
 	)
+	_expect(
+		not controls._settings_panel._reset_button.visible
+		and not controls._settings_panel._tools_button.visible,
+		"暂停菜单不应显示重置存档与工作台。"
+	)
 	controls.toggle_pause()
 	_expect(not paused and not controls._settings_panel.is_open(), "再次 Esc 应恢复并关闭设置。")
 
@@ -70,6 +75,14 @@ func _test_menu_settings() -> void:
 	_expect(menu.quit_button != null and menu.quit_button.visible, "主菜单应显示退出游戏按钮。")
 	menu._on_settings_pressed()
 	_expect(menu._settings_panel.is_open(), "主菜单设置应能打开。")
+	_expect(
+		menu._settings_panel._reset_button.visible and menu._settings_panel._tools_button.visible,
+		"主菜单设置应显示重置存档与工作台。"
+	)
+	_expect(
+		menu._settings_panel._reset_confirm != null,
+		"重置存档应有确认框。"
+	)
 	menu._on_menu_mute_toggled(true)
 	_expect(menu.get_preferred_muted(), "主菜单应记录静音偏好。")
 	menu.queue_free()

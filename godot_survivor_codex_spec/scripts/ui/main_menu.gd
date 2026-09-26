@@ -6,6 +6,8 @@ class_name MainMenu
 extends Control
 
 signal start_requested(loadout: RunLoadout)
+signal reset_requested
+signal tools_requested
 
 const BUTTON_NORMAL: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_normal.tres")
 const BUTTON_HOVER: StyleBox = preload("res://data/visuals/v2_dark_comic/menu_button_hover.tres")
@@ -67,7 +69,17 @@ func _on_settings_pressed() -> void:
 		_settings_panel.initialize(_menu_muted, false)
 		_settings_panel.mute_toggled.connect(_on_menu_mute_toggled)
 		_settings_panel.quit_requested.connect(_on_quit_pressed)
+		_settings_panel.reset_requested.connect(_on_reset_pressed)
+		_settings_panel.tools_requested.connect(_on_tools_pressed)
 	_settings_panel.open()
+
+
+func _on_reset_pressed() -> void:
+	reset_requested.emit()
+
+
+func _on_tools_pressed() -> void:
+	tools_requested.emit()
 
 
 func _on_menu_mute_toggled(muted: bool) -> void:

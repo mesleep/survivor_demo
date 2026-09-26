@@ -7,9 +7,11 @@ extends Resource
 
 enum Attribute { MOVE_SPEED, DAMAGE, REGENERATION, LIFESTEAL, DEFENSE }
 
+@export_group("基础信息")
 @export var id: StringName
 @export var display_name: String
 @export var attribute: Attribute = Attribute.MOVE_SPEED
+@export_group("数值与价格")
 ## 每级增量：移速/伤害/吸血为比例，每秒恢复为点数/秒，防御为点数。
 @export_range(0.0, 100.0, 0.01) var per_level_value: float = 0.05
 @export_range(1, 20, 1) var max_level: int = 5

@@ -5,6 +5,7 @@
 class_name DifficultyStage
 extends Resource
 
+@export_group("难度阶段")
 @export_range(0.0, 3600.0, 1.0) var start_time_seconds: float = 0.0
 @export_range(0.05, 60.0, 0.05) var spawn_interval_seconds: float = 1.0
 @export_range(1, 100, 1) var batch_size: int = 1

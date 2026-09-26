@@ -11,8 +11,10 @@ enum TargetMode { NEAREST, RANDOM }
 ## 攻击形态：发射弹体；或在目标方向做一次近战扇形斩击（T32）。
 enum AttackMode { PROJECTILE, MELEE_FAN }
 
+@export_group("基础信息")
 @export var id: StringName
 @export var display_name: String
+@export_group("表现与素材")
 ## 装备栏图标；为空时回退到武器动画首帧（T33）。
 @export var icon: Texture2D
 ## 解锁所需金币；0 表示默认解锁（T29）。
@@ -23,6 +25,7 @@ enum AttackMode { PROJECTILE, MELEE_FAN }
 @export var visual_frames: SpriteFrames
 ## 手持武器显示缩放（可配置，避免在控制器里写死）。
 @export_range(0.02, 2.0, 0.01) var visual_scale: float = 0.22
+@export_group("开火参数")
 @export var projectile_definition: ProjectileDefinition
 @export_range(0.02, 60.0, 0.01) var cooldown_seconds: float = 1.0
 @export_range(1, 100, 1) var projectile_count: int = 1
@@ -36,9 +39,11 @@ enum AttackMode { PROJECTILE, MELEE_FAN }
 @export_range(1.0, 20.0, 0.1) var charge_damage_multiplier: float = 1.0
 ## 索敌方式；RANDOM 时每一发各自从 TargetingService 候选中随机取目标。
 @export var target_mode: TargetMode = TargetMode.NEAREST
+@export_group("交替弹体")
 ## 交替攻击弹体（T25 激光）：每次开火在主弹体与该弹体之间交替；为空则只发主弹体。
 @export var alternate_projectile_definition: ProjectileDefinition
 @export_range(1, 100, 1) var alternate_projectile_count: int = 1
+@export_group("近战扇形")
 ## 攻击形态；MELEE_FAN 时不发射弹体，改为扇形范围斩击。
 @export var attack_mode: AttackMode = AttackMode.PROJECTILE
 ## 近战扇形参数（MELEE_FAN 使用）。

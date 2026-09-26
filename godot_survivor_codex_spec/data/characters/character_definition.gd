@@ -6,16 +6,19 @@
 class_name CharacterDefinition
 extends Resource
 
+@export_group("基础信息")
 @export var id: StringName
 @export var display_name: String
 @export var scene: PackedScene
 @export_range(1.0, 10000.0, 1.0) var max_health: float = 100.0
 @export_range(0.0, 2000.0, 1.0) var move_speed: float = 220.0
+@export_group("战斗属性")
 ## Camera2D 缩放；小于 1 可看到更大的世界范围，大于 1 则拉近视野。
 @export_range(0.25, 2.0, 0.05) var camera_zoom: float = 0.75
 @export_range(1.0, 5000.0, 1.0) var base_attack_range: float = 1000.0
 @export_range(0.0, 2000.0, 1.0) var pickup_radius: float = 96.0
 @export var starting_weapons: Array[WeaponDefinition] = []
+@export_group("解锁与被动")
 ## 解锁所需金币；0 表示默认解锁（T29）。
 @export_range(0, 1000000, 1) var unlock_cost: int = 0
 ## 角色被动：对带 passive_weapon_tag 标签的武器提供的伤害倍率增量（T31）。

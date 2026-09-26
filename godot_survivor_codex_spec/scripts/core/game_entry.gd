@@ -23,6 +23,7 @@ var permanent_catalog: PermanentUpgradeCatalog
 
 var _menu: MainMenu
 var _session: GameSession
+var _workbench: Node
 var _status_text: String = ""
 
 
@@ -59,6 +60,7 @@ func _free_character_ids() -> Array[StringName]:
 	return ids
 
 
+## 默认解锁：价格为 0 的武器，以及免费角色的起始武器（保证新档可开局）。
 func _free_weapon_ids() -> Array[StringName]:
 	var ids: Array[StringName] = []
 	if not is_instance_valid(catalog):
@@ -66,6 +68,12 @@ func _free_weapon_ids() -> Array[StringName]:
 	for weapon: WeaponDefinition in catalog.weapons:
 		if weapon != null and weapon.unlock_cost == 0:
 			ids.append(weapon.id)
+	for character: CharacterDefinition in catalog.characters:
+		if character == null or character.unlock_cost != 0:
+			continue
+		for weapon: WeaponDefinition in character.starting_weapons:
+			if weapon != null and not ids.has(weapon.id):
+				ids.append(weapon.id)
 	return ids
 
 
@@ -94,6 +102,8 @@ func show_menu() -> void:
 	_menu.catalog = catalog
 	_menu.configure_profile(profile, unlock_service, permanent_catalog)
 	_menu.start_requested.connect(_on_start_requested)
+	_menu.reset_requested.connect(_on_menu_reset_requested)
+	_menu.tools_requested.connect(_on_menu_tools_requested)
 	if _remembered_loadout != null:
 		_menu.preselect(_remembered_loadout)
 	add_child(_menu)
@@ -101,9 +111,60 @@ func show_menu() -> void:
 		_menu.set_status(_status_text)
 
 
-## 清空记忆的配置，仅供测试或未来的“重置进度”使用。
+## 清空记忆的配置，仅供测试或“重置进度”使用。
 static func clear_remembered_loadout() -> void:
 	_remembered_loadout = null
+
+
+## 重置存档：删除正式/临时/备份档并恢复默认档案（只解锁免费内容、金币清零）。
+func reset_profile() -> void:
+	if profile_store == null:
+		return
+	profile_store.delete_save()
+	profile = profile_store.load_profile()
+	unlock_service = UnlockService.new(profile, profile_store)
+	clear_remembered_loadout()
+	_status_text = "存档已重置：金币、解锁与永久强化已恢复初始状态。"
+	if is_instance_valid(_menu):
+		_menu.configure_profile(profile, unlock_service, permanent_catalog)
+		_menu.set_status(_status_text)
+	else:
+		show_menu()
+
+
+func _on_menu_reset_requested() -> void:
+	reset_profile()
+
+
+func _on_menu_tools_requested() -> void:
+	_open_config_workbench()
+
+
+## 打开数值/素材工作台；工作台以覆盖层形式挂在入口下，关闭后回到主菜单。
+func _open_config_workbench() -> void:
+	if is_instance_valid(_workbench):
+		_workbench.visible = true
+		return
+	var scene: PackedScene = load("res://scenes/tools/config_workbench.tscn") as PackedScene
+	if scene == null:
+		_status_text = "工作台场景缺失。"
+		if is_instance_valid(_menu):
+			_menu.set_status(_status_text)
+		return
+	_workbench = scene.instantiate()
+	if _workbench is CanvasLayer:
+		(_workbench as CanvasLayer).layer = 20
+	elif _workbench is Control:
+		(_workbench as Control).set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_workbench)
+	if _workbench.has_signal("closed"):
+		_workbench.connect("closed", _on_workbench_closed)
+
+
+func _on_workbench_closed() -> void:
+	if is_instance_valid(_workbench):
+		_workbench.queue_free()
+	_workbench = null
 
 
 func get_active_session() -> GameSession:

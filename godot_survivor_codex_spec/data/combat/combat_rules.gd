@@ -6,6 +6,7 @@
 class_name CombatRules
 extends Resource
 
+@export_group("战斗上限")
 ## 防御后的最低伤害比例：实际伤害 = max(原始 - 防御, 原始 × 该比例)。
 @export_range(0.0, 1.0, 0.01) var minimum_damage_ratio: float = 0.1
 @export_range(0.0, 1.0, 0.01) var max_dodge_chance: float = 0.75
